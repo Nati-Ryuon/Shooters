@@ -178,7 +178,6 @@
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="Golem.h" />
     <ClInclude Include="Kuratas.h" />
-    <ClInclude Include="list.h" />
     <ClInclude Include="Random.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="shooter.h" />

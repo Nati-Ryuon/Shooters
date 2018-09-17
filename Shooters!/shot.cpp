@@ -127,7 +127,7 @@ int ShotGraph[ShotGraphMax];
 int ShotInit(){
 
 	ShotReadFromFile( "ShotTypeData.csv" );
-
+	
 	ShotGraph[Red] = LoadGraph( "./Shot/dot_red_x16.png" );
 	ShotGraph[Orange] = LoadGraph( "./Shot/dot_orange_x16.png" );
 	ShotGraph[Yellow] = LoadGraph( "./Shot/dot_yellow_x16.png" );

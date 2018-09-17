@@ -1,5 +1,5 @@
-#ifndef LIST_H
-#define LIST_H
+#ifndef DATA_H
+#define DATA_H
 
 #include <list>
 

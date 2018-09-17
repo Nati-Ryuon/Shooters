@@ -137,9 +137,6 @@
     <ClInclude Include="main.h">
       <Filter>ヘッダー ファイル\ナティ</Filter>
     </ClInclude>
-    <ClInclude Include="list.h">
-      <Filter>ヘッダー ファイル\ナティ</Filter>
-    </ClInclude>
     <ClInclude Include="help.h">
       <Filter>ヘッダー ファイル\ナティ</Filter>
     </ClInclude>
