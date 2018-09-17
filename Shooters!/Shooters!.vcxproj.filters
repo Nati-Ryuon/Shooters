@@ -1,0 +1,166 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ソース ファイル">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="ヘッダー ファイル">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="リソース ファイル">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="ソース ファイル\リュオン">
+      <UniqueIdentifier>{c99b9f5d-e47b-4212-b2dc-05fdb0073e2e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\ナティ">
+      <UniqueIdentifier>{7e254535-b83e-4c09-8c40-ac72bbb43b49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\ナティ">
+      <UniqueIdentifier>{eb218ab5-7a71-41b9-801a-cbb938092b51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\リュオン">
+      <UniqueIdentifier>{08a9574e-bf7b-4e87-882e-6b42442c2b5e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="CollisionControl.cpp">
+      <Filter>ソース ファイル\リュオン</Filter>
+    </ClCompile>
+    <ClCompile Include="CollisionDetection.cpp">
+      <Filter>ソース ファイル\リュオン</Filter>
+    </ClCompile>
+    <ClCompile Include="enemyShot.cpp">
+      <Filter>ソース ファイル\リュオン</Filter>
+    </ClCompile>
+    <ClCompile Include="GameScene.cpp">
+      <Filter>ソース ファイル\リュオン</Filter>
+    </ClCompile>
+    <ClCompile Include="Golem.cpp">
+      <Filter>ソース ファイル\リュオン</Filter>
+    </ClCompile>
+    <ClCompile Include="Item.cpp">
+      <Filter>ソース ファイル\リュオン</Filter>
+    </ClCompile>
+    <ClCompile Include="Kuratas.cpp">
+      <Filter>ソース ファイル\リュオン</Filter>
+    </ClCompile>
+    <ClCompile Include="Random.cpp">
+      <Filter>ソース ファイル\リュオン</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneManager.cpp">
+      <Filter>ソース ファイル\リュオン</Filter>
+    </ClCompile>
+    <ClCompile Include="TitleScene.cpp">
+      <Filter>ソース ファイル\リュオン</Filter>
+    </ClCompile>
+    <ClCompile Include="Vec2.cpp">
+      <Filter>ソース ファイル\リュオン</Filter>
+    </ClCompile>
+    <ClCompile Include="ZakoEnemy.cpp">
+      <Filter>ソース ファイル\リュオン</Filter>
+    </ClCompile>
+    <ClCompile Include="skill.cpp">
+      <Filter>ソース ファイル\ナティ</Filter>
+    </ClCompile>
+    <ClCompile Include="shot.cpp">
+      <Filter>ソース ファイル\ナティ</Filter>
+    </ClCompile>
+    <ClCompile Include="shooter.cpp">
+      <Filter>ソース ファイル\ナティ</Filter>
+    </ClCompile>
+    <ClCompile Include="player.cpp">
+      <Filter>ソース ファイル\ナティ</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>ソース ファイル\ナティ</Filter>
+    </ClCompile>
+    <ClCompile Include="help.cpp">
+      <Filter>ソース ファイル\ナティ</Filter>
+    </ClCompile>
+    <ClCompile Include="ArchGolem.cpp">
+      <Filter>ソース ファイル\リュオン</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CollisionCell.h">
+      <Filter>ヘッダー ファイル\リュオン</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionControl.h">
+      <Filter>ヘッダー ファイル\リュオン</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionDetection.h">
+      <Filter>ヘッダー ファイル\リュオン</Filter>
+    </ClInclude>
+    <ClInclude Include="GameScene.h">
+      <Filter>ヘッダー ファイル\リュオン</Filter>
+    </ClInclude>
+    <ClInclude Include="Golem.h">
+      <Filter>ヘッダー ファイル\リュオン</Filter>
+    </ClInclude>
+    <ClInclude Include="Item.h">
+      <Filter>ヘッダー ファイル\リュオン</Filter>
+    </ClInclude>
+    <ClInclude Include="Kuratas.h">
+      <Filter>ヘッダー ファイル\リュオン</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager.h">
+      <Filter>ヘッダー ファイル\リュオン</Filter>
+    </ClInclude>
+    <ClInclude Include="Random.h">
+      <Filter>ヘッダー ファイル\リュオン</Filter>
+    </ClInclude>
+    <ClInclude Include="TitleScene.h">
+      <Filter>ヘッダー ファイル\リュオン</Filter>
+    </ClInclude>
+    <ClInclude Include="Vec2.h">
+      <Filter>ヘッダー ファイル\リュオン</Filter>
+    </ClInclude>
+    <ClInclude Include="ZakoEnemy.h">
+      <Filter>ヘッダー ファイル\ナティ</Filter>
+    </ClInclude>
+    <ClInclude Include="skill.h">
+      <Filter>ヘッダー ファイル\ナティ</Filter>
+    </ClInclude>
+    <ClInclude Include="shot.h">
+      <Filter>ヘッダー ファイル\ナティ</Filter>
+    </ClInclude>
+    <ClInclude Include="shooter.h">
+      <Filter>ヘッダー ファイル\ナティ</Filter>
+    </ClInclude>
+    <ClInclude Include="player.h">
+      <Filter>ヘッダー ファイル\ナティ</Filter>
+    </ClInclude>
+    <ClInclude Include="main.h">
+      <Filter>ヘッダー ファイル\ナティ</Filter>
+    </ClInclude>
+    <ClInclude Include="list.h">
+      <Filter>ヘッダー ファイル\ナティ</Filter>
+    </ClInclude>
+    <ClInclude Include="help.h">
+      <Filter>ヘッダー ファイル\ナティ</Filter>
+    </ClInclude>
+    <ClInclude Include="data.h">
+      <Filter>ヘッダー ファイル\ナティ</Filter>
+    </ClInclude>
+    <ClInclude Include="ArchGolem.h">
+      <Filter>ヘッダー ファイル\リュオン</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Prim_Graph.bmp">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="Prim_Icon.bmp">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resorce.rc">
+      <Filter>リソース ファイル</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>
