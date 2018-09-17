@@ -322,17 +322,17 @@ void RainbowShotEnd(){
 
 //ハイパーレイ用宣言領域
 
-int Count;
-int timer;
-int ExtendTime;
-int delay;
+int HRcount;
+int HRtimer;
+int HRExtendTime;
+int HRdelay;
 int HRLight;//レーザーの根元の光
 int HR1;//レーザーの下地
 int HR2;//レーザーの上(加算)
-bool draw;//描画するかを制御
+bool HRdraw;//描画するかを制御
 int HRWidth;
 int HRHeight;
-float ExRate;
+float HRExRate;
 
 //----
 
@@ -341,13 +341,13 @@ void HyperRayInit( PLAYER *player ){
 	player -> can_move = 0;
 	player -> shoot_flag = 0;//ショット撃てないようにするフラグ
 	
-	Count = delay = 15;
-	draw = 0;
+	HRcount = HRdelay = 15;
+	HRdraw = 0;
 
-	timer = 300;//点滅終了後から300Fで終了
-	ExtendTime = 240;//timerが240Fになった時点で展開終了
+	HRtimer = 300;//点滅終了後から300Fで終了
+	HRExtendTime = 240;//HRtimerが240Fになった時点で展開終了
 
-	ExRate = player -> level;
+	HRExRate = player -> level;
 
 	HRLight = LoadGraph( "./Skill/HyperRayLight.png" );
 	HR1 = LoadGraph( "./Skill/HyperRay1.png" );
@@ -359,44 +359,44 @@ void HyperRayInit( PLAYER *player ){
 
 void HyperRayUpdate(){
 
-	if( Count == 0 && delay > 0 ){
-		draw = draw ^ 1;//排他的論理和によって1と0を切り替え
-		Count += delay;
-		delay -= 1;
+	if( HRcount == 0 && HRdelay > 0 ){
+		HRdraw = HRdraw ^ 1;//排他的論理和によって1と0を切り替え
+		HRcount += HRdelay;
+		HRdelay -= 1;
 	}else
-		Count--;
+		HRcount--;
 
-	if( delay == 0 ){
-		draw = 1;
-		timer--;
+	if( HRdelay == 0 ){
+		HRdraw = 1;
+		HRtimer--;
 	}
 
-	if( timer == 0 )
+	if( HRtimer == 0 )
 		SkillEnd();
 }
 
 void HyperRayDraw(){
 
-	if( draw == 1 ){
+	if( HRdraw == 1 ){
 		DrawRotaGraphF( owner -> pos.x, owner -> pos.y - MAINSCREEN_HEIGHT / 2, 1.0, 0, HR1, 1 );
 	}
 
-	if( delay == 0 ){
+	if( HRdelay == 0 ){
 		SetDrawBlendMode( DX_BLENDMODE_ADD, 255 );
 		
 		float ex_width;
-		if( timer > 240 )
-			ex_width = 1.f + ExRate / 60.f * (float)(300 - timer);
+		if( HRtimer > 240 )
+			ex_width = 1.f + HRExRate / 60.f * (float)(300 - HRtimer);
 		else
-			ex_width = ExRate + 1.0;
+			ex_width = HRExRate + 1.0;
 		DrawExtendGraphF( owner -> pos.x - HRWidth / 2 * ex_width, owner -> pos.y - HRHeight - 32, owner -> pos.x + HRWidth / 2 * ex_width, owner -> pos.y - 32, HR1, 1 );
 		DrawExtendGraphF( owner -> pos.x - HRWidth / 2 * ex_width, owner -> pos.y - HRHeight - 32, owner -> pos.x + HRWidth / 2 * ex_width, owner -> pos.y - 32, HR2, 1 );
 		DrawRotaGraphF( owner -> pos.x, owner -> pos.y - 32, 1.0, 0, HRLight, 1 );
 	}
 	
-	if( timer < 240 && (timer % 2) == 1 ){
-		//目がチカチカするようなら(timer % 2)の部分を消せばよいよ
-		DrawExtendGraphF( owner -> pos.x - HRWidth / 2 * (1.0+ExRate), owner -> pos.y - HRHeight - 32, owner -> pos.x + HRWidth / 2 * (1.0+ExRate), owner -> pos.y - 32, HR2, 1 );
+	if( HRtimer < 240 && (HRtimer % 2) == 1 ){
+		//目がチカチカするようなら(HRtimer % 2)の部分を消せばよいよ
+		DrawExtendGraphF( owner -> pos.x - HRWidth / 2 * (1.0+HRExRate), owner -> pos.y - HRHeight - 32, owner -> pos.x + HRWidth / 2 * (1.0+HRExRate), owner -> pos.y - 32, HR2, 1 );
 	}
 
 	SetDrawBlendMode( DX_BLENDMODE_NOBLEND, 255 );

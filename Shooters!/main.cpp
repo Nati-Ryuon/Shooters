@@ -16,7 +16,6 @@ extern unsigned int KeyState[256];
 extern unsigned int MouseLeftClick, MouseRightClick, MouseMiddleClick;
 extern int MouseX, MouseY;
 
-
 char end_flag = 0;
 int ProgramStartTime;
 
@@ -36,6 +35,7 @@ int WINAPI WinMain(HINSTANCE,HINSTANCE,LPSTR,int){
 	SetGraphMode( MAINSCREEN_WIDTH, MAINSCREEN_HEIGHT, 32 );
 	SetWindowSizeChangeEnableFlag( TRUE );
 	ChangeWindowMode( TRUE );
+	SetWindowIconID(101);
 	SetOutApplicationLogValidFlag( FALSE );
 	DxLib_Init();
 	SetDrawScreen( DX_SCREEN_BACK );
@@ -51,7 +51,7 @@ int WINAPI WinMain(HINSTANCE,HINSTANCE,LPSTR,int){
 
 	ShooterInit();
 	ShotInit();
-	PlayerInit( 0, Ash );
+	PlayerInit( 0, Abel );
 	loadZakoEnemyGraph();
 	loadKuratasGraph();
 	loadGolemGraph();
@@ -86,11 +86,19 @@ int WINAPI WinMain(HINSTANCE,HINSTANCE,LPSTR,int){
 			end_flag = 1;
 		*/
 
-		SetMousePoint( MAINSCREEN_WIDTH / 2, MAINSCREEN_HEIGHT / 2 );
+		if( GetWindowActiveFlag() == 1 ){
+			if( MouseX < 0 )
+				SetMousePoint(0, MouseY);
+			if( MouseY < 0 )
+				SetMousePoint(MouseX, 0);
+			if( MouseX > MAINSCREEN_WIDTH )
+				SetMousePoint(MAINSCREEN_WIDTH, MouseY);
+			if( MouseY > MAINSCREEN_HEIGHT )
+				SetMousePoint(MouseX, MAINSCREEN_HEIGHT);
+		}
 
 		updateSceneManager();
 		drawSceneManager();
-
 		
 		if( KeyState[KEY_INPUT_ESCAPE] == 1 )
 			end_flag = 1;
@@ -124,7 +132,9 @@ bool FPSUpdate(){
 }
 
 void FPSDraw(){
-	DrawFormatString(0, 0, GetColor(255,255,255), "%.1f", mFps);
+	char titlebar[30];
+	sprintf_s(titlebar, "Shooters!  [%f f]", mFps);
+	SetMainWindowText(titlebar);
 }
 
 void FPSWait(){
