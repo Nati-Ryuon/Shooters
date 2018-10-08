@@ -30,18 +30,18 @@ unsigned char MOVE_UP = KEY_INPUT_W;
 unsigned char MOVE_DOWN = KEY_INPUT_S;
 unsigned char SHOOT = KEY_INPUT_SPACE;
 
-unsigned int ColorRed = GetColor( 255, 0, 0 );
-unsigned int ColorBlue = GetColor( 0, 0, 255 );
-unsigned int ColorLBlue = GetColor( 100, 200, 255 );
-unsigned int ColorGreen = GetColor( 0, 255, 0 );
-unsigned int ColorWhite = GetColor( 255, 255, 255 );
+const unsigned int ColorRed = GetColor( 255, 0, 0 );
+const unsigned int ColorBlue = GetColor( 0, 0, 255 );
+const unsigned int ColorLBlue = GetColor( 100, 200, 255 );
+const unsigned int ColorGreen = GetColor( 0, 255, 0 );
+const unsigned int ColorWhite = GetColor( 255, 255, 255 );
 
 PLAYER Players[PLAYER_MAX];
 char player_num = 1;//プレイヤー人数
 
 bool DoubleShotFlag = 0;//1ならDoubleShot中(ShotMakeに渡す座標をずらす)
 
-int PlayerShot( Player *player );
+//int PlayerShot( Player *player );
 void PlayerLevelUp( Player *player );
 void PlayerLevelDown( Player *player );
 

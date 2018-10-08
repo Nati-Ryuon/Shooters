@@ -2,6 +2,7 @@
 
 enum Scene {
 	TITLE,
+	CHARACTER_SELECT,
 	GAME,
 	RESULT
 };

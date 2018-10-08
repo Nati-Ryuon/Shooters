@@ -119,9 +119,6 @@
     <ClInclude Include="Vec2.h">
       <Filter>ヘッダー ファイル\リュオン</Filter>
     </ClInclude>
-    <ClInclude Include="ZakoEnemy.h">
-      <Filter>ヘッダー ファイル\ナティ</Filter>
-    </ClInclude>
     <ClInclude Include="skill.h">
       <Filter>ヘッダー ファイル\ナティ</Filter>
     </ClInclude>
@@ -144,6 +141,9 @@
       <Filter>ヘッダー ファイル\ナティ</Filter>
     </ClInclude>
     <ClInclude Include="ArchGolem.h">
+      <Filter>ヘッダー ファイル\リュオン</Filter>
+    </ClInclude>
+    <ClInclude Include="ZakoEnemy.h">
       <Filter>ヘッダー ファイル\リュオン</Filter>
     </ClInclude>
   </ItemGroup>

@@ -11,6 +11,8 @@ void drawSceneManager(){
 	case TITLE:
 		drawTitle();
 		break;
+	case CHARACTER_SELECT:
+		break;
 	case GAME:
 		drawGame();
 		break;
@@ -27,6 +29,8 @@ void updateSceneManager() {
 	case TITLE:
 		updateTitle();
 		break;
+	case CHARACTER_SELECT:
+		break;
 	case GAME:
 		updateGame();
 		break;
@@ -40,7 +44,23 @@ void updateSceneManager() {
 //シーン変更用の関数
 void changeScene(const Scene nextScene){
 	scene = nextScene;
+	/*
 	if (nextScene == GAME) {
 		initStage();
+	}
+	*/
+	switch (scene) {
+	case TITLE:
+		initTitle();
+		break;
+	case CHARACTER_SELECT:
+		break;
+	case GAME:
+		initStage();
+		break;
+	case RESULT:
+		break;
+	default:
+		break;
 	}
 }

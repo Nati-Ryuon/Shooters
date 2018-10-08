@@ -56,8 +56,7 @@ int WINAPI WinMain(HINSTANCE,HINSTANCE,LPSTR,int){
 	loadKuratasGraph();
 	loadGolemGraph();
 	loadArchGolemGraph();
-	
-
+	changeScene(TITLE);
 
 	//PlayerInit( 0, Prim );
 	//PlayerInit( 1, Rupi );

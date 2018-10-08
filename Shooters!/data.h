@@ -49,7 +49,8 @@ enum ShooterName{
 	Alice,
 	Nati,
 	Ryuon,
-	Abel
+	Abel,
+	ShooterEnd
 };
 
 struct Vec2 {
