@@ -150,6 +150,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ArchGolem.cpp" />
+    <ClCompile Include="CharacterSelect.cpp" />
     <ClCompile Include="CollisionControl.cpp" />
     <ClCompile Include="CollisionDetection.cpp" />
     <ClCompile Include="enemyShot.cpp" />
@@ -171,6 +172,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArchGolem.h" />
+    <ClInclude Include="CharacterSelect.h" />
     <ClInclude Include="CollisionCell.h" />
     <ClInclude Include="CollisionControl.h" />
     <ClInclude Include="CollisionDetection.h" />

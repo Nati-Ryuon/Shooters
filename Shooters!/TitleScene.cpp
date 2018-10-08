@@ -42,8 +42,21 @@ void drawTitle(){
 
 //タイトルの処理
 void updateTitle(){
-	if (KeyState[KEY_INPUT_RETURN] > 0) {//エンターでゲーム画面
-		changeScene(GAME);
+	if (KeyState[KEY_INPUT_ESCAPE] == 1) {
+		endMain();
+	}
+
+	if (KeyState[KEY_INPUT_RETURN] == 1) {//エンターでゲーム画面
+		//changeScene(GAME);
+		for (int i = 0; i < WALKER_MAX; i++) {
+			if (walker[i].exist == FALSE) continue;
+			DeleteGraph(walker[i].ghundle[0]);
+			DeleteGraph(walker[i].ghundle[1]);
+			DeleteGraph(walker[i].ghundle[2]);
+			DeleteGraph(walker[i].srcgraph);
+		}
+		walker_num = 0;
+		changeScene(CHARACTER_SELECT);
 	}
 	makeWalker();
 	updateWalker();

@@ -15,6 +15,7 @@
 extern unsigned int KeyState[256];
 extern unsigned int MouseLeftClick, MouseRightClick, MouseMiddleClick;
 extern int MouseX, MouseY;
+//extern Scene scene;
 
 char end_flag = 0;
 int ProgramStartTime;
@@ -51,7 +52,7 @@ int WINAPI WinMain(HINSTANCE,HINSTANCE,LPSTR,int){
 
 	ShooterInit();
 	ShotInit();
-	PlayerInit( 0, Abel );
+	//PlayerInit( 0, Abel );
 	loadZakoEnemyGraph();
 	loadKuratasGraph();
 	loadGolemGraph();
@@ -99,7 +100,7 @@ int WINAPI WinMain(HINSTANCE,HINSTANCE,LPSTR,int){
 		updateSceneManager();
 		drawSceneManager();
 		
-		if( KeyState[KEY_INPUT_ESCAPE] == 1 )
+		if( KeyState[KEY_INPUT_ESCAPE] == 30 )
 			end_flag = 1;
 
 		if( end_flag )
@@ -142,4 +143,8 @@ void FPSWait(){
 	if( waitTime > 0 ){
 		WaitTimer(waitTime);	//‘Ò‹@
 	}
+}
+
+void endMain() {
+	end_flag = 1;
 }

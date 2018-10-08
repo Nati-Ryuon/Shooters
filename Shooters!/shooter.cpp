@@ -23,6 +23,7 @@ void ShooterInit(){
 
 	//プリム※ショットタイプ＆必殺技確定
 	name = Prim;
+	Shooters[name].sn = name;
 	sprintf_s( Shooters[name].Name, "Prim" );
 
 	//アイコン
@@ -47,6 +48,7 @@ void ShooterInit(){
 
 	//ルピ※ショットタイプ＆必殺技確定
 	name = Rupi;
+	Shooters[name].sn = name;
 	sprintf_s( Shooters[name].Name, "Rupi" );
 
 	//アイコン
@@ -71,6 +73,7 @@ void ShooterInit(){
 
 	//シエル※ショットタイプ＆必殺技確定
 	name = Ciel;
+	Shooters[name].sn = name;
 	sprintf_s( Shooters[name].Name, "Ciel" );
 
 	//アイコン
@@ -95,6 +98,7 @@ void ShooterInit(){
 
 	//アッシュ※ショットタイプ＆必殺技確定
 	name = Ash;
+	Shooters[name].sn = name;
 	sprintf_s( Shooters[name].Name, "Ash" );
 
 	//アイコン
@@ -119,6 +123,7 @@ void ShooterInit(){
 
 	//マスター※ショットタイプ確定
 	name = Master;
+	Shooters[name].sn = name;
 	sprintf_s( Shooters[name].Name, "Master" );
 
 	//アイコン
@@ -143,6 +148,7 @@ void ShooterInit(){
 
 	//カリン
 	name = Karin;
+	Shooters[name].sn = name;
 	sprintf_s( Shooters[name].Name, "Karin" );
 
 	//アイコン
@@ -167,6 +173,7 @@ void ShooterInit(){
 
 	//アリス※必殺技確定
 	name = Alice;
+	Shooters[name].sn = name;
 	sprintf_s( Shooters[name].Name, "Alice" );
 
 	//アイコン
@@ -191,6 +198,7 @@ void ShooterInit(){
 
 	//ナティ※必殺技確定
 	name = Nati;
+	Shooters[name].sn = name;
 	sprintf_s( Shooters[name].Name, "Nati" );
 
 	//アイコン
@@ -215,6 +223,7 @@ void ShooterInit(){
 
 	//リュオン
 	name = Ryuon;
+	Shooters[name].sn = name;
 	sprintf_s( Shooters[name].Name, "Ryuon" );
 
 	//アイコン
@@ -239,6 +248,7 @@ void ShooterInit(){
 
 	//アベル※ショットタイプ＆必殺技確定
 	name = Abel;
+	Shooters[name].sn = name;
 	sprintf_s( Shooters[name].Name, "Abel" );
 
 	//アイコン

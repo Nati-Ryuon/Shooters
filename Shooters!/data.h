@@ -69,6 +69,7 @@ typedef struct Shooter{
 	int Graph[3];
 	float Speed;
 	int NeedMagicPoint;
+	ShooterName sn;
 	ShotTypeName st;
 	Skill SkillName;
 } SHOOTER;

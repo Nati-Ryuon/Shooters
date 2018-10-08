@@ -37,7 +37,9 @@ const unsigned int ColorGreen = GetColor( 0, 255, 0 );
 const unsigned int ColorWhite = GetColor( 255, 255, 255 );
 
 PLAYER Players[PLAYER_MAX];
-char player_num = 1;//プレイヤー人数
+
+//プレイヤー人数
+char player_num = 1;
 
 bool DoubleShotFlag = 0;//1ならDoubleShot中(ShotMakeに渡す座標をずらす)
 

@@ -1,6 +1,7 @@
 #include"SceneManager.h"
 #include "GameScene.h"
 #include "TitleScene.h"
+#include "CharacterSelect.h"
 
 static Scene scene = TITLE;
 
@@ -12,6 +13,7 @@ void drawSceneManager(){
 		drawTitle();
 		break;
 	case CHARACTER_SELECT:
+		drawCSelect();
 		break;
 	case GAME:
 		drawGame();
@@ -30,6 +32,7 @@ void updateSceneManager() {
 		updateTitle();
 		break;
 	case CHARACTER_SELECT:
+		updateCSelect();
 		break;
 	case GAME:
 		updateGame();
@@ -54,6 +57,7 @@ void changeScene(const Scene nextScene){
 		initTitle();
 		break;
 	case CHARACTER_SELECT:
+		initCSelect();
 		break;
 	case GAME:
 		initStage();

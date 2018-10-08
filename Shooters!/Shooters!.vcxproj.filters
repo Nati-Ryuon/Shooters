@@ -84,6 +84,9 @@
     <ClCompile Include="ArchGolem.cpp">
       <Filter>ソース ファイル\リュオン</Filter>
     </ClCompile>
+    <ClCompile Include="CharacterSelect.cpp">
+      <Filter>ソース ファイル\ナティ</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CollisionCell.h">
@@ -145,6 +148,9 @@
     </ClInclude>
     <ClInclude Include="ZakoEnemy.h">
       <Filter>ヘッダー ファイル\リュオン</Filter>
+    </ClInclude>
+    <ClInclude Include="CharacterSelect.h">
+      <Filter>ヘッダー ファイル\ナティ</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
