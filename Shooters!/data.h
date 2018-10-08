@@ -128,6 +128,8 @@ typedef struct Player{
 	bool shoot_flag;//0:Œ‚‚Ä‚È‚¢ 1:Œ‚‚Ä‚é
 	bool skill_flag;//1:ƒXƒLƒ‹”­“®’†
 	bool double_flag;//0:¶ 1:‰E
+	bool invincible;//0:•’Ê 1:–³“G
+	bool invisible;//0:•’Ê 1:Œ©‚¦‚È‚¢
 	unsigned char level;
 	unsigned int EXP;
 	float reload;

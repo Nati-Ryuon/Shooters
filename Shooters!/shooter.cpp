@@ -36,7 +36,7 @@ void ShooterInit(){
 	Shooters[name].Speed = 5.0;
 	
 	//必要ポイント
-	Shooters[name].NeedMagicPoint = 100;//10000
+	Shooters[name].NeedMagicPoint = 10000;//10000
 
 	//ショットタイプ
 	Shooters[name].st = Normal;
@@ -61,7 +61,7 @@ void ShooterInit(){
 	Shooters[name].Speed = 4.0;
 	
 	//必要ポイント
-	Shooters[name].NeedMagicPoint = 100;//7000
+	Shooters[name].NeedMagicPoint = 7000;//7000
 
 	//ショットタイプ
 	Shooters[name].st = Beam;
@@ -211,7 +211,7 @@ void ShooterInit(){
 	Shooters[name].Speed = 5.0;
 	
 	//必要ポイント
-	Shooters[name].NeedMagicPoint = 500;
+	Shooters[name].NeedMagicPoint = 15000;
 
 	//ショットタイプ
 	Shooters[name].st = Fireflower;
@@ -236,7 +236,7 @@ void ShooterInit(){
 	Shooters[name].Speed = 5.0;
 	
 	//必要ポイント
-	Shooters[name].NeedMagicPoint = 500;
+	Shooters[name].NeedMagicPoint = 15000;
 
 	//ショットタイプ
 	Shooters[name].st = Fireflower;
@@ -261,7 +261,7 @@ void ShooterInit(){
 	Shooters[name].Speed = 4.0;
 	
 	//必要ポイント
-	Shooters[name].NeedMagicPoint = 500;
+	Shooters[name].NeedMagicPoint = 20000;
 
 	//ショットタイプ
 	Shooters[name].st = Cross;

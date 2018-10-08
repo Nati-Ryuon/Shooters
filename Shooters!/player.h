@@ -15,6 +15,7 @@
 int PlayerInit( char player_number, ShooterName sn );
 int PlayerUpdate();
 int PlayerDraw();
+void damagePlayer(int PlayerNum);
 
 void PlayerShotTypeOverRide2( void (*func)( SHOTTYPE *st ), char player_bitflag );
 void PlayerShotTypeReset( char player_bitflag );

@@ -590,9 +590,11 @@ int OnTheFilmInit( PLAYER *player ){
 	player -> can_move = 0;
 	
 	player -> shoot_flag = 0;//ショット撃てないようにするフラグ
-	pre = player -> pos;//プレイヤーを画面外にテレポートさせた後に戻ってこさせるため。
-	player -> pos.x = MAINSCREEN_WIDTH / 2;//プレイヤーを見えない場所へ
-	player -> pos.y = MAINSCREEN_HEIGHT * 2;
+	//pre = player -> pos;//プレイヤーを画面外にテレポートさせた後に戻ってこさせるため。
+	//player -> pos.x = MAINSCREEN_WIDTH / 2;//プレイヤーを見えない場所へ
+	//player -> pos.y = MAINSCREEN_HEIGHT * 2;
+	player->invisible = 1;
+	player->invincible = 1;
 
 	film_pos_x = MAINSCREEN_WIDTH / 2;
 	film_pos_y = MAINSCREEN_HEIGHT / 2;
@@ -961,7 +963,9 @@ void OnTheFilmDraw(){
 void OnTheFilmEnd(){
 	owner -> can_move = 1;//動けるように
 	owner -> shoot_flag = 1;//ショット撃てるようにするフラグ
-	owner -> pos = pre;//プレイヤーを画面外にテレポートさせた後に戻ってこさせるため。
+	//owner -> pos = pre;//プレイヤーを画面外にテレポートさせた後に戻ってこさせるため。
+	owner->invincible = 0;
+	owner->invisible = 0;
 	DeleteGraph( GraphHandle );
 	DeleteGraph( PhotoHandle );
 }

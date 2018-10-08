@@ -2,7 +2,13 @@
 #include"Vec2.h"
 
 enum ItemType {
-	Item1
+	EXP,
+	Gem,
+	Item1,
+	Item2,
+	Item3,
+	Item4,
+	ItemTypeEnd
 };
 
 struct Item {
@@ -10,6 +16,7 @@ struct Item {
 	int range;
 	bool draw_flag;
 	int graph_handle;
+	int count;
 	ItemType type;//ƒAƒCƒeƒ€‚ÌŽí—Þ
 };
 

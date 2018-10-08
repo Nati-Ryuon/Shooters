@@ -49,7 +49,10 @@ void initStage() {
 	for (int i = 0; i < STAGE_NUM; i++) {
 		stage_counter[i] = 0;
 	}
+	kuratas.clear();
 	zakoenemy.clear();
+	golem.clear();
+	archgolem.clear();
 	current_stage = 1;
 	refresh_time = GetNowCount();
 	pop_flag = false;
@@ -88,13 +91,18 @@ void updateGame(){
 	}
 
 	//各オブジェクトの処理
-	int i;
+	//int i;
 	if (IntroFlag != 1) {
 		PlayerUpdate();
 		updateZakoEnemy(zakoenemy);
 		updateKuratas(kuratas);
 		updateGolem(golem, Players);
 		updateArchGolem(archgolem, Players);
+
+		if (KeyState[KEY_INPUT_ESCAPE] == 1) {
+
+			changeScene(TITLE);
+		}
 	}
 	else {
 		SkillIntroUpdate();
@@ -132,12 +140,13 @@ void Stage1(){
 }
 
 //当たり判定をまとめてるところ
-void CollisionControll(){
+void CollisionControll() {
 	int i;
 	bool break_flag = false;//多重ループ脱出用フラグ
 	list<Shot>::iterator shot_itr;
 	for (i = 0; i < PLAYER_MAX; i++) {
-		if (Players[i].alive == 1) {
+		if (Players[i].alive == 1 && Players[i].invisible == 0) {
+			//----------------------------------------
 			shot_itr = Players[i].shot.begin();
 			while (1) {
 			continueLabel:
@@ -165,8 +174,105 @@ void CollisionControll(){
 						}
 					}
 				}
+
+				//Golem
+				for (list<Golem>::iterator golem_itr = golem.begin(); golem_itr != golem.end(); golem_itr++) {
+					if (golem_itr->draw_flag == true) {
+						if (ShotCollisionDetection(*shot_itr, *golem_itr)) {
+							damageGolem(*golem_itr, shot_itr->damage);
+							shot_itr = Players[i].shot.erase(shot_itr);
+							goto continueLabel;
+						}
+					}
+				}
+
+				//ArchGolem
+				for (list<ArchGolem>::iterator archgolem_itr = archgolem.begin(); archgolem_itr != archgolem.end(); archgolem_itr++) {
+					if (archgolem_itr->draw_flag == true) {
+						if (ShotCollisionDetection(*shot_itr, *archgolem_itr)) {
+							damageArchGolem(*archgolem_itr, shot_itr->damage);
+							shot_itr = Players[i].shot.erase(shot_itr);
+							goto continueLabel;
+						}
+					}
+				}
 				shot_itr++;
 			}
+			//----------------------------------------
+			
+			for (list<Kuratas>::iterator kuratas_itr = kuratas.begin(); kuratas_itr != kuratas.end(); kuratas_itr++) {
+				if (kuratas_itr->draw_flag == true) {
+					if (CollisionDetection(Players[i], *kuratas_itr)) {
+						damagePlayer(i);
+						damageKuratas(*kuratas_itr, 10);//マジックナンバー、衝突時のダメージ
+						goto nextPlayer;
+					}
+					for (list<Shot>::iterator eshot_itr = kuratas_itr->shot.begin(); eshot_itr != kuratas_itr->shot.end();) {
+						if (ShotCollisionDetection(*eshot_itr, Players[i])) {
+							damagePlayer(i);
+							kuratas_itr->shot.erase(eshot_itr);
+							goto nextPlayer;
+						}
+						eshot_itr++;
+					}
+				}
+			}
+			
+			for (list<ZakoEnemy>::iterator zako_itr = zakoenemy.begin(); zako_itr != zakoenemy.end(); zako_itr++) {
+				if (zako_itr->draw_flag == true) {
+					if (CollisionDetection(Players[i], *zako_itr)) {
+						damagePlayer(i);
+						damageZakoEnemy(*zako_itr, 10);//マジックナンバー、衝突時のダメージ
+						goto nextPlayer;
+					}
+					for (list<Shot>::iterator eshot_itr = zako_itr->shot.begin(); eshot_itr != zako_itr->shot.end();) {
+						if (ShotCollisionDetection(*eshot_itr, Players[i])) {
+							damagePlayer(i);
+							eshot_itr = zako_itr->shot.erase(eshot_itr);
+							goto nextPlayer;
+						}
+						eshot_itr++;
+					}
+				}
+			}
+			
+			for (list<Golem>::iterator golem_itr = golem.begin(); golem_itr != golem.end(); golem_itr++) {
+				if (golem_itr->draw_flag == true) {
+					if (CollisionDetection(Players[i], *golem_itr)) {
+						damagePlayer(i);
+						damageGolem(*golem_itr, 10);//マジックナンバー、衝突時のダメージ
+						goto nextPlayer;
+					}
+					for (list<Shot>::iterator eshot_itr = golem_itr->shot.begin(); eshot_itr != golem_itr->shot.end();) {
+						if (ShotCollisionDetection(*eshot_itr, Players[i])) {
+							damagePlayer(i);
+							eshot_itr = golem_itr->shot.erase(eshot_itr);
+							goto nextPlayer;
+						}
+						eshot_itr++;
+					}
+				}
+			}
+			
+			for (list<ArchGolem>::iterator archgolem_itr = archgolem.begin(); archgolem_itr != archgolem.end(); archgolem_itr++) {
+				if (archgolem_itr->draw_flag == true) {
+					if (CollisionDetection(Players[i], *archgolem_itr)) {
+						damagePlayer(i);
+						damageArchGolem(*archgolem_itr, 10);//マジックナンバー、衝突時のダメージ
+						goto nextPlayer;
+					}
+					for (list<Shot>::iterator eshot_itr = archgolem_itr->shot.begin(); eshot_itr != archgolem_itr->shot.end();) {
+						if (ShotCollisionDetection(*eshot_itr, Players[i])) {
+							damagePlayer(i);
+							eshot_itr = archgolem_itr->shot.erase(eshot_itr);
+							goto nextPlayer;
+						}
+						eshot_itr++;
+					}
+				}
+			}
 		}
+	nextPlayer:
+		continue;
 	}
 }

@@ -37,6 +37,7 @@ const unsigned int ColorGreen = GetColor( 0, 255, 0 );
 const unsigned int ColorWhite = GetColor( 255, 255, 255 );
 
 PLAYER Players[PLAYER_MAX];
+//list<Player> PlayerList;
 
 //プレイヤー人数
 char player_num = 1;
@@ -63,7 +64,8 @@ int PlayerInit( char player_number, ShooterName name ){
 	//シューターのデータからショットタイプのデータを参照して保持する
 	Players[player_number].shottype = ShotType[(Players[player_number].shooter.st - 1) * SHOTTYPE_LEVELMAX];
 
-	Players[player_number].alive = 1;
+	Players[player_number].alive = TRUE;
+	Players[player_number].range = 12;//マジックナンバー
 
 	Players[player_number].EXP = 0;
 	Players[player_number].level = 1;
@@ -76,7 +78,7 @@ int PlayerInit( char player_number, ShooterName name ){
 	Players[player_number].can_move = 1;
 	Players[player_number].shoot_flag = 1;
 	Players[player_number].skill_flag = 0;
-
+	Players[player_number].invincible = 0;
 
 	sprintf_s( InstantFileName, "./Shooter/%s_Graph.png", Players[player_number].shooter.Name );
 
@@ -97,7 +99,8 @@ int PlayerDraw(){
 		if( Players[i1].alive ){
 
 			//プレイヤー描画
-			DrawRotaGraph( (int)Players[i1].pos.x, (int)Players[i1].pos.y, 1.0, 0, Players[i1].graph_handle, 1 );
+			if( Players[i1].invisible == 0 )
+				DrawRotaGraph( (int)Players[i1].pos.x, (int)Players[i1].pos.y, 1.0, 0, Players[i1].graph_handle, 1 );
 
 			//弾描画
 
@@ -196,19 +199,6 @@ int PlayerUpdate(){
 					Players[i1].reload--;
 			}
 
-			//ショット位置更新
-			/*
-			for( int i2 = 0; i2 < PLAYERSHOT_MAX; i2++ ){
-				if( Players[i1].shot[i2].shot_flag == 0 )
-					continue;
-				Players[i1].shot[i2].pos.x += Players[i1].shot[i2].speed.x;
-				Players[i1].shot[i2].pos.y -= Players[i1].shot[i2].speed.y;
-				//壁に到達したら消去
-				if( Players[i1].shot[i2].pos.x < 0 || Players[i1].shot[i2].pos.x > MAINSCREEN_WIDTH || Players[i1].shot[i2].pos.y < 0 || Players[i1].shot[i2].pos.y > MAINSCREEN_HEIGHT ){
-					Players[i1].shot[i2].shot_flag = 0;
-				}
-			}//死んだときに全部消す判定してね(まぁ消さなくていいならしなくてもいいけど)
-			*/
 			ShotUpdate( Players[i1].shot, Players[i1].shottype );
 
 
@@ -217,8 +207,12 @@ int PlayerUpdate(){
 
 		
 			//必殺技更新
-			if( Players[i1].magic_point < Players[i1].shooter.NeedMagicPoint && Players[i1].skill_flag == 0 )
-				Players[i1].magic_point++;
+			if (Players[i1].skill_flag == 0) {
+				if (Players[i1].magic_point < Players[i1].shooter.NeedMagicPoint)
+					Players[i1].magic_point++;
+				else
+					Players[i1].magic_point = Players[i1].shooter.NeedMagicPoint;
+			}
 
 			if( Players[i1].magic_point == Players[i1].shooter.NeedMagicPoint ){
 				if( KeyState[KEY_INPUT_Q] == 1 ){
@@ -241,9 +235,14 @@ int PlayerUpdate(){
 				PlayerLevelUp( &Players[i1] );
 			if( KeyState[KEY_INPUT_DOWN] == 1 )
 				PlayerLevelDown( &Players[i1] );
+			if (KeyState[KEY_INPUT_1] == 1)
+				Players[i1].invincible ^= 1;
+			if (KeyState[KEY_INPUT_2] == 1)
+				Players[i1].magic_point += 10000;
+			if (KeyState[KEY_INPUT_3] == 1)
+				Players[i1].invisible ^= 1;
 		}
 
-		
 	}
 
 	return 0;
@@ -275,6 +274,18 @@ void PlayerShotTypeOverRide2( void (*func)( SHOTTYPE *st ), char player_bitflag 
 			if( player_bitflag & (1 << i) )
 				func( &Players[i].shottype );
 	}
+}
+
+void damagePlayer( int PlayerNum ) {
+
+	if (Players[PlayerNum].invincible)
+		return;
+
+	for (list<SHOT>::iterator itr = Players[PlayerNum].shot.begin(); itr != Players[PlayerNum].shot.end();) {
+		itr = Players[PlayerNum].shot.erase(itr);
+	}
+	
+	Players[PlayerNum].alive = FALSE;
 }
 
 void PlayerDoubleShotStart(){
