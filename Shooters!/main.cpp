@@ -11,6 +11,7 @@
 #include "Kuratas.h"
 #include "Golem.h"
 #include "ArchGolem.h"
+#include "StrLikeExcel.h"
 
 extern unsigned int KeyState[256];
 extern unsigned int MouseLeftClick, MouseRightClick, MouseMiddleClick;
@@ -72,7 +73,11 @@ int WINAPI WinMain(HINSTANCE,HINSTANCE,LPSTR,int){
 
 	ProgramStartTime = GetNowCount();
 
+	char test[] = "abcde";
+
 	while( ScreenFlip()==0 && ProcessMessage()==0 && ClearDrawScreen()==0 ){
+
+		DrawFormatString(0, 40, GetColor(255, 255, 255), Left(test, 2));
 
 		KeyStateUpdate();
 		MouseStateUpdate();
