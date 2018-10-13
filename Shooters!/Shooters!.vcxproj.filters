@@ -87,6 +87,9 @@
     <ClCompile Include="CharacterSelect.cpp">
       <Filter>ソース ファイル\ナティ</Filter>
     </ClCompile>
+    <ClCompile Include="Enemy.cpp">
+      <Filter>ソース ファイル\リュオン</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CollisionCell.h">
@@ -151,6 +154,9 @@
     </ClInclude>
     <ClInclude Include="CharacterSelect.h">
       <Filter>ヘッダー ファイル\ナティ</Filter>
+    </ClInclude>
+    <ClInclude Include="Enemy.h">
+      <Filter>ヘッダー ファイル\リュオン</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

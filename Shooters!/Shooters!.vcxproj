@@ -153,6 +153,7 @@
     <ClCompile Include="CharacterSelect.cpp" />
     <ClCompile Include="CollisionControl.cpp" />
     <ClCompile Include="CollisionDetection.cpp" />
+    <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="enemyShot.cpp" />
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="Golem.cpp" />
@@ -177,6 +178,7 @@
     <ClInclude Include="CollisionControl.h" />
     <ClInclude Include="CollisionDetection.h" />
     <ClInclude Include="data.h" />
+    <ClInclude Include="Enemy.h" />
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="Golem.h" />
     <ClInclude Include="Kuratas.h" />
