@@ -87,6 +87,9 @@
     <ClCompile Include="CharacterSelect.cpp">
       <Filter>ソース ファイル\ナティ</Filter>
     </ClCompile>
+    <ClCompile Include="StrLikeExcel.cpp">
+      <Filter>ソース ファイル\ナティ</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CollisionCell.h">
@@ -150,6 +153,9 @@
       <Filter>ヘッダー ファイル\リュオン</Filter>
     </ClInclude>
     <ClInclude Include="CharacterSelect.h">
+      <Filter>ヘッダー ファイル\ナティ</Filter>
+    </ClInclude>
+    <ClInclude Include="StrLikeExcel.h">
       <Filter>ヘッダー ファイル\ナティ</Filter>
     </ClInclude>
   </ItemGroup>
