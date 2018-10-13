@@ -68,3 +68,19 @@ void changeScene(const Scene nextScene){
 		break;
 	}
 }
+
+void SceneManager::update(){
+	if (currentScene != nullptr) currentScene->update();
+	if (currentScene->IsFinished()) {
+		prevScene = std::move(currentScene);
+		currentScene = currentScene->getNextScene();
+	}
+	else if (currentScene->getReturnScene() && prevScene != nullptr) {
+		currentScene = std::move(prevScene);
+		prevScene = nullptr;//‰¼
+	}
+}
+
+void SceneManager::draw(){
+	if (currentScene != nullptr) currentScene->draw();
+}

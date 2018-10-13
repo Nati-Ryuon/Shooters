@@ -159,6 +159,7 @@
     <ClCompile Include="Golem.cpp" />
     <ClCompile Include="Kuratas.cpp" />
     <ClCompile Include="Random.cpp" />
+    <ClCompile Include="SceneBase.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="shooter.cpp" />
     <ClCompile Include="shot.cpp" />
@@ -183,6 +184,7 @@
     <ClInclude Include="Golem.h" />
     <ClInclude Include="Kuratas.h" />
     <ClInclude Include="Random.h" />
+    <ClInclude Include="SceneBase.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="shooter.h" />
     <ClInclude Include="shot.h" />

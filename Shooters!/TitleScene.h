@@ -1,6 +1,7 @@
 #pragma once
 
 #include "data.h"
+#include "SceneBase.h"
 
 struct Walker {
 	char exist;
@@ -12,6 +13,13 @@ struct Walker {
 	float exrate;	//拡大率
 	int alpha;		//透明度：0～255
 	int count;		//画像切り替え等に使うカウンター
+};
+
+class Title : public SceneBase {
+public:
+	Title();
+	void draw() override;
+	void update() override;
 };
 
 //タイトル初期化

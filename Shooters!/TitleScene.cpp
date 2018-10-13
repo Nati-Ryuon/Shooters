@@ -146,3 +146,13 @@ void drawWalker() {
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	//DrawFormatString(0, 20, white, "Walker1:%.1f, %.1f, %d", walker[0].pos.x, walker[0].pos.y, walker[0].alpha);
 }
+
+Title::Title(){
+}
+
+void Title::draw(){
+}
+
+void Title::update()
+{
+}

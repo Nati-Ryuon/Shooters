@@ -1,10 +1,22 @@
 #pragma once
 
+#include "SceneBase.h"
+#include <memory>
+
 enum Scene {
 	TITLE,
 	CHARACTER_SELECT,
 	GAME,
 	RESULT
+};
+
+class SceneManager {
+	std::unique_ptr<SceneBase> currentScene;
+	std::unique_ptr<SceneBase> prevScene;
+public:
+	SceneManager() : currentScene(nullptr), prevScene(nullptr) {}
+	void update();
+	void draw();
 };
 
 //ŠeƒV[ƒ“‚Ìˆ—

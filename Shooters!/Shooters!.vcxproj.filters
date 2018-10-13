@@ -90,6 +90,9 @@
     <ClCompile Include="Enemy.cpp">
       <Filter>ソース ファイル\リュオン</Filter>
     </ClCompile>
+    <ClCompile Include="SceneBase.cpp">
+      <Filter>ソース ファイル\リュオン</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CollisionCell.h">
@@ -156,6 +159,9 @@
       <Filter>ヘッダー ファイル\ナティ</Filter>
     </ClInclude>
     <ClInclude Include="Enemy.h">
+      <Filter>ヘッダー ファイル\リュオン</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneBase.h">
       <Filter>ヘッダー ファイル\リュオン</Filter>
     </ClInclude>
   </ItemGroup>
