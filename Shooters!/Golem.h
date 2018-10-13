@@ -6,14 +6,14 @@
 #define GOLEM_SIZE 32
 
 class Golem : public Enemy {
-	std::shared_ptr<Player> players;
+	list<std::shared_ptr<Player>> players;
+	list<std::shared_ptr<Player>>::iterator targetPlayer;
 	int refresh_move;//移動用
 	int move_interval;//移動間隔　ミリ秒単位
-	int targetPlayerNum;
-	void Pattern(Player & player);
+	void Pattern();
 	void Shoot();
 public:
-	Golem(Vec2 & pos, std::shared_ptr<Player> p);
+	Golem(Vec2 & pos, const list<std::shared_ptr<Player>> & pList);
 	void draw() override;
 	void update() override;
 };

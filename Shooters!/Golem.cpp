@@ -13,9 +13,10 @@ void loadGolemGraph() {
 }
 
 //エネミー初期化および設置
-Golem::Golem(Vec2 & pos, std::shared_ptr<Player> p)
-	: Enemy(pos, golem_graph[0], 20, 1.5, 16, 200), players(p){
-
+Golem::Golem(Vec2 & pos, const list<std::shared_ptr<Player>> & pList)
+	: Enemy(pos, golem_graph[0], 20, 1.5, 16, 200), players(pList), move_interval(200)
+{
+	targetPlayer = players.begin();
 }
 //void setGolem(Vec2 pos, list<Golem> &golemList, Player players[8]) {
 //	Golem golem;
@@ -65,7 +66,7 @@ void Golem::draw() {
 void Golem::update() {
 	if (draw_flag == true) {
 		//行動パターン
-		Pattern(players[targetPlayerNum]);
+		Pattern();
 		//		ShotUpdate(shot, );
 
 		//出現してからの時間計測
@@ -144,8 +145,8 @@ void Golem::update() {
 //}
 
 
-void Golem::Pattern(Player &player) {//
-	Vec2 velocity = nomalizeVec(player.pos - pos);
+void Golem::Pattern() {//
+	Vec2 velocity = nomalizeVec((*targetPlayer)->pos - pos);
 	if (GetNowCount() - refresh_move > move_interval) {
 		pos = pos + speed * velocity;
 	}
