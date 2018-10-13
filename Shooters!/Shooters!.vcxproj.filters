@@ -164,10 +164,10 @@
     <ClInclude Include="Enemy.h">
       <Filter>ヘッダー ファイル\リュオン</Filter>
     </ClInclude>
-    <ClInclude Include="SceneBase.h">
-      <Filter>ヘッダー ファイル\リュオン</Filter>
-    </ClInclude>
     <ClInclude Include="StrLikeExcel.h">
+      <Filter>ヘッダー ファイル\ナティ</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneBase.h">
       <Filter>ヘッダー ファイル\ナティ</Filter>
     </ClInclude>
   </ItemGroup>

@@ -25,6 +25,12 @@ int Len(char *str) {
 	return i;
 }
 
+int Len(const char str[]) {
+	int i = 0;
+	while (str[i] != '\0') i++;
+	return i;
+}
+
 char* JointStr(char *str1, char *str2) {
 	int i = 0;
 	int len_str1 = Len(str1);
