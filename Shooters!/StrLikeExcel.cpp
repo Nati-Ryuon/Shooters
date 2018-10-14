@@ -11,7 +11,7 @@ int InStr(const char *str, const char *keyword, int start) {
 		if (*(str + i) == *(keyword + j)) {
 			j++;
 			if (*(keyword + j) == '\0') {
-				return (i + 1);
+				return (i - j + 2);
 			}
 		}else{
 			j = 0;
@@ -24,86 +24,120 @@ int InStr(const char *str, const char *keyword, int start) {
 
 int Len(const char *str) {
 	int i = 0;
+
+	if (*str == '\0')
+		return 0;
+
 	while (*(str + i) != '\0') i++;
+
 	return i;
 }
 
-char* JointStr(const char *str1, const char *str2) {
+char* JointStr(char buff[], const char *str1, const char *str2) {
 	int i = 0, j = 0;
-	char rt[255];
+	//char rt[STRING_SIZE];
 	int len_str1 = Len(str1);
 	int len_str2 = Len(str2);
 
 	while (i < len_str1) {
-		rt[i] = *(str1 + i);
+		buff[i] = *(str1 + i);
 		i++;
 	}
 
 	while (j < len_str2){
-		rt[i] = *(str2 + j);
+		buff[i] = *(str2 + j);
 		i++;
 		j++;
 	}
-	rt[i] = '\0';
+	buff[i] = '\0';
 
-	return rt;
+	return buff;
 }
 
-char* Mid(const char *str, int start, int length) {
-	char rt[255];
+char* Mid(char buff[], const char *str, int start, int length) {
+	//char rt[STRING_SIZE];
 	int i;
 	for (i = 0; i < length; i++) {
 		if (*(str + start - 1 + i) != '\0')
-			rt[i] = *(str + start - 1 + i);
+			buff[i] = *(str + start - 1 + i);
 		else
 			break;
 	}
-	rt[i] = '\0';
+	buff[i] = '\0';
 
-	return rt;
+	return buff;
 }
 
-char* Left(const char *str, int length) {
-	char rt[255];
+char* Left(char buff[], const char *str, int length) {
+	//char rt[STRING_SIZE];
 	int i;
 	if (length > Len(str))
 		length = Len(str);
 	for(i = 0; i < length; i++)
-		rt[i] = *(str + i);
-	rt[i] = '\0';
-	return rt;
+		buff[i] = *(str + i);
+	buff[i] = '\0';
+	return buff;
 }
 
-char* Right(const char *str, int length) {
+char* Right(char buff[], const char *str, int length) {
 	int len = Len(str);
 	if (length > len)
 		length = len;
-	return Mid(str, len - length + 1, len);
+	return Mid(buff, str, len - length + 1, len);
 }
 
-char* Replace(const char *str, const char *keyword, const char *replace){
-	int i,j = 1,k;
-	//iはkeywordの位置、jはstr用の位置、kはrtの位置
+char* Replace(char buff[], const char *str, const char *keyword, const char *replace){
+	int i,j = 1;
+	//iはkeywordの位置、jはstr用の位置
 
-	char rt[255];
-	char *tmp;
+	char rt[STRING_SIZE];
+	char tmp[STRING_SIZE];
+	char str2[STRING_SIZE];
+
+	str2[0] = '\0';
+	JointStr(str2, str2, str);
 
 	if (InStr(str, keyword) == 0) {
 		for (i = 0; i < Len(str) + 1; i++)
-			rt[i] = *(str + i);
-		return rt;
+			buff[i] = *(str + i);
+		return buff;
 	}
 
-	while ((i = InStr(str, keyword, j)) != 0) {
-		tmp = JointStr(rt, Mid(str, j, i - 1));
-		for (k = 0; k < Len(tmp) + 1; k++)
-			rt[i] = *(tmp + k);
-		tmp = JointStr(rt, replace);
-		for (k = 0; k < Len(tmp) + 1; k++)
-			rt[i] = *(tmp + k);
-		j = i + Len(replace);
+	rt[0] = '\0';
+	tmp[0] = '\0';
+	buff[0] = '\0';
+
+	//abcdecde,cd
+	while ((i = InStr(str2, keyword, j)) != 0) {
+		Mid(tmp, str2, j, i - 1 - j + 1);
+		JointStr(rt, rt, tmp);
+		JointStr(rt, rt, replace);
+		//for (k = 0; k < Len(tmp) + 1; k++)
+			//rt[k] = *(tmp + k);
+		j = i + Len(keyword);
 	}
+
+	Mid(tmp, str2, j, Len(str));
+	JointStr(rt, rt, tmp);
 
 	rt[Len(rt)] = '\0';
+	JointStr(buff, buff, rt);
+	
+	return buff;
+}
+
+int Value(const char *str) {
+	int i = 0;
+	int tmp;
+	int rt = 0;
+
+	while (*(str + i) != '\0') {
+		tmp = (int)(*(str + i) - '0');
+		if (tmp >= 0 && tmp <= 9) {
+			rt = rt * 10 + tmp;
+		}
+		i++;
+	}
+
 	return rt;
 }

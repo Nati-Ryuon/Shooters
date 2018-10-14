@@ -1,6 +1,7 @@
 #pragma once
 #include"Vec2.h"
 
+/*
 enum ItemType {
 	EXP,
 	Gem,
@@ -10,6 +11,7 @@ enum ItemType {
 	Item4,
 	ItemTypeEnd
 };
+*/
 
 struct Item {
 	Vec2 pos;

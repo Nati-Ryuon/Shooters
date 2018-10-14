@@ -9,8 +9,11 @@
 #include"Kuratas.h"
 #include"Golem.h"
 #include"ArchGolem.h"
+#include "StrLikeExcel.h"
+#include "main.h"
+//#include <memory>
 
-
+#define MSECOND_PER_ROW 500  
 #define STAGE_NUM 2
 
 extern unsigned int KeyState[256];
@@ -31,6 +34,7 @@ static int pop_flag;//エネミーがその時間に出現したかどうか
 static void Stage1();
 static void CollisionControll();
 
+Stage stage;
 
 ////空いてるオブジェクトを返す draw_flag持ってないとあかん
 //template <typename Object>
@@ -53,14 +57,17 @@ void initStage() {
 	zakoenemy.clear();
 	golem.clear();
 	archgolem.clear();
-	current_stage = 1;
-	refresh_time = GetNowCount();
-	pop_flag = false;
+	Players[0].shot.clear();//仮
+	stage.setStage("TestStage");
+	stage.start();
+	//current_stage = 1;
+	//refresh_time = GetNowCount();
+	//pop_flag = false;
 }
 
 //ゲーム画面描画
 void drawGame(){
-	int i;
+	/*
 	if (IntroFlag == 1) {
 		SkillIntroDraw();
 	}
@@ -69,10 +76,13 @@ void drawGame(){
 	drawGolem(golem);
 	drawArchGolem(archgolem);
 	PlayerDraw();
+	*/
+	stage.draw();
 }
 
 //ゲーム画面の処理
 void updateGame(){
+	/*
 	//各ステージの時間計測
 	if (GetNowCount() - refresh_time > 1000) {//一秒経過したら
 		stage_counter[current_stage - 1]++;
@@ -110,6 +120,9 @@ void updateGame(){
 
 	//当たり判定
 	CollisionControll();
+	*/
+
+	stage.update();
 }
 
 void Stage1(){
@@ -138,6 +151,7 @@ void Stage1(){
 		break;
 	}
 }
+
 
 //当たり判定をまとめてるところ
 void CollisionControll() {
@@ -274,5 +288,267 @@ void CollisionControll() {
 		}
 	nextPlayer:
 		continue;
+	}
+}
+
+Condition::Condition() {
+}
+
+Condition::~Condition() {
+	//if (condition_name != NULL)
+		//free(condition_name);
+}
+
+void Condition::setConditionName(const char *name) {
+	//condition_name = (char *)malloc(Len(name) + 1);
+	//condition_name.reset(new char(Len(name) + 1));
+	condition_name[0] = '\0';
+	JointStr(condition_name, condition_name, name);
+}
+
+void Condition::resetConditionName() {
+	//condition_name = NULL;
+}
+
+TimeLine::TimeLine() : frame(0), xpos(0), id(0){
+}
+
+EnemyList::EnemyList() : id(0), level(1) {
+}
+
+EnemyList::~EnemyList() {
+}
+
+void EnemyList::setEnemyName(const char *name) {
+	EnemyList::name = StrToEN(name);
+}
+
+Stage::Stage() : BGMhundle(-1), starttime(0){
+}
+
+Stage::~Stage() {
+	tl.clear();
+	//if (stage_name != NULL)
+		//free(stage_name);
+	//if (BGM != NULL)
+		//free(BGM);
+}
+
+void Stage::setStage(const char *name) {
+	//stage_name.reset(new char(Len(name) + 1));
+	//stage_name = (char *)malloc(Len(name) + 1);
+	stage_name[0] = '\0';
+	JointStr(stage_name, stage_name, name);
+
+	char buff[STRING_SIZE];
+	char buff2[STRING_SIZE];
+
+	JointStr(buff, "./Stage/", stage_name);
+	JointStr(buff, buff, "/");
+	JointStr(buff, buff, stage_name);
+	JointStr(buff, buff, ".txt");
+	readStage(buff);
+
+	Replace(buff2, buff, ".txt", "_EnemyList.txt");
+	readEnemyList(buff2);
+}
+
+void Stage::setBGMName(const char *name) {
+	//stage_name.reset(new char(Len(name) + 1));
+	//BGM = (char *)malloc(Len(name) + 1);
+	BGM[0] = '\0';
+	JointStr(stage_name, stage_name, name);
+}
+
+void Stage::addTimeLine(TimeLine timeline) {
+	tl.push_back(timeline);
+}
+
+void Stage::addEnemyList(EnemyList enemylist) {
+	en.push_back(enemylist);
+}
+
+void Stage::resetTimeLine() {
+	tl.clear();
+}
+
+void Stage::resetEnemyList() {
+	en.clear();
+}
+
+void Stage::start() {
+	Stage::starttime = GetNowCount();
+}
+
+void Stage::update() {
+
+	//5行で1秒,1行で0.2秒 1s=1000ms, 0.2s = 200ms
+	const int time = (GetNowCount() - Stage::starttime) / MSECOND_PER_ROW;
+
+	setEnemy(time);
+
+	if (IntroFlag != 1) {
+		PlayerUpdate();
+		updateZakoEnemy(zakoenemy);
+		updateKuratas(kuratas);
+		updateGolem(golem, Players);
+		updateArchGolem(archgolem, Players);
+
+		if (KeyState[KEY_INPUT_ESCAPE] == 1) {
+
+			changeScene(TITLE);
+		}
+	}
+	else {
+		SkillIntroUpdate();
+	}
+
+	//当たり判定
+	CollisionControll();
+}
+
+void Stage::draw() {
+	if (IntroFlag == 1) {
+		SkillIntroDraw();
+	}
+	drawZakoEnemy(zakoenemy);
+	drawKuratas(kuratas);
+	drawGolem(golem);
+	drawArchGolem(archgolem);
+	PlayerDraw();
+}
+
+int Stage::readEnemyList(const char *FileName) {
+
+	int FileHandle;
+	if ((FileHandle = FileRead_open(FileName)) == 0)
+		return -1;
+
+	int id = 0;
+
+	//const int BufferSize = 256;
+	char buff1[STRING_SIZE], buff2[STRING_SIZE];
+
+	stage.resetEnemyList();
+	EnemyList el;
+
+	while (FileRead_eof(FileHandle) == 0) {
+		FileRead_gets(buff1, STRING_SIZE, FileHandle);
+		if (InStr(buff1, "{") != 0) {
+			//Mid(buff2, buff1, 1, InStr(buff1, "=") - 1);
+			el.id = id;
+		}
+		else if (InStr(buff1, "Color") != 0) {
+			//Mid(buff2, buff1, 1, InStr(buff1, "=") - 1);
+		}
+		else if (InStr(buff1, "EnemyName") != 0) {
+			Mid(buff2, buff1, InStr(buff1, "=") + 1, Len(buff1));
+			el.setEnemyName(buff2);
+		}
+		else if (InStr(buff1, "Level") != 0) {
+			Mid(buff2, buff1, InStr(buff1, "=") + 1, Len(buff1));
+			el.level = Value(buff2);
+		}
+		else if (InStr(buff1, "Item") != 0) {
+			Mid(buff2, buff1, InStr(buff1, "=") + 1, Len(buff1));
+			el.item = Item1;
+		}
+		else if (InStr(buff1, "Condition") != 0) {
+			Mid(buff2, buff1, InStr(buff1, "=") + 1, Len(buff1));
+			el.cond.setConditionName(buff2);
+		}
+		else if (InStr(buff1, "}") != 0) {
+			stage.addEnemyList(el);
+			id++;
+		}
+	}
+
+	el.cond.resetConditionName();
+
+	FileRead_close(FileHandle);
+
+	return 0;
+}
+
+int Stage::readStage(const char *FileName) {
+
+	int tmp;
+
+	int FileHandle;
+	if ((FileHandle = FileRead_open(FileName)) == 0)
+		return -1;
+
+	//const int BufferSize = 256;
+	char buff1[STRING_SIZE], buff2[STRING_SIZE];
+
+	stage.resetTimeLine();
+	TimeLine tl;
+
+	while (FileRead_eof(FileHandle) == 0) {
+		FileRead_gets(buff1, STRING_SIZE, FileHandle);
+		if (InStr(buff1, ",") != 0) {
+			JointStr(buff1, buff1, ",");
+			Left(buff2, buff1, InStr(buff1, ",") - 1);
+			tl.frame = Value(buff2);
+			tmp = InStr(buff1, ",");
+			Mid(buff1, buff1, tmp + 1, Len(buff1));
+			//Left(buff2, buff1, InStr(buff1, ","));
+			//Replace(buff1, buff1, buff2, "");
+
+			Left(buff2, buff1, InStr(buff1, ",") - 1);
+			tl.xpos = Value(buff2) * MAINSCREEN_WIDTH / 32;
+			tmp = InStr(buff1, ",");
+			Mid(buff1, buff1, tmp + 1, Len(buff1));
+			//Left(buff2, buff1, InStr(buff1, ","));
+			//Replace(buff1, buff1, buff2, "");
+
+			Left(buff2, buff1, InStr(buff1, ",") - 1);
+			tl.id = Value(buff2);
+			//Replace(buff1, buff1, Left(buff2, buff1, InStr(buff1, ",")), "");
+
+			stage.addTimeLine(tl);
+		}
+	}
+	FileRead_close(FileHandle);
+
+	return 0;
+}
+
+void Stage::setEnemy(const int time) {
+	int count = 0;
+	for (auto itr : tl) {
+		if (itr.frame == time) {
+			summonEnemy(itr.id, itr.xpos);
+			count++;
+		} else {
+			for (int i = 0; i < count; i++) tl.pop_front();
+			return;
+		}
+	}
+}
+
+void Stage::summonEnemy(int id, int xpos) {
+	//idからエネミーの種類を特定してswitchで呼び出しか
+	int i = 0;
+	for (auto itr : en) {
+		if (itr.id == id) {
+			switch (itr.name) {
+			case enZakoEnemy:
+				setZakoEnemy(Vec2(xpos, 0), zakoenemy);
+				return;
+			case enKuratas:
+				setKuratas(Vec2(xpos, 0), kuratas);
+				return;
+			case enGolem:
+				setGolem(Vec2(xpos, 0), golem, Players);
+				return;
+			case enArchGolem:
+				setArchGolem(Vec2(xpos, 0), archgolem, Players);
+				return;
+			default:
+				break;
+			}
+			break;
+		}
 	}
 }

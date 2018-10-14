@@ -1,6 +1,7 @@
 #ifndef DATA_H
 #define DATA_H
 
+#include "StrLikeExcel.h"
 #include <list>
 
 #define SHOOTER_NAME_MAX 30
@@ -51,6 +52,24 @@ enum ShooterName{
 	Ryuon,
 	Abel,
 	ShooterEnd
+};
+
+enum EnemyName {
+	enZakoEnemy,
+	enKuratas,
+	enGolem,
+	enArchGolem,
+	enEnemyEnd
+};
+
+enum ItemType {
+	EXP,
+	Gem,
+	Item1,
+	Item2,
+	Item3,
+	Item4,
+	ItemTypeEnd
 };
 
 struct Vec2 {
@@ -144,5 +163,7 @@ typedef struct Player{
 	list<Shot> shot;
 
 } PLAYER;
+
+EnemyName StrToEN(const char *str);
 
 #endif

@@ -12,6 +12,7 @@
 #include "Golem.h"
 #include "ArchGolem.h"
 #include "StrLikeExcel.h"
+#include "GameScene.h"
 
 extern unsigned int KeyState[256];
 extern unsigned int MouseLeftClick, MouseRightClick, MouseMiddleClick;
@@ -73,11 +74,18 @@ int WINAPI WinMain(HINSTANCE,HINSTANCE,LPSTR,int){
 
 	ProgramStartTime = GetNowCount();
 
-	const char *test = "abcdefdfdsafds";
+	extern Stage stage;
+	//Stage test;
+	//test.setStage("test");
+	//const char *test = "Nati-chan";
+	//char buff[STRING_SIZE];
+	//Replace(buff, test, "-chan", "");
 
 	while( ScreenFlip()==0 && ProcessMessage()==0 && ClearDrawScreen()==0 ){
 
-		DrawFormatString(0, 60, GetColor(255, 255, 255), "%s", Replace(test, "f","F"));
+		//DrawFormatString(0, 60, GetColor(255, 255, 255), "%s", );
+		//DrawFormatString(0, 60, GetColor(255, 255, 255), "%s", Mid(test, 1, 5));
+		//DrawFormatString(0, 60, GetColor(255, 255, 255), "%s", test.stage_name);
 
 		KeyStateUpdate();
 		MouseStateUpdate();

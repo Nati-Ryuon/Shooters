@@ -153,6 +153,7 @@
     <ClCompile Include="CharacterSelect.cpp" />
     <ClCompile Include="CollisionControl.cpp" />
     <ClCompile Include="CollisionDetection.cpp" />
+    <ClCompile Include="data.cpp" />
     <ClCompile Include="enemyShot.cpp" />
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="Golem.cpp" />

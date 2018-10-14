@@ -90,6 +90,9 @@
     <ClCompile Include="StrLikeExcel.cpp">
       <Filter>ソース ファイル\ナティ</Filter>
     </ClCompile>
+    <ClCompile Include="data.cpp">
+      <Filter>ソース ファイル\ナティ</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CollisionCell.h">
