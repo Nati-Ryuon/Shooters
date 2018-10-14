@@ -116,6 +116,9 @@ int WINAPI WinMain(HINSTANCE,HINSTANCE,LPSTR,int){
 		if( KeyState[KEY_INPUT_ESCAPE] == 30 )
 			end_flag = 1;
 
+		if( KeyState[KEY_INPUT_F1] == 1)
+			SaveDrawScreenToJPEG(0, 0, MAINSCREEN_WIDTH, MAINSCREEN_HEIGHT, "SS.jpg");
+
 		if( end_flag )
 			break;
 

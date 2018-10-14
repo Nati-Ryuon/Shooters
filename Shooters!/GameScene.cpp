@@ -58,7 +58,7 @@ void initStage() {
 	golem.clear();
 	archgolem.clear();
 	Players[0].shot.clear();//‰¼
-	stage.setStage("TestStage");
+	stage.setStage("TestStage2");
 	stage.start();
 	//current_stage = 1;
 	//refresh_time = GetNowCount();
