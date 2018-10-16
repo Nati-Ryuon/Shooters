@@ -29,4 +29,6 @@ public:
 	virtual void draw() = 0;
 	virtual void update() = 0;
 	void damage(const int damage);
+	bool isAlive() { return draw_flag; }
+	bool isFinished() { return erase_flag; }
 };
