@@ -11,7 +11,7 @@ class Kuratas : public Enemy{
 	void Pattern();
 	void Shoot();
 public:
-	Kuratas(Vec2 & pos);
+	Kuratas(Vec2 pos);
 	void draw() override;
 	void update() override;
 };

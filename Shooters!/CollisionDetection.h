@@ -11,9 +11,9 @@
 template<typename Enemy>
 bool CollisionDetection(const Player &player, const Enemy &enemy) {
 	//円と円の接触　ほかのやつも同じ
-	Vec2 reletivePos = enemy.pos - player.pos;
+	Vec2 reletivePos = enemy.getPos() - player.pos;
 	double distance = getNorm(reletivePos);
-	if (distance <= player.range + enemy.range) {
+	if (distance <= player.range + enemy.getRange()) {
 		return true;
 	}
 	else {
@@ -27,9 +27,9 @@ bool CollisionDetection(const Player &player, const Item &item);
 //プレイヤーの弾とエネミー
 template<typename Enemy>
 bool ShotCollisionDetection(const Shot &playershot, const Enemy &enemy) {
-	Vec2 reletivepos = playershot.pos - enemy.pos;
+	Vec2 reletivepos = playershot.pos - enemy.getPos();
 	double distance = getNorm(reletivepos);
-	if (distance <= playershot.range + enemy.range) {
+	if (distance <= playershot.range + enemy.getRange()) {
 		return true;
 	}
 	else {

@@ -123,7 +123,7 @@ void Stage1(){
 			enemies.push_back(std::make_unique<ZakoEnemy>(Vec2(getRandom(16, 1264), 0)));
 			enemies.push_back(std::make_unique<ZakoEnemy>(Vec2(getRandom(16, 1264), 0)));
 			enemies.push_back(std::make_unique<ZakoEnemy>(Vec2(getRandom(16, 1264), 0)));
-			enemies.push_back(std::make_unique<ArchGolem>(Vec2(getRandom(16, 1264), 0)));
+//			enemies.push_back(std::make_unique<ArchGolem>(Vec2(getRandom(16, 1264), 0)));
 			pop_flag = true;
 		}
 	default:
@@ -134,24 +134,28 @@ void Stage1(){
 //当たり判定をまとめてるところ
 void CollisionControll() {
 	int i;
-	bool break_flag = false;//多重ループ脱出用フラグ
-	list<Shot>::iterator shot_itr;
+//	bool break_flag = false;//多重ループ脱出用フラグ
+//	list<Shot>::iterator shot_itr;
 	for (i = 0; i < PLAYER_MAX; i++) {
 		if (Players[i].alive == 1 && Players[i].invisible == 0) {
 			//----------------------------------------
-			shot_itr = Players[i].shot.begin();
-			while (1) {
-				if (shot_itr == Players[i].shot.end()) {
-					break;
-				}
+			for (auto & pshot : Players[i].shot) {
 				for (auto & e : enemies) {
 					if (e->isAlive()) {
-						if (ShotCollisionDetection(*shot_itr, *e)) {
-							e->damage(shot_itr->damage);
-							shot_itr = Players[i].shot.erase(shot_itr);
+						if (ShotCollisionDetection(pshot, *e)) {
+							e->damage(pshot.damage);
+							pshot.SetFlag(0);
+//							shot_itr = Players[i].shot.erase(shot_itr);
 						}
 					}
 				}
+			}
+//			shot_itr = Players[i].shot.begin();
+//			while (1) {
+
+//				if (shot_itr == Players[i].shot.end()) {
+//					break;
+//				}
 				////Kuratus
 				//for (list<Kuratas>::iterator kuratas_itr = kuratas.begin(); kuratas_itr != kuratas.end(); kuratas_itr++) {
 				//	if (kuratas_itr->draw_flag == true) {
@@ -195,8 +199,8 @@ void CollisionControll() {
 				//		}
 				//	}
 				//}
-				shot_itr++;
-			}
+	//			shot_itr++;
+	//		}
 			//----------------------------------------
 			
 			for (auto & e : enemies) {
