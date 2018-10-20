@@ -1,8 +1,8 @@
 #include "DxLib.h"
-#include "main.h"
-#include "help.h"
-#include "player.h"
-#include "shot.h"
+#include "Data.h"
+#include "Main.h"
+#include "Player.h"
+#include "Shot.h"
 #include "Vec2.h"
 #include <math.h>
 #include <list>
@@ -57,29 +57,16 @@ extern unsigned int KeyState[256];
 extern unsigned int MouseLeftClick, MouseRightClick, MouseMiddleClick;
 extern int MouseX, MouseY;
 
-void ShotTypeInsert( SHOTTYPE *st, int i, char *Value );
-int ShotReadFromFile( const char *FileName );
-void ShotMake( Vec2 pos, list<Shot> &ShotList, SHOTTYPE st );
-void ShotDraw( list<Shot> &ShotList );
-void ShotUpdate( list<Shot> &ShotList, SHOTTYPE st );
+void ShotTypeInsert(ShotType &shot_type, int i, char *value);
+int ShotReadFromFile( const char *file_name );
+void ShotMake( Vec2 pos, list<Shot> &shots, ShotType shot_type );
+void ShotDraw( list<Shot> &shots );
+void ShotUpdate( list<Shot> &shots, ShotType shot_type );
 void ShotDelete( Shot &shot );
-void MakeFireflower( list<SHOT> &ShotList, Vec2 pos, SHOTTYPE st );
-void MakeRose( list<SHOT> &ShotList, Vec2 pos, SHOTTYPE st );
+void MakeFireflower( list<Shot> &shots, Vec2 pos, ShotType shot_type );
+void MakeRose( list<Shot> &shots, Vec2 pos, ShotType shot_type );
 
-enum ShotGraph{
-	Red,
-	Orange,
-	Yellow,
-	Green,
-	LBlue,
-	Blue,
-	Purple,
-	Sword1,
-	Sword2,
-	Sword3,
-	Red2,
-	ShotGraphMax//必ず最終メンバーにすること
-};
+
 
 char SwordFlag = 0;//0,1,2でどの画像を出すか決める
 
@@ -120,33 +107,33 @@ sp.y = RoseSinWidth * sin( PI * count / RoseHz ) * sin(angle);
 */
 //↑-------------------------------花火用
 
-SHOTTYPE ShotType[SHOTTYPE_MAX * SHOTTYPE_LEVELMAX];
+ShotType shot_types[SHOTTYPE_MAX * SHOTTYPE_LEVELMAX];
 
-int ShotGraph[ShotGraphMax];
+int ShotGraph[static_cast<int>(enShotGraph::sgShotGraphEnd)];
 
 int ShotInit(){
 
 	ShotReadFromFile( "ShotTypeData.csv" );
 	
-	ShotGraph[Red] = LoadGraph( "./Shot/dot_red_x16.png" );
-	ShotGraph[Orange] = LoadGraph( "./Shot/dot_orange_x16.png" );
-	ShotGraph[Yellow] = LoadGraph( "./Shot/dot_yellow_x16.png" );
-	ShotGraph[Green] = LoadGraph( "./Shot/dot_green_x16.png" );
-	ShotGraph[LBlue] = LoadGraph( "./Shot/dot_lblue_x16.png" );
-	ShotGraph[Blue] = LoadGraph( "./Shot/dot_blue_x16.png" );
-	ShotGraph[Purple] = LoadGraph( "./Shot/dot_purple_x16.png" );
-	ShotGraph[Sword1] = LoadGraph( "./Shot/sword_1.png" );
-	ShotGraph[Sword2] = LoadGraph( "./Shot/sword_2.png" );
-	ShotGraph[Sword3] = LoadGraph( "./Shot/sword_3.png" );
-	ShotGraph[Red2] = LoadGraph( "./Shot/dot_red2_x16.png" );
+	ShotGraph[enShotGraph::sgRed] = LoadGraph( "./Shot/dot_red_x16.png" );
+	ShotGraph[enShotGraph::sgOrange] = LoadGraph( "./Shot/dot_orange_x16.png" );
+	ShotGraph[enShotGraph::sgYellow] = LoadGraph( "./Shot/dot_yellow_x16.png" );
+	ShotGraph[enShotGraph::sgGreen] = LoadGraph( "./Shot/dot_green_x16.png" );
+	ShotGraph[enShotGraph::sgLBlue] = LoadGraph( "./Shot/dot_lblue_x16.png" );
+	ShotGraph[enShotGraph::sgBlue] = LoadGraph( "./Shot/dot_blue_x16.png" );
+	ShotGraph[enShotGraph::sgPurple] = LoadGraph( "./Shot/dot_purple_x16.png" );
+	ShotGraph[enShotGraph::sgSword1] = LoadGraph( "./Shot/sword_1.png" );
+	ShotGraph[enShotGraph::sgSword2] = LoadGraph( "./Shot/sword_2.png" );
+	ShotGraph[enShotGraph::sgSword3] = LoadGraph( "./Shot/sword_3.png" );
+	ShotGraph[enShotGraph::sgRed2] = LoadGraph( "./Shot/dot_red2_x16.png" );
 
 	return 0;
 }
 
-int ShotReadFromFile( const char *FileName ){
+int ShotReadFromFile( const char *file_name ){
 
-	int FileHandle;
-	if( (FileHandle = FileRead_open( FileName )) == 0 )
+	int file_handle;
+	if( (file_handle = FileRead_open( file_name )) == 0 )
 		return -1;
 
 	const int BufferSize = 256;
@@ -161,15 +148,15 @@ int ShotReadFromFile( const char *FileName ){
 	//穴だらけだが何とか作成
 	//()内はコメントとして飛ばせるようになっているが行をまたぐとぶっ飛ぶ
 
-	while( FileRead_eof( FileHandle ) == 0 ){
-		FileRead_gets( Buffer1, BufferSize, FileHandle );
+	while( FileRead_eof( file_handle ) == 0 ){
+		FileRead_gets( Buffer1, BufferSize, file_handle );
 		if( Buffer1[0] != '\0' ){
 			for( int i = 0; i < BufferSize; i++ ){
 				switch( Buffer1[i] ){
 					case '\0':
 						Buffer2[++k] = '\0';
 						if( j2 == 7 ){//7は項目数
-							ShotTypeInsert( &ShotType[j1], j2, Buffer2 );
+							ShotTypeInsert( &shot_types[j1], j2, Buffer2 );
 							j1++;
 						}
 						j2 = 0;
@@ -185,7 +172,7 @@ int ShotReadFromFile( const char *FileName ){
 						break;
 					case ',':
 						Buffer2[k] = '\0';
-						ShotTypeInsert( &ShotType[j1], j2, Buffer2 );
+						ShotTypeInsert( &shot_types[j1], j2, Buffer2 );
 						j2++;
 						k = 0;
 						break;
@@ -197,46 +184,46 @@ int ShotReadFromFile( const char *FileName ){
 			}
 		}
 	}
-	FileRead_close( FileHandle );
+	FileRead_close( file_handle );
 
 	return 0;
 }
 
-void ShotTypeInsert( SHOTTYPE *st, int i, char *Value ){
+void ShotTypeInsert( ShotType &st, int i, char *value ){
 
 	switch( i ){
 	case 0:
-		st -> ShotTypeID = (char)atoi( Value );
+		st.shot_type = enShotType((char)atoi( value ));
 		break;
 	case 1:
-		st -> Level = (char)atoi( Value );
+		st.level = (char)atoi( value );
 		break;
 	case 2:
-		st -> Speed.x = 0;
-		st -> Speed.y = (float)atof( Value );
+		st.speed.x = 0;
+		st.speed.y = (float)atof( value );
 		break;
 	case 3:
-		st -> Damage = atoi( Value );
+		st.damage = atoi( value );
 		break;
 	case 4:
-		st -> Multiple = (char)atoi( Value );
+		st.multiple = (char)atoi( value );
 		break;
 	case 5:
-		st -> MoveRange = atoi( Value );
+		st.move_range = atoi( value );
 		break;
 	case 6:
-		st -> CoolTime = (float)atof( Value );
+		st.cool_time = (float)atof( value );
 		break;
 	case 7:
-		st -> ChargeTime = atoi( Value );
+		st.charge_time = atoi( value );
 		break;
 	default:
-		DrawFormatString( 0, 0, GetColor( 255, 0, 0 ), "%s", Value );
+		DrawFormatString( 0, 0, GetColor( 255, 0, 0 ), "%s", value );
 		break;
 	}
 }
 
-void ShotMake( Vec2 pos, list<Shot> &ShotList, SHOTTYPE st ){
+void ShotMake( Vec2 pos, list<Shot> &shots, ShotType shot_type ){
 	//listを受け取って処理するだけの関数
 
 	Vec2 pos2;//座標計算用
@@ -245,66 +232,66 @@ void ShotMake( Vec2 pos, list<Shot> &ShotList, SHOTTYPE st ){
 
 	Shot shot;
 
-	auto itr = ShotList.end();
+	auto itr = shots.end();
 
-	switch( st.ShotTypeID ){
-	case Normal:
-		for( int j = 0; j < st.Multiple; j++ ){
-			angle = (st.Level - 1) * NORMAL_ANGLE / 2;
-			sp.x = getNorm(st.Speed) * sin( PI / 180.0 * (angle - j * NORMAL_ANGLE) );
-			sp.y = st.Speed.y * cos( PI / 180.0 * (angle - j * NORMAL_ANGLE) );//プレイヤーのショットのスピードは-
+	switch( shot_type.shot_type ){
+	case enShotType::stNormal:
+		for( int j = 0; j < shot_type.multiple; j++ ){
+			angle = (shot_type.level - 1) * NORMAL_ANGLE / 2;
+			sp.x = getNorm(shot_type.speed) * sin( PI / 180.0 * (angle - j * NORMAL_ANGLE) );
+			sp.y = shot_type.speed.y * cos( PI / 180.0 * (angle - j * NORMAL_ANGLE) );//プレイヤーのショットのスピードは-
 
-			shot.SetShot( pos, sp, Yellow, st.Damage, SHOT_RANGE );
+			shot.setShot( pos, sp, enShotGraph::sgYellow, shot_type.Damage, SHOT_RANGE );
 			
-			ShotList.push_back( shot );
+			shots.push_back( shot );
 		}
 		break;
-	case Penetrate:
-		shot.SetShot( pos, st.Speed, Yellow, st.Damage, SHOT_RANGE );
+	case enShotType::stPenetrate:
+		shot.setShot( pos, shot_type.speed, enShotGraph::sgYellow, shot_type.Damage, SHOT_RANGE );
 		shot.Pene = 1;
-		ShotList.push_back( shot );
+		shots.push_back( shot );
 		break;
 
-	case Shotgun:
-		//Speedが斜めで固定。新たにVec2を作って値を入れる。
-		for( int j = 0; j < st.Multiple; j++ ){
+	case enShotType::stShotgun:
+		//speedが斜めで固定。新たにVec2を作って値を入れる。
+		for( int j = 0; j < shot_type.multiple; j++ ){
 			angle = GetRand( SHOTGUN_ANGLE ) - SHOTGUN_ANGLE / 2;
-			sp.x = getNorm(st.Speed) * sin( PI / 180.0 * angle );
-			sp.y = st.Speed.y * cos( PI / 180.0 * angle );//プレイヤーのショットのスピードは-
-			shot.SetShot( pos, sp, Yellow, st.Damage, SHOT_RANGE );
-			shot.SetMoveRange( st.MoveRange );
-			ShotList.push_back( shot );
+			sp.x = getNorm(shot_type.speed) * sin( PI / 180.0 * angle );
+			sp.y = shot_type.speed.y * cos( PI / 180.0 * angle );//プレイヤーのショットのスピードは-
+			shot.setShot( pos, sp, enShotGraph::sgYellow, shot_type.Damage, SHOT_RANGE );
+			shot.SetMoveRange( shot_type.rifle_range );
+			shots.push_back( shot );
 		}
 
 		break;
 
-	case Machinegun:
+	case enShotType::stMachinegun:
 		angle = GetRand( MACHINEGUN_ANGLE ) - MACHINEGUN_ANGLE / 2;
-		sp.x = getNorm(st.Speed) * sin( PI / 180.0 * angle );
-		sp.y = st.Speed.y * cos( PI / 180.0 * angle );
-		shot.SetShot( pos, sp, Yellow, st.Damage, SHOT_RANGE );
-		ShotList.push_back( shot );
+		sp.x = getNorm(shot_type.speed) * sin( PI / 180.0 * angle );
+		sp.y = shot_type.speed.y * cos( PI / 180.0 * angle );
+		shot.setShot( pos, sp, enShotGraph::sgYellow, shot_type.Damage, SHOT_RANGE );
+		shots.push_back( shot );
 		break;
 
-	case Sword:
-		pos.y -= st.MoveRange / 2;
+	case enShotType::stSword:
+		pos.y -= shot_type.rifle_range / 2;
 		switch( SwordFlag ){
 		case 0:
-			pos.x += 20 * (st.Level-1);
-			shot.SetShot( pos, st.Speed, Sword1, st.Damage, st.MoveRange / 2 );
-			ShotList.push_back( shot );
+			pos.x += 20 * (shot_type.level-1);
+			shot.setShot( pos, shot_type.speed, Sword1, shot_type.Damage, shot_type.rifle_range / 2 );
+			shots.push_back( shot );
 			SwordFlag++;
 			break;
 		case 1:
-			pos.x -= 20*(st.Level-1);
-			shot.SetShot( pos, st.Speed, Sword2, st.Damage, st.MoveRange / 2 );
-			ShotList.push_back( shot );
+			pos.x -= 20*(shot_type.level-1);
+			shot.setShot( pos, shot_type.speed, Sword2, shot_type.Damage, shot_type.rifle_range / 2 );
+			shots.push_back( shot );
 			SwordFlag++;
 			break;
 		case 2:
-			pos.y -= 20*(st.Level-1);
-			shot.SetShot( pos, st.Speed, Sword3, st.Damage, st.MoveRange / 2 );
-			ShotList.push_back( shot );
+			pos.y -= 20*(shot_type.level-1);
+			shot.setShot( pos, shot_type.speed, Sword3, shot_type.Damage, shot_type.rifle_range / 2 );
+			shots.push_back( shot );
 			SwordFlag = 0;
 			break;
 		default:
@@ -313,75 +300,75 @@ void ShotMake( Vec2 pos, list<Shot> &ShotList, SHOTTYPE st ){
 
 		break;
 
-	case Beam:
+	case enShotType::stBeam:
 
 		PlayerPos = pos;
-		shot.SetShot( pos, st.Speed, LBlue, st.Damage, SHOT_RANGE );
-		shot.SetFlag( 2 );
-		ShotList.push_back( shot );
+		shot.setShot( pos, shot_type.speed, enShotGraph::sgLBlue, shot_type.Damage, SHOT_RANGE );
+		shot.setFlag( 2 );
+		shots.push_back( shot );
 
 		break;
 
-	case Fireflower:
+	case enShotType::stFireflower:
 
-		shot.SetShot( pos, st.Speed, Red, st.Damage * 5, SHOT_RANGE );
-		shot.SetFlag( 2 );//1発目は2、以降は距離ごとに3,4,5と分けていく(予定だったが角度情報を持たせるためにそのグループの弾の総数でもいいと思う)
-		ShotList.push_back( shot );
+		shot.setShot( pos, shot_type.speed, enShotGraph::sgRed, shot_type.Damage * 5, SHOT_RANGE );
+		shot.setFlag( 2 );//1発目は2、以降は距離ごとに3,4,5と分けていく(予定だったが角度情報を持たせるためにそのグループの弾の総数でもいいと思う)
+		shots.push_back( shot );
 
 		break;
 
-	case Cross:
+	case enShotType::stCross:
 
 		pos2 = pos;
 		
-		for( int i = 0; i < st.Multiple; i++ ){
-			pos2.y -= PLAYERSIZE * (st.Multiple - 1) / 2;//1,3,5でそれぞれ0,1,2となるように
+		for( int i = 0; i < shot_type.multiple; i++ ){
+			pos2.y -= PLAYERSIZE * (shot_type.multiple - 1) / 2;//1,3,5でそれぞれ0,1,2となるように
 
 			pos2.x += PLAYERSIZE * i * (i % 2?-1:1);
 			pos2.y += PLAYERSIZE * (int)((i + 1) / 2);
 
-			shot.SetShot( pos2, st.Speed, Yellow, st.Damage, SHOT_RANGE );
-			shot.SetFlag( i + 2 );//2,3,4,5,6
-			ShotList.push_back( shot );
+			shot.setShot( pos2, shot_type.speed, enShotGraph::sgYellow, shot_type.Damage, SHOT_RANGE );
+			shot.setFlag( i + 2 );//2,3,4,5,6
+			shots.push_back( shot );
 
 			pos2.y = pos.y;
 		}
 
 		break;
 
-	case Rose:
+	case enShotType::stRose:
 		
-		for( int i = 0; i < st.Multiple; i++ ){
+		for( int i = 0; i < shot_type.multiple; i++ ){
 			angle = (i % 2?-1:1) * PI / 2 - (int)((i + 1) / 2) * PI / 6;
 			//angle = PI / 4;
 
-			shot.SetShot( pos, st.Speed, Green, st.Damage, SHOT_RANGE );
+			shot.setShot( pos, shot_type.speed, enShotGraph::sgGreen, shot_type.damage, SHOT_RANGE );
 			if( SpikeCounter[i] == SpikeWait ){
-				shot.SetFlag( (i << 2) | 1 );
+				shot.setFlag( (i << 2) | 1 );
 				SpikeCounter[i] = 0;
 			}else if( RoseCounter[i] == RoseWait ){
-				shot.SetFlag( (i << 2) | 2 );
+				shot.setFlag( (i << 2) | 2 );
 				RoseCounter[i] = 0;
 			}else{
-				shot.SetFlag( i << 2 );
+				shot.setFlag( i << 2 );
 				SpikeCounter[i]++;
 				RoseCounter[i]++;
 			}
 
-			ShotList.push_back( shot );
+			shots.push_back( shot );
 
 		}
 
 	break;
 
-	case OverRide_RainbowShot:
-		for( int j = 0; j < st.Multiple; j++ ){
-			angle = (st.Level - 1) * NORMAL_ANGLE / 2;
-			sp.x = getNorm(st.Speed) * sin( PI / 180.0 * (angle - j * NORMAL_ANGLE) );
-			sp.y = st.Speed.y * cos( PI / 180.0 * (angle - j * NORMAL_ANGLE) );//プレイヤーのショットのスピードは-
-			shot.SetShot( pos, sp, j, st.Damage, SHOT_RANGE );
+	case enShotType::stOverRide_RainbowShot:
+		for( int j = 0; j < shot_type.multiple; j++ ){
+			angle = (shot_type.level - 1) * NORMAL_ANGLE / 2;
+			sp.x = getNorm(shot_type.speed) * sin( PI / 180.0 * (angle - j * NORMAL_ANGLE) );
+			sp.y = shot_type.speed.y * cos( PI / 180.0 * (angle - j * NORMAL_ANGLE) );//プレイヤーのショットのスピードは-
+			shot.setShot( pos, sp, (enShotGraph)j, shot_type.damage, SHOT_RANGE );
 			
-			ShotList.push_back( shot );
+			shots.push_back( shot );
 		}
 		break;
 	default:
@@ -391,7 +378,7 @@ void ShotMake( Vec2 pos, list<Shot> &ShotList, SHOTTYPE st ){
 }
 
 /*
-void SetShot( Vec2 &pos, Vec2 &speed, int damage, char shot_graph, int range, Shot &shot, int MoveRange, char shot_flag ){
+void setShot( Vec2 &pos, Vec2 &speed, int damage, char shot_graph, int range, Shot &shot, int MoveRange, char shot_flag ){
 	shot.shot_flag = shot_flag;
 	shot.pos = pos;
 	shot.speed = speed;
@@ -404,11 +391,11 @@ void SetShot( Vec2 &pos, Vec2 &speed, int damage, char shot_graph, int range, Sh
 }
 */
 
-void ShotDraw( list<Shot> &ShotList ){
+void ShotDraw( list<Shot> &shots ){
 	int count = 0;
 
 	SetDrawBlendMode( DX_BLENDMODE_ADD, 255 );
-	for( list<Shot>::iterator itr = ShotList.begin(); itr != ShotList.end(); itr++ ){
+	for( list<Shot>::iterator itr = shots.begin(); itr != shots.end(); itr++ ){
 		DrawRotaGraph( (int)itr -> pos.x, (int)itr -> pos.y, 1.0, 0, ShotGraph[itr -> shot_graph], 1 );
 		//DrawCircle( (int)itr -> pos.x, (int)itr -> pos.y, itr -> range, GetColor( 255, 0, 0 ) );
 		count++;
@@ -418,18 +405,18 @@ void ShotDraw( list<Shot> &ShotList ){
 	DrawFormatString( 0, 64, GetColor( 255,255,255 ),"%d", count );
 }
 
-void ShotUpdate( list<Shot> &ShotList, SHOTTYPE st ){
+void ShotUpdate( list<Shot> &shots, SHOTTYPE st ){
 
 	Shot shot;
 	float angle;
 	Vec2 sp,sp2;
 
-	for( list<Shot>::iterator itr = ShotList.begin(); itr != ShotList.end(); ){
+	for( list<Shot>::iterator itr = shots.begin(); itr != shots.end(); ){
 
 		switch( st.ShotTypeID ){//特殊なやつはここで分岐していろいろ処理
 		case Sword:
 			if( itr -> count == 4 ){
-				itr = ShotList.erase( itr );
+				itr = shots.erase( itr );
 				continue;
 			}
 			break;
@@ -440,7 +427,7 @@ void ShotUpdate( list<Shot> &ShotList, SHOTTYPE st ){
 				shot.SetShot( PlayerPos, st.Speed, LBlue, st.Damage, SHOT_RANGE );//1発目、2発目、という感じで
 				shot.SetFlag( itr -> shot_flag + 1 );
 				
-				ShotList.push_back( shot );
+				shots.push_back( shot );
 				
 				itr -> SetFlag(st.Multiple + 1);//2回目反応しないように
 			}
@@ -449,19 +436,19 @@ void ShotUpdate( list<Shot> &ShotList, SHOTTYPE st ){
 		case Fireflower:
 
 			if( itr -> shot_flag == 2 && itr -> count == OpenCount ){
-				MakeFireflower( ShotList, itr -> pos, st );
-				itr = ShotList.erase( itr );//2回目反応しないように
+				MakeFireflower( shots, itr -> pos, st );
+				itr = shots.erase( itr );//2回目反応しないように
 				continue;
 			}
 
 			if( itr -> shot_flag > 2 ){
 				if( itr -> count > T - 30 ){
-					itr = ShotList.erase( itr );
+					itr = shots.erase( itr );
 					continue;
 				}else{
 					Vec2 nomal = nomalizeVec( itr -> speed );
 					double norm = getNorm( itr -> speed );
-					itr -> speed = nomal * (norm + a[st.Level-1]);
+					itr -> speed = nomal * (norm + a[st.level-1]);
 				}
 			}
 
@@ -475,14 +462,14 @@ void ShotUpdate( list<Shot> &ShotList, SHOTTYPE st ){
 
 				if( (itr -> shot_flag % 2) == 1 || itr -> shot_flag == 2 ){
 					sp.x = st.Speed.y;
-					shot.SetShot( itr -> pos, sp, Yellow, st.Damage, SHOT_RANGE );
-					ShotList.push_back( shot );
+					shot.SetShot( itr -> pos, sp, enShotGraph::sgYellow, st.Damage, SHOT_RANGE );
+					shots.push_back( shot );
 				}
 
 				if( (itr -> shot_flag % 2) == 0 ){
 					sp.x = -1 * st.Speed.y;
-					shot.SetShot( itr -> pos, sp, Yellow, st.Damage, SHOT_RANGE );
-					ShotList.push_back( shot );
+					shot.SetShot( itr -> pos, sp, enShotGraph::sgYellow, st.Damage, SHOT_RANGE );
+					shots.push_back( shot );
 				}
 	
 			}
@@ -502,28 +489,28 @@ void ShotUpdate( list<Shot> &ShotList, SHOTTYPE st ){
 					itr -> speed.x *= -1;
 				itr -> speed.y = -(sp.x * sin(angle) + sp.y * cos(angle));
 
-				if( st.Level > 2 ){
+				if( st.level > 2 ){
 					if( itr -> count != 0 && itr -> shot_flag & 1 ){
 						if( (itr -> count % 5) == 0 ){
 							sp2.x = itr->speed.y * 0.05;
 							sp2.y = -itr->speed.x * 0.05;
-							shot.SetShot( itr->pos, sp2, Green, st.Damage, SHOT_RANGE );
+							shot.SetShot( itr->pos, sp2, enShotGraph::sgGreen, st.Damage, SHOT_RANGE );
 							shot.SetFlag( -1 );
 							shot.SetMoveRange( 15 );
-							ShotList.push_back( shot );
+							shots.push_back( shot );
 							sp2 = sp2 * -1;
-							shot.SetShot( itr->pos, sp2, Green, st.Damage, SHOT_RANGE );
+							shot.SetShot( itr->pos, sp2, enShotGraph::sgGreen, st.Damage, SHOT_RANGE );
 							shot.SetFlag( -1 );
 							shot.SetMoveRange( 15 );
-							ShotList.push_back( shot );
+							shots.push_back( shot );
 						}
 					}
 				}
 
-				if( st.Level > 3 ){
+				if( st.level > 3 ){
 					if( itr -> count != 0 && itr -> shot_flag & 2 ){
 						if( (itr -> count - RoseHz / 2 ) % RoseHz == 0 ){
-							MakeRose( ShotList, itr -> pos, st );
+							MakeRose( shots, itr -> pos, st );
 						}
 					}
 				}
@@ -540,13 +527,13 @@ void ShotUpdate( list<Shot> &ShotList, SHOTTYPE st ){
 		itr -> move_distance += getNorm( itr -> speed );
 
 		if( (int)itr -> move_distance >= itr -> MoveRange && itr -> MoveRange != 0 ){
-			itr = ShotList.erase( itr );//ショットの移動距離が射程を超えたら削除
+			itr = shots.erase( itr );//ショットの移動距離が射程を超えたら削除
 			continue;
 		}
 
 		//壁に到達したら消去
 		if( itr -> pos.x < 0 || itr -> pos.x > MAINSCREEN_WIDTH || itr -> pos.y < 0 || itr -> pos.y > MAINSCREEN_HEIGHT ){
-			itr = ShotList.erase( itr );//次の要素を指すイテレーターを返してくるので受け取る
+			itr = shots.erase( itr );//次の要素を指すイテレーターを返してくるので受け取る
 			continue;
 		}
 
@@ -558,28 +545,28 @@ void ShotDelete( Shot &shot ){
 	shot.shot_flag = 0;
 }
 
-void MakeFireflower( list<SHOT> &ShotList, Vec2 pos, SHOTTYPE st ){
+void MakeFireflower( list<SHOT> &shots, Vec2 pos, SHOTTYPE st ){
 
 	Shot shot;
 	Vec2 sp;
 
-	for( int i = 0; i < GroupNum[st.Level-1]; i++ ){
+	for( int i = 0; i < GroupNum[st.level-1]; i++ ){
 		int color = GetRand( 6 );//7色からランダム
 
-		for( int j = 0; j < Multiple[st.Level-1]; j++ ){
+		for( int j = 0; j < Multiple[st.level-1]; j++ ){
 
-			sp.x = V0[i] * sin( 2.0 * PI / Multiple[st.Level-1] * (float)j );
-			sp.y = V0[i] * cos( 2.0 * PI / Multiple[st.Level-1] * (float)j );
+			sp.x = V0[i] * sin( 2.0 * PI / Multiple[st.level-1] * (float)j );
+			sp.y = V0[i] * cos( 2.0 * PI / Multiple[st.level-1] * (float)j );
 
 			shot.SetShot( pos, sp, color, st.Damage, SHOT_RANGE );
 			shot.SetFlag( 3+i );
 				
-			ShotList.push_back( shot );
+			shots.push_back( shot );
 		}
 	}
 }
 
-void MakeRose( list<SHOT> &ShotList, Vec2 pos, SHOTTYPE st ){
+void MakeRose( list<SHOT> &shots, Vec2 pos, SHOTTYPE st ){
 
 	Shot shot;
 	Vec2 sp;
@@ -597,11 +584,11 @@ void MakeRose( list<SHOT> &ShotList, Vec2 pos, SHOTTYPE st ){
 		sp.x = 0.3 * sin( 2.0 * PI / Multiple * (float)j );
 		sp.y = 0.3 * cos( 2.0 * PI / Multiple * (float)j );
 
-		shot.SetShot( pos, sp, Red2, st.Damage * 5, SHOT_RANGE );
+		shot.SetShot( pos, sp, enShotGraph::sgRed2, st.Damage * 5, SHOT_RANGE );
 		shot.SetFlag( -1 );
 		shot.SetMoveRange( 20 );//バラの半径
 		
-		ShotList.push_back( shot );
+		shots.push_back( shot );
 	}
 }
 

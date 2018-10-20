@@ -1,9 +1,9 @@
 #include "DxLib.h"
-#include "help.h"
-#include "player.h"
-#include "main.h"
-#include "shooter.h"
-#include "skill.h"
+#include "Help.h"
+#include "Player.h"
+#include "Main.h"
+#include "Shooter.h"
+#include "Skill.h"
 #include <stdlib.h>
 #include <time.h>
 #include "SceneManager.h"
@@ -13,10 +13,12 @@
 #include "ArchGolem.h"
 #include "StrLikeExcel.h"
 
-extern unsigned int KeyState[256];
-extern unsigned int MouseLeftClick, MouseRightClick, MouseMiddleClick;
-extern int MouseX, MouseY;
+//extern unsigned int KeyState[256];
+//extern unsigned int MouseLeftClick, MouseRightClick, MouseMiddleClick;
+//extern int MouseX, MouseY;
 //extern Scene scene;
+extern Key key;
+extern Mouse mouse;
 
 char end_flag = 0;
 int ProgramStartTime;
@@ -73,14 +75,11 @@ int WINAPI WinMain(HINSTANCE,HINSTANCE,LPSTR,int){
 
 	ProgramStartTime = GetNowCount();
 
-	char test[] = "abcde";
-
 	while( ScreenFlip()==0 && ProcessMessage()==0 && ClearDrawScreen()==0 ){
 
-		DrawFormatString(0, 40, GetColor(255, 255, 255), Left(test, 2));
-
-		KeyStateUpdate();
-		MouseStateUpdate();
+		//KeyStateUpdate();
+		//MouseStateUpdate();
+		updateHelp();
 
 		//SceneUpdate();
 
@@ -91,22 +90,14 @@ int WINAPI WinMain(HINSTANCE,HINSTANCE,LPSTR,int){
 			end_flag = 1;
 		*/
 
-		if( GetWindowActiveFlag() == 1 ){
-			if( MouseX < 0 )
-				SetMousePoint(0, MouseY);
-			if( MouseY < 0 )
-				SetMousePoint(MouseX, 0);
-			if( MouseX > MAINSCREEN_WIDTH )
-				SetMousePoint(MAINSCREEN_WIDTH, MouseY);
-			if( MouseY > MAINSCREEN_HEIGHT )
-				SetMousePoint(MouseX, MAINSCREEN_HEIGHT);
-		}
-
 		updateSceneManager();
 		drawSceneManager();
 		
-		if( KeyState[KEY_INPUT_ESCAPE] == 30 )
+		if (key[KEY_INPUT_ESCAPE] == 30)
 			end_flag = 1;
+
+		if (key[KEY_INPUT_F1] == 1)
+			SaveDrawScreenToJPEG(0, 0, MAINSCREEN_WIDTH, MAINSCREEN_HEIGHT, "SS.jpg");
 
 		if( end_flag )
 			break;
@@ -152,4 +143,12 @@ void FPSWait(){
 
 void endMain() {
 	end_flag = 1;
+}
+
+void debugPrint(const char *str) {
+	DrawFormatString(0, MAINSCREEN_HEIGHT / 2, GetColor(255, 255, 255), "%s", str);
+}
+
+void debugPrint(int i) {
+	DrawFormatString(0, MAINSCREEN_HEIGHT / 2, GetColor(255, 255, 255), "%d", i);
 }

@@ -1,9 +1,10 @@
 #include "DxLib.h"
-#include "help.h"
-#include "main.h"
-#include "player.h"
-#include "skill.h"
-#include "shot.h"
+//#include "Help.h"
+#include "Main.h"
+#include "Player.h"
+#include "Skill.h"
+#include "Shot.h"
+#include "Shooter.h"
 #include <stdio.h>
 #include <math.h>
 
@@ -20,8 +21,8 @@ extern unsigned int MouseLeftClick, MouseRightClick, MouseMiddleClick;
 extern int MouseX, MouseY;
 
 //extern float ShotDefaultCoolTime[SHOTTYPE_MAX];
-extern SHOOTER Shooters[SHOOTER_MAX];
-extern SHOTTYPE ShotType[SHOTTYPE_MAX * SHOTTYPE_LEVELMAX];
+extern Shooter shooters[SHOOTER_MAX];
+extern ShotType shot_types[static_cast<int>(enShotType(enShotType::stShotTypeEnd)) * SHOTTYPE_LEVELMAX];
 
 //操作用
 unsigned char MOVE_LEFT = KEY_INPUT_A;
@@ -36,170 +37,170 @@ const unsigned int ColorLBlue = GetColor( 100, 200, 255 );
 const unsigned int ColorGreen = GetColor( 0, 255, 0 );
 const unsigned int ColorWhite = GetColor( 255, 255, 255 );
 
-PLAYER Players[PLAYER_MAX];
-//list<Player> PlayerList;
+Player players[PLAYER_MAX];
+//list<Player> players;
 
 //プレイヤー人数
-char player_num = 1;
+unsigned int player_count = 1;
 
-bool DoubleShotFlag = 0;//1ならDoubleShot中(ShotMakeに渡す座標をずらす)
+bool double_shot_flag = 0;//1ならDoubleShot中(ShotMakeに渡す座標をずらす)
 
 //int PlayerShot( Player *player );
-void PlayerLevelUp( Player *player );
-void PlayerLevelDown( Player *player );
+void upPlayerLevel( Player &player );
+void downPlayerLevel( Player &player );
 
-int PlayerInit( char player_number, ShooterName name ){
+int PlayerInit( char player_number, enShooter name ){
 
 	char InstantFileName[FILENAME_MAX];
 
 	//名前と番号を一致させる
-	Players[player_number].PlayerNumber = player_number;
+	players[player_number].player_index = player_number;
 
 	//予約されてる名前以外は無理
-	Players[player_number].sn = name;
+	players[player_number].shooter_name = name;
 
 	//名前からシューターのデータを参照して保持する
-	Players[player_number].shooter = Shooters[Players[player_number].sn];
+	players[player_number].shooter = shooters[players[player_number].sn];
 
 	//シューターのデータからショットタイプのデータを参照して保持する
-	Players[player_number].shottype = ShotType[(Players[player_number].shooter.st - 1) * SHOTTYPE_LEVELMAX];
+	players[player_number].shot_type = shot_types[(static_cast<int>(players[player_number].shooter.shot_type) - 1) * SHOTTYPE_LEVELMAX];
 
-	Players[player_number].alive = TRUE;
-	Players[player_number].range = 12;//マジックナンバー
+	players[player_number].alive = TRUE;
+	players[player_number].range = 12;//マジックナンバー
 
-	Players[player_number].EXP = 0;
-	Players[player_number].level = 1;
+	players[player_number].EXP = 0;
+	players[player_number].level = 1;
 
-	Players[player_number].pos.x = MAINSCREEN_WIDTH / (player_num+1) * (player_number+1);
-	Players[player_number].pos.y = MAINSCREEN_HEIGHT / 8 * 6;//初期の座標だけど仮の値
+	players[player_number].pos.x = MAINSCREEN_WIDTH / (player_count + 1) * (player_number+1);
+	players[player_number].pos.y = MAINSCREEN_HEIGHT / 8 * 6;//初期の座標だけど仮の値
 
-	Players[player_number].magic_point = 0;
+	players[player_number].magic_point = 0;
 
-	Players[player_number].can_move = 1;
-	Players[player_number].shoot_flag = 1;
-	Players[player_number].skill_flag = 0;
-	Players[player_number].invincible = 0;
+	players[player_number].can_move = 1;
+	players[player_number].can_shoot = 1;
+	players[player_number].skill_flag = 0;
+	players[player_number].invincible = 0;
+	players[player_number].invisible = 0;
 
-	sprintf_s( InstantFileName, "./Shooter/%s_Graph.png", Players[player_number].shooter.Name );
+	sprintf_s( InstantFileName, "./Shooter/%s_Graph.png", players[player_number].shooter.name );
 
-	LoadDivGraph( InstantFileName, 3, 3, 1, PLAYERSIZE, PLAYERSIZE, Players[player_number].shooter.Graph );
+	LoadDivGraph( InstantFileName, 3, 3, 1, PLAYERSIZE, PLAYERSIZE, players[player_number].shooter.graph );
 
-	Players[player_number].graph_handle = Players[player_number].shooter.Graph[PLAYERMOVING_DEFAULT];
+	players[player_number].graph_handle = players[player_number].shooter.graph[PLAYERMOVING_DEFAULT];
 
 	return 0;
-
 }
 
 int PlayerDraw(){
 
 	int count = 0;//弾表示用
 
-	for( int i1 = 0; i1 < player_num; i1++ ){
+	for( int i1 = 0; i1 < player_count; i1++ ){
 
-		if( Players[i1].alive ){
+		if( players[i1].alive ){
 
 			//プレイヤー描画
-			if( Players[i1].invisible == 0 )
-				DrawRotaGraph( (int)Players[i1].pos.x, (int)Players[i1].pos.y, 1.0, 0, Players[i1].graph_handle, 1 );
+			if( players[i1].invisible == 0 )
+				DrawRotaGraph( (int)players[i1].pos.x, (int)players[i1].pos.y, 1.0, 0, players[i1].graph_handle, 1 );
 
 			//弾描画
 
-			ShotDraw( Players[i1].shot );
+			ShotDraw( players[i1].shot );
 
 			//DrawFormatString( 0, 16, ColorBlue, "使用されている弾の数:%d/100", count );
 		}
 
 		//アイコン描画
-		//DrawExtendGraph( MAINSCREEN_WIDTH / (player_num + 1) * (i1+1) - 48, MAINSCREEN_HEIGHT - 96, MAINSCREEN_WIDTH / (player_num + 1) * (i1+1) + 48, MAINSCREEN_HEIGHT, Players[i1].shooter.Icon, 1 );
-		DrawRotaGraph( MAINSCREEN_WIDTH / (player_num + 1) * (i1+1), MAINSCREEN_HEIGHT - ICON_DRAWSIZE / 2, ICON_DRAWSIZE / ICON_SIZE, 0, Players[i1].shooter.Icon, 1 );
+		//DrawExtendGraph( MAINSCREEN_WIDTH / (player_count + 1) * (i1+1) - 48, MAINSCREEN_HEIGHT - 96, MAINSCREEN_WIDTH / (player_count + 1) * (i1+1) + 48, MAINSCREEN_HEIGHT, players[i1].shooter.Icon, 1 );
+		DrawRotaGraph( MAINSCREEN_WIDTH / (player_count + 1) * (i1+1), MAINSCREEN_HEIGHT - ICON_DRAWSIZE / 2, ICON_DRAWSIZE / ICON_SIZE, 0, players[i1].shooter.icon_handle, 1 );
 
 		//必殺ゲージ表示
-		DrawBox( MAINSCREEN_WIDTH / (player_num + 1) * (i1+1) - ICON_DRAWSIZE / 2 - BAR_WIDTH, MAINSCREEN_HEIGHT - (ICON_DRAWSIZE - BAR_HEIGHT) / 2, MAINSCREEN_WIDTH / (player_num + 1) * (i1+1) - ICON_DRAWSIZE / 2, MAINSCREEN_HEIGHT - (ICON_DRAWSIZE - BAR_HEIGHT) / 2 - (int)((float)Players[i1].magic_point / (float)Players[i1].shooter.NeedMagicPoint * BAR_HEIGHT), ColorLBlue, 1 );
-		DrawBox( MAINSCREEN_WIDTH / (player_num + 1) * (i1+1) - ICON_DRAWSIZE / 2 - BAR_WIDTH, MAINSCREEN_HEIGHT - (ICON_DRAWSIZE - BAR_HEIGHT) / 2, MAINSCREEN_WIDTH / (player_num + 1) * (i1+1) - ICON_DRAWSIZE / 2, MAINSCREEN_HEIGHT - (ICON_DRAWSIZE - BAR_HEIGHT) / 2 - BAR_HEIGHT , ColorWhite, 0 );
+		DrawBox( MAINSCREEN_WIDTH / (player_count + 1) * (i1+1) - ICON_DRAWSIZE / 2 - BAR_WIDTH, MAINSCREEN_HEIGHT - (ICON_DRAWSIZE - BAR_HEIGHT) / 2, MAINSCREEN_WIDTH / (player_count + 1) * (i1+1) - ICON_DRAWSIZE / 2, MAINSCREEN_HEIGHT - (ICON_DRAWSIZE - BAR_HEIGHT) / 2 - (int)((float)players[i1].magic_point / (float)players[i1].shooter.NeedMagicPoint * BAR_HEIGHT), ColorLBlue, 1 );
+		DrawBox( MAINSCREEN_WIDTH / (player_count + 1) * (i1+1) - ICON_DRAWSIZE / 2 - BAR_WIDTH, MAINSCREEN_HEIGHT - (ICON_DRAWSIZE - BAR_HEIGHT) / 2, MAINSCREEN_WIDTH / (player_count + 1) * (i1+1) - ICON_DRAWSIZE / 2, MAINSCREEN_HEIGHT - (ICON_DRAWSIZE - BAR_HEIGHT) / 2 - BAR_HEIGHT , ColorWhite, 0 );
 
 		//経験値ゲージ表示
-		//DrawBox( MAINSCREEN_WIDTH / (player_num + 1) * (i1+1) - ICON_DRAWSIZE - BAR_WIDTH, MAINSCREEN_HEIGHT - (ICON_DRAWSIZE - BAR_HEIGHT) / 2, MAINSCREEN_WIDTH / (player_num + 1) * (i1+1) - ICON_DRAWSIZE, MAINSCREEN_HEIGHT - (ICON_DRAWSIZE - BAR_HEIGHT) / 2 - (Players[i1].shooter.NeedMagicPoint - Players[i1].magic_point) / BAR_HEIGHT, ColorBlue, 1 );
-		//DrawBox( MAINSCREEN_WIDTH / (player_num + 1) * (i1+1) - ICON_DRAWSIZE - BAR_WIDTH, MAINSCREEN_HEIGHT - (ICON_DRAWSIZE - BAR_HEIGHT) / 2, MAINSCREEN_WIDTH / (player_num + 1) * (i1+1) - ICON_DRAWSIZE, MAINSCREEN_HEIGHT - (ICON_DRAWSIZE - BAR_HEIGHT) / 2 - BAR_HEIGHT , ColorWhite, 0 );
+		//DrawBox( MAINSCREEN_WIDTH / (player_count + 1) * (i1+1) - ICON_DRAWSIZE - BAR_WIDTH, MAINSCREEN_HEIGHT - (ICON_DRAWSIZE - BAR_HEIGHT) / 2, MAINSCREEN_WIDTH / (player_count + 1) * (i1+1) - ICON_DRAWSIZE, MAINSCREEN_HEIGHT - (ICON_DRAWSIZE - BAR_HEIGHT) / 2 - (players[i1].shooter.NeedMagicPoint - players[i1].magic_point) / BAR_HEIGHT, ColorBlue, 1 );
+		//DrawBox( MAINSCREEN_WIDTH / (player_count + 1) * (i1+1) - ICON_DRAWSIZE - BAR_WIDTH, MAINSCREEN_HEIGHT - (ICON_DRAWSIZE - BAR_HEIGHT) / 2, MAINSCREEN_WIDTH / (player_count + 1) * (i1+1) - ICON_DRAWSIZE, MAINSCREEN_HEIGHT - (ICON_DRAWSIZE - BAR_HEIGHT) / 2 - BAR_HEIGHT , ColorWhite, 0 );
 
 	}
 
 	//必殺技
-	for( int i = 0; i < player_num; i++ )
-		if( Players[i].skill_flag == 1 )
+	for( int i = 0; i < player_count; i++ )
+		if( players[i].skill_flag == 1 )
 			SkillDraw();
 
-	DrawFormatString( 0,0, ColorRed, "ID:%d,Level:%d,CT:%f", Players[0].shottype.ShotTypeID, Players[0].shottype.Level, Players[0].shottype.CoolTime );
-	DrawFormatString( 0,32,ColorRed,"%d",Players[0].magic_point );
+	//DrawFormatString( 0,0, ColorRed, "ID:%d,level:%d,CT:%f", players[0].shot_type.name, players[0].shot_type.level, players[0].shot_type.CoolTime );
+	//DrawFormatString( 0,32,ColorRed,"%d",players[0].magic_point );
 
 	return 0;
 }
 
 int PlayerUpdate(){
 
-	for( int i1 = 0; i1 < player_num; i1++ ){
-		if( Players[i1].alive ){
+	for( int i1 = 0; i1 < player_count; i1++ ){
+		if( players[i1].alive ){
 
-			int prex = Players[i1].pos.x;//更新前の座標
-			//int prey = Players[i1].pos.y;
+			int prex = players[i1].pos.x;//更新前の座標
+			//int prey = players[i1].pos.y;
 
 
 			//移動入力を受け付けたら座標を更新
 
 			/*
-			DrawFormatString( 0, 0, ColorRed, "%s", Players[i1].shooter.Name );
-			DrawGraph( 0, 32, Players[i1].shooter.Icon, 1 );
-			DrawFormatString( 0, 32, ColorRed, "%d", Players[i1].shooter.Icon );
-			DrawFormatString( 0, 64, ColorRed, "%f", Players[i1].shooter.Speed );
-			DrawFormatString( 0, 96, ColorRed, "%d", Players[i1].shooter.magic_point );
-			DrawFormatString( 0, 128, ColorRed, "%d", Players[i1].shooter.st );
-			DrawFormatString( 0, 160, ColorRed, "%d", Players[i1].shooter.skill );
+			DrawFormatString( 0, 0, ColorRed, "%s", players[i1].shooter.Name );
+			DrawGraph( 0, 32, players[i1].shooter.Icon, 1 );
+			DrawFormatString( 0, 32, ColorRed, "%d", players[i1].shooter.Icon );
+			DrawFormatString( 0, 64, ColorRed, "%f", players[i1].shooter.Speed );
+			DrawFormatString( 0, 96, ColorRed, "%d", players[i1].shooter.magic_point );
+			DrawFormatString( 0, 128, ColorRed, "%d", players[i1].shooter.st );
+			DrawFormatString( 0, 160, ColorRed, "%d", players[i1].shooter.skill );
 			*/
 
-			if( Players[i1].can_move == 1 ){
-				if( KeyState[MOVE_LEFT] && Players[i1].pos.x - Players[i1].shooter.Speed > 0 )
-					Players[i1].pos.x -= Players[i1].shooter.Speed;
+			if( players[i1].can_move == 1 ){
+				if( KeyState[MOVE_LEFT] && players[i1].pos.x - players[i1].shooter.speed > 0 )
+					players[i1].pos.x -= players[i1].shooter.speed;
 
-				if( KeyState[MOVE_RIGHT] && Players[i1].pos.x + Players[i1].shooter.Speed < MAINSCREEN_WIDTH )
-					Players[i1].pos.x += Players[i1].shooter.Speed;
+				if( KeyState[MOVE_RIGHT] && players[i1].pos.x + players[i1].shooter.speed < MAINSCREEN_WIDTH )
+					players[i1].pos.x += players[i1].shooter.speed;
 
-				if( KeyState[MOVE_UP] && Players[i1].pos.y  - Players[i1].shooter.Speed > 0 )
-					Players[i1].pos.y -= Players[i1].shooter.Speed;
+				if( KeyState[MOVE_UP] && players[i1].pos.y  - players[i1].shooter.speed > 0 )
+					players[i1].pos.y -= players[i1].shooter.speed;
 
-				if( KeyState[MOVE_DOWN] && Players[i1].pos.y + Players[i1].shooter.Speed < MAINSCREEN_HEIGHT )
-					Players[i1].pos.y += Players[i1].shooter.Speed;
+				if( KeyState[MOVE_DOWN] && players[i1].pos.y + players[i1].shooter.speed < MAINSCREEN_HEIGHT )
+					players[i1].pos.y += players[i1].shooter.speed;
 			}
 
-			if( Players[i1].pos.x != prex ){
-				if( Players[i1].pos.x < prex )
-					Players[i1].graph_handle = Players[i1].shooter.Graph[PLAYERMOVING_LEFT];//左に移動
+			if( players[i1].pos.x != prex ){
+				if( players[i1].pos.x < prex )
+					players[i1].graph_handle = players[i1].shooter.graph[PLAYERMOVING_LEFT];//左に移動
 				else
-					Players[i1].graph_handle = Players[i1].shooter.Graph[PLAYERMOVING_RIGHT];//右に移動
+					players[i1].graph_handle = players[i1].shooter.graph[PLAYERMOVING_RIGHT];//右に移動
 			}else
-				Players[i1].graph_handle = Players[i1].shooter.Graph[PLAYERMOVING_DEFAULT];
+				players[i1].graph_handle = players[i1].shooter.graph[PLAYERMOVING_DEFAULT];
 
 			//ショット入力
-			if( Players[i1].shoot_flag == 1 && MouseLeftClick != 0 && Players[i1].reload <= 0 ){
+			if( players[i1].can_shoot == 1 && MouseLeftClick != 0 && players[i1].reload <= 0 ){
 				//シュートフラグが1かつマウスをクリックしているかつリロードが終わっていれば発射
-				if( DoubleShotFlag == 1 ){
-					if( Players[i1].double_flag ){
-						Players[i1].pos.x -= PLAYERSIZE / 2;
-						ShotMake( Players[i1].pos, Players[i1].shot, Players[i1].shottype );
-						Players[i1].pos.x += PLAYERSIZE / 2;
+				if( double_shot_flag == 1 ){
+					if( players[i1].double_shot ){
+						players[i1].pos.x -= PLAYERSIZE / 2;
+						ShotMake( players[i1].pos, players[i1].shot, players[i1].shot_type );
+						players[i1].pos.x += PLAYERSIZE / 2;
 					}else{
-						Players[i1].pos.x += PLAYERSIZE / 2;
-						ShotMake( Players[i1].pos, Players[i1].shot, Players[i1].shottype );
-						Players[i1].pos.x -= PLAYERSIZE / 2;
+						players[i1].pos.x += PLAYERSIZE / 2;
+						ShotMake( players[i1].pos, players[i1].shot, players[i1].shot_type );
+						players[i1].pos.x -= PLAYERSIZE / 2;
 					}
-					Players[i1].double_flag ^= 1;
+					players[i1].double_shot ^= 1;
 				}else
-					ShotMake( Players[i1].pos, Players[i1].shot, Players[i1].shottype );
-				Players[i1].reload += Players[i1].shottype.CoolTime;
+					ShotMake( players[i1].pos, players[i1].shot, players[i1].shot_type );
+				players[i1].reload += players[i1].shot_type.cool_time;
 			}else{
-				if( Players[i1].reload > 0 )
-					Players[i1].reload--;
+				if( players[i1].reload > 0 )
+					players[i1].reload--;
 			}
 
-			ShotUpdate( Players[i1].shot, Players[i1].shottype );
+			ShotUpdate( players[i1].shot, players[i1].shot_type );
 
 
 			//経験値更新
@@ -207,40 +208,40 @@ int PlayerUpdate(){
 
 		
 			//必殺技更新
-			if (Players[i1].skill_flag == 0) {
-				if (Players[i1].magic_point < Players[i1].shooter.NeedMagicPoint)
-					Players[i1].magic_point++;
+			if (players[i1].skill_flag == 0) {
+				if (players[i1].magic_point < players[i1].shooter.need_magic_point)
+					players[i1].magic_point++;
 				else
-					Players[i1].magic_point = Players[i1].shooter.NeedMagicPoint;
+					players[i1].magic_point = players[i1].shooter.need_magic_point;
 			}
 
-			if( Players[i1].magic_point == Players[i1].shooter.NeedMagicPoint ){
+			if( players[i1].magic_point == players[i1].shooter.need_magic_point ){
 				if( KeyState[KEY_INPUT_Q] == 1 ){
-					for( int j = 0; j < player_num; j++ ){
-						if( Players[j].skill_flag == 1 )
+					for( int j = 0; j < player_count; j++ ){
+						if( players[j].skill_flag == 1 )
 							break;
-						else if( (j + 1) == player_num ){
+						else if( (j + 1) == player_count ){
 							//自分含む全プレイヤーが必殺技中でないなら発動可能
-							SkillInit( &Players[i1] );
+							SkillInit( &players[i1] );
 						}
 					}
 				}
 			}
 
-			if( Players[i1].skill_flag == 1 )
+			if( players[i1].skill_flag == 1 )
 				SkillUpdate();
 
 			//デバッグ欄
 			if( KeyState[KEY_INPUT_UP] == 1 )
-				PlayerLevelUp( &Players[i1] );
+				upPlayerLevel( players[i1] );
 			if( KeyState[KEY_INPUT_DOWN] == 1 )
-				PlayerLevelDown( &Players[i1] );
+				downPlayerLevel( players[i1] );
 			if (KeyState[KEY_INPUT_1] == 1)
-				Players[i1].invincible ^= 1;
+				players[i1].invincible ^= 1;
 			if (KeyState[KEY_INPUT_2] == 1)
-				Players[i1].magic_point += 10000;
+				players[i1].magic_point += 10000;
 			if (KeyState[KEY_INPUT_3] == 1)
-				Players[i1].invisible ^= 1;
+				players[i1].invisible ^= 1;
 		}
 
 	}
@@ -248,52 +249,54 @@ int PlayerUpdate(){
 	return 0;
 }
 
-void PlayerLevelUp( Player *player ){
-	if( player -> shottype.Level < SHOTTYPE_LEVELMAX && player -> skill_flag == 0){
-		player -> shottype = ShotType[(player -> shooter.st - 1) * SHOTTYPE_LEVELMAX + player -> shottype.Level];
-		player -> level++;
+void upPlayerLevel( Player &player ){
+	if( player.shot_type.level < SHOTTYPE_LEVELMAX && player.skill_flag == 0){
+		player.shot_type = shot_types[(static_cast<int>(player.shooter.shot_type) - 1) * SHOTTYPE_LEVELMAX + player.shot_type.level];
+		player.level++;
 	}
 }
 
-void PlayerLevelDown( Player *player ){
-	if( player -> shottype.Level > 1 && player -> skill_flag == 0 ){
-		player -> shottype = ShotType[(player -> shooter.st - 1) * SHOTTYPE_LEVELMAX + player -> shottype.Level - 2];
-		player -> level--;
+void downPlayerLevel( Player &player ){
+	if( player.shot_type.level > 1 && player.skill_flag == 0 ){
+		player.shot_type = shot_types[(static_cast<int>(player.shooter.shot_type) - 1) * SHOTTYPE_LEVELMAX + player.shot_type.level - 2];
+		player.level--;
 	}
 }
 
-void PlayerShotTypeReset( char player_bitflag ){
-	for( int i = 0; i < player_num; i++ ){
+void resetPlayerShotType( char player_bitflag ){
+	for( int i = 0; i < player_count; i++ ){
 			if( player_bitflag & (1 << i) )
-				Players[i].shottype = ShotType[(Players[i].shooter.st - 1) * SHOTTYPE_LEVELMAX + Players[i].level - 1];
+				players[i].shot_type = shot_types[(static_cast<int>(players[i].shooter.shot_type) - 1) * SHOTTYPE_LEVELMAX + players[i].level - 1];
 	}
 }
 
-void PlayerShotTypeOverRide2( void (*func)( SHOTTYPE *st ), char player_bitflag ){
-	for( int i = 0; i < player_num; i++ ){
+
+//関数ポインタを渡して好きにショットタイプを弄る
+void overridePlayerShotType( void (*func)( ShotType &shot_type ), char player_bitflag ){
+	for( int i = 0; i < player_count; i++ ){
 			if( player_bitflag & (1 << i) )
-				func( &Players[i].shottype );
+				func( players[i].shot_type );
 	}
 }
 
 void damagePlayer( int PlayerNum ) {
 
-	if (Players[PlayerNum].invincible)
+	if (players[PlayerNum].invincible)
 		return;
 
-	for (list<SHOT>::iterator itr = Players[PlayerNum].shot.begin(); itr != Players[PlayerNum].shot.end();) {
-		itr = Players[PlayerNum].shot.erase(itr);
+	for (list<Shot>::iterator itr = players[PlayerNum].shot.begin(); itr != players[PlayerNum].shot.end();) {
+		itr = players[PlayerNum].shot.erase(itr);
 	}
 	
-	Players[PlayerNum].alive = FALSE;
+	players[PlayerNum].alive = FALSE;
 }
 
-void PlayerDoubleShotStart(){
-	DoubleShotFlag = 1;
+void beginPlayerDoubleShot(){
+	double_shot_flag = 1;
 }
 
-void PlayerDoubleShotEnd(){
-	DoubleShotFlag = 0;
+void endPlayerDoubleShot(){
+	double_shot_flag = 0;
 }
 
 /*

@@ -1,11 +1,5 @@
-#ifndef SHOOTER_H
-#define SHOOTER_H
-
-
-//#define SHOOTER_PRIM 0
-//Å™enumÇ≈ä«óù
-
-#include "data.h"
+#pragma once
+#include "Data.h"
 
 void ShooterInit();
 
@@ -102,5 +96,15 @@ No.9
 */
 
 
-
-#endif
+class Shooter {
+public:
+	Shooter() : icon_handle(-1), speed(0), need_magic_point(1), shooter_name(shShooterEnd), shot_type(stShotTypeEnd), skill(skSkillEnd) {}
+	string name;
+	int icon_handle;
+	int graph[3];
+	float speed;
+	int need_magic_point;
+	enShooter shooter_name;
+	enShotType shot_type;
+	enSkill skill;
+};

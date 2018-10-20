@@ -1,7 +1,7 @@
 #include"Golem.h"
 #include"DxLib.h"
 #include"Random.h"
-#include"main.h"
+#include"Main.h"
 
 
 static int golem_graph[GOLEM_GRAPH_NUM];

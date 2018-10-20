@@ -1,8 +1,8 @@
 #pragma once
-#include<vector>
-#include"player.h"
-#include"zakoenemy.h"
-#include"item.h"
+#include <vector>
+#include "Player.h"
+#include "Zakoenemy.h"
+#include "Item.h"
 
 using namespace std;
 

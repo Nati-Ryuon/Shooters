@@ -1,7 +1,8 @@
-#include"ArchGolem.h"
-#include"DxLib.h"
-#include"Random.h"
-#include"main.h"
+#include "ArchGolem.h"
+#include "DxLib.h"
+#include "Random.h"
+#include "Main.h"
+#include "Player.h"
 
 //‚±‚ÌŠÖ”‚Í‚ ‚Æ‚Å‚¿‚á‚ñ‚Æshot.h‚É‘‚¢‚Æ‚­
 extern void EnemyShotUpdate(list<Shot> &ShotList);

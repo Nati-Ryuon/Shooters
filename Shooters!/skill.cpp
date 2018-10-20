@@ -1,9 +1,9 @@
 #include "DxLib.h"
-#include "skill.h"
-#include "main.h"
-#include "help.h"
-#include "player.h"
-#include "shot.h"
+#include "Skill.h"
+#include "Main.h"
+#include "Help.h"
+#include "Player.h"
+#include "Shot.h"
 #include "Vec2.h"
 #include <time.h>
 
@@ -26,7 +26,7 @@ extern unsigned char SHOOT;
 
 //スキル使用中はレベル上がらないようにする？経験値の蓄積はありで。
 
-PLAYER *owner;//使用したプレイヤーの情報を残すための変数
+Player *owner;//使用したプレイヤーの情報を残すための変数
 SHOTTYPE st;//ショットオーバーライド系スキルを元に戻すため
 int EffectTime;//スキルの効果時間(使わない場合もあり)
 int SkillStartTime;//スキルの使用開始時間(主に時間計測)
@@ -36,7 +36,7 @@ void (*UsingSkillUpdate)();
 void (*UsingSkillDraw)();
 void (*UsingSkillEnd)();
 
-void SkillInit( PLAYER *player ){
+void SkillInit( Player *player ){
 	//処理を止める関数
 	
 
@@ -252,7 +252,7 @@ int SkillIntroEnd(){
 
 //SHOTTYPE stRainbowShot;//定義名が被るのでstをつけること！
 
-void RainbowShotInit( SHOTTYPE *st ){
+void RainbowShotInit( ShotType *st ){
 	char bitflag = 0;
 	
 	owner -> magic_point = owner -> shooter.NeedMagicPoint;//必殺技ゲージをタイマー代わりにするため
@@ -270,7 +270,7 @@ void RainbowShotInit( SHOTTYPE *st ){
 	/*
 	stRainbowShot = *st;
 	stRainbowShot.ShotTypeID = SHOTOVERRIDE_RAINBOW;
-	stRainbowShot.Level = 7;
+	stRainbowShot.level = 7;
 	stRainbowShot.Multiple = 7;
 	stRainbowShot.CoolTime -= 1;
 
@@ -278,10 +278,10 @@ void RainbowShotInit( SHOTTYPE *st ){
 	*/
 }
 
-void RainbowOverRide( SHOTTYPE *st ){
+void RainbowOverRide( ShotType *st ){
 	
 	st -> ShotTypeID = SHOTOVERRIDE_RAINBOW;
-	st -> Level = 7;
+	st -> level = 7;
 	st -> Multiple = 7;
 	st -> CoolTime -= 1;
 
@@ -336,7 +336,7 @@ float HRExRate;
 
 //----
 
-void HyperRayInit( PLAYER *player ){
+void HyperRayInit( Player *player ){
 
 	player -> can_move = 0;
 	player -> shoot_flag = 0;//ショット撃てないようにするフラグ
@@ -419,10 +419,10 @@ void HyperRayEnd(){
 //No.11 背水の陣(BackwaterCamp)
 //一部ショットオーバーライド
 
-void BCInit( SHOTTYPE *st ){
+void BCInit( ShotType *st ){
 	char bitflag = 0;
 	
-	EffectTime = 10000 + (3000 * st->Level);//ミリ秒
+	EffectTime = 10000 + (3000 * st->level);//ミリ秒
 	SkillStartTime = GetNowCount();
 
 	owner -> magic_point = owner -> shooter.NeedMagicPoint;
@@ -438,7 +438,7 @@ void BCInit( SHOTTYPE *st ){
 
 }
 
-void BCOverRide( SHOTTYPE *st ){
+void BCOverRide( ShotType *st ){
 	
 	st -> Damage *= 2;
 
@@ -476,10 +476,10 @@ void BCEnd(){
 //No.12 二丁拳銃(DoubleShot)
 //ショットオーバーライド
 
-void DoubleShotInit( SHOTTYPE *st ){
+void DoubleShotInit( ShotType *st ){
 	char bitflag = 0;
 	
-	EffectTime = 10000 + (3000 * st -> Level);//ミリ秒
+	EffectTime = 10000 + (3000 * st -> level);//ミリ秒
 	SkillStartTime = GetNowCount();
 
 	owner -> magic_point = owner -> shooter.NeedMagicPoint;
@@ -494,7 +494,7 @@ void DoubleShotInit( SHOTTYPE *st ){
 
 }
 
-void DoubleShotOverRide( SHOTTYPE *st ){
+void DoubleShotOverRide( ShotType *st ){
 	
 	st -> CoolTime /= 1.5;//CoolTimeが3分の2に。
 
@@ -585,7 +585,7 @@ bool Flash;
 //bool Photo;写真撮影用のフラグにしようと思ったがFlashで事足りた。
 
 
-int OnTheFilmInit( PLAYER *player ){
+int OnTheFilmInit( Player *player ){
 
 	player -> can_move = 0;
 	

@@ -1,7 +1,7 @@
 #pragma once
-#include"shot.h"
-#include"Vec2.h"
-#include<list>
+#include "Shot.h"
+#include "Vec2.h"
+#include <list>
 
 class Enemy {
 protected:

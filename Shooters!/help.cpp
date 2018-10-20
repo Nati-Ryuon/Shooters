@@ -1,12 +1,11 @@
-#include "DxLib.h"
-#include "help.h"
+#include "Help.h"
 //#include "main.h"
 
-char KeyBuf[256];
-unsigned int KeyState[256] = {0};
+//char KeyBuf[256];
+//unsigned int KeyState[256] = {0};
 
-int MouseX = -1, MouseY = -1, MouseWheel = 0;
-unsigned int MouseLeftClick = 0, MouseRightClick = 0, MouseMiddleClick = 0;
+//int MouseX = -1, MouseY = -1, MouseWheel = 0;
+//unsigned int MouseLeftClick = 0, MouseRightClick = 0, MouseMiddleClick = 0;
 
 //カラーサンプルたち
 int CS_White = GetColor( 255,255,255 );
@@ -14,7 +13,11 @@ int CS_Black = GetColor( 0,0,0 );
 int CS_Gray = GetColor( 100,100,100 );
 int CS_LightGray = GetColor( 200,200,200 );
 
-void KeyStateUpdate(){
+static Key key;
+static Mouse mouse;
+
+/*
+void updateKeyState(){
 	GetHitKeyStateAll( KeyBuf );
 	for( int i = 0; i < 256; i++ ){
 		if( KeyBuf[i] )
@@ -24,7 +27,7 @@ void KeyStateUpdate(){
 	}
 }
 
-void MouseStateUpdate(){
+void updateMouseState(){
 	GetMousePoint( &MouseX, &MouseY );
 	
 	MouseWheel = GetMouseWheelRotVol();
@@ -45,12 +48,12 @@ void MouseStateUpdate(){
 		MouseMiddleClick = 0;
 
 }
+*/
 
-
-
-
-
-
+void updateHelp() {
+	key.update();
+	mouse.update();
+}
 
 void DrawCenterBox( int cx, int cy, int Width, int Height, int Color, int FillFlag ){
 	DrawBox( cx - Width / 2, cy - Height / 2, cx + Width / 2, cy + Height / 2, Color, FillFlag );
@@ -62,6 +65,7 @@ void DrawCenterString( int cx, int cy, const char *String, int Color ){
 	DrawString( cx - Width / 2, cy - DEF_FONTSIZE / 2, String, Color );
 }
 
+/*
 int MakeButton( int cx, int cy, int Width, int Height, char *String, int SelectFlag, int InvisibleFlag, int FontSize ){
 	if( FontSize != DEF_FONTSIZE )
 		SetFontSize( FontSize );
@@ -161,7 +165,7 @@ int HelpKeyInputNumber( int MinNum, int MaxNum, int *Number ){
 
 	return 0;
 }
-
+*/
 
 /*ttp://www.cc.kyoto-su.ac.jp/~yamada/ap/qsort.html*/
 /* ttp://www.bohyoh.com/CandCPP/FAQ/FAQ00047.html から引用*/
@@ -176,163 +180,81 @@ void int_qsort( int *ArrayP ){
 	qsort( ArrayP, nx, sizeof(int), int_cmp );
 }
 
-int HelpLeftClick( int x1, int y1, int x2, int y2, char ReturnMomentFlag ){
+void Mouse::update() {
 
-	if( x1 <= MouseX && MouseX <= x2 && y1 <= MouseY && MouseY <= y2 ){
-		if( MouseLeftClick == 1 && ReturnMomentFlag == 1 )
-			return 2;
-		else if( MouseLeftClick != 0 )
-			return MouseLeftClick;
+	int input = GetMouseInput();
 
-		return 1;
+	GetMousePoint(&x, &y);
+	wheel = GetMouseWheelRotVol();
+
+	if ((input & MOUSE_INPUT_LEFT) != 0)
+		left_click++;
+	else
+		left_click = 0;
+
+	if ((input & MOUSE_INPUT_RIGHT) != 0)
+		right_click++;
+	else
+		right_click = 0;
+
+	if ((input & MOUSE_INPUT_MIDDLE) != 0)
+		middle_click++;
+	else
+		middle_click = 0;
+
+	if (force_in_window && GetWindowActiveFlag() == 1) {
+		int window_width;
+		int window_height;
+		GetWindowSize(&window_width, &window_height);
+		if (x > window_width)
+			x = window_width;
+		else if (x < 0)
+			x = 0;
+		else if (y > window_height)
+			y = window_height;
+		else if (y < 0)
+			y = 0;
+		SetMousePoint(x, y);
 	}
-
-	return 0;
 }
 
-int HelpLeftClick2( int cx, int cy, int Width, int Height, char ReturnMomentFlag ){
-
-	//DrawFormatString( 0, 60, GetColor( 255,255,255 ), "MouseX:%d MouseY:%d x1:%d y1:%d x2:%d y2:%d", MouseX, MouseY, cx - Width / 2, cy - Height / 2, cx + Width / 2, cy + Height / 2 );
-
-	if( cx - Width / 2 <= MouseX && MouseX <= cx + Width / 2 && cy - Height / 2 <= MouseY && MouseY <= cy + Height / 2 ){
-		if( MouseLeftClick == 1 && ReturnMomentFlag == 1 )
-			return 2;
-		else if( MouseLeftClick != 0 )
-			return MouseLeftClick;
-
-		return 1;
+unsigned int Mouse::getClickState(enClick clCtg){
+	switch (clCtg) {
+	case enClick::clLeft:
+		return left_click;
+	case enClick::clRight:
+		return right_click;
+	case enClick::clMiddle:
+		return middle_click;
+	default:
+		return 0;
 	}
-
-	return 0;
 }
 
-int HelpRightClick( int x1, int y1, int x2, int y2, char ReturnMomentFlag ){
-
-	if( x1 <= MouseX && MouseX <= x2 && y1 <= MouseY && MouseY <= y2 ){
-		if( MouseRightClick == 1 && ReturnMomentFlag == 1 )
-			return 2;
-		else if( MouseRightClick != 0 )
-			return MouseRightClick;
-
-		return 1;
-	}
-
-	return 0;
+bool Mouse::isInRange(int x1, int x2, int y1, int y2) {
+	if (x2 > x && x > x1 && y2 > y && y > y1) return true;
+	return false;
 }
 
-int HelpRightClick2( int cx, int cy, int Width, int Height, char ReturnMomentFlag ){
-
-	if( cx - Width / 2 <= MouseX && MouseX <= cx + Width / 2 && cy - Height / 2 <= MouseY && MouseY <= cy + Height / 2 ){
-		if( MouseRightClick == 1 && ReturnMomentFlag == 1 )
-			return 2;
-		else if( MouseRightClick != 0 )
-			return MouseRightClick;
-
-		return 1;
-	}
-
-	return 0;
+bool Mouse::isInRange2(int x, int y, int width, int height) {
+	if (x + width >> 1 > x && x > x - width >> 1 && y + height >> 1 > y && y > y - height >> 1) return true;
+	return false;
 }
 
-int HelpMiddleClick( int x1, int y1, int x2, int y2, char ReturnMomentFlag ){
-
-	if( x1 <= MouseX && MouseX <= x2 && y1 <= MouseY && MouseY <= y2 ){
-		if( MouseMiddleClick == 1 && ReturnMomentFlag == 1 )
-			return 2;
-		else if( MouseMiddleClick != 0 )
-			return MouseMiddleClick;
-
-		return 1;
+void Key::update() {
+	GetHitKeyStateAll(key_buff);
+	for (int i = 0; i < 256; i++) {
+		if (key_buff[i])
+			key_state[i]++;
+		else
+			key_state[i] = 0;
 	}
-
-	return 0;
 }
 
-int HelpMiddleClick2( int cx, int cy, int Width, int Height, char ReturnMomentFlag ){
-
-	if( cx - Width / 2 <= MouseX && MouseX <= cx + Width / 2 && cy - Height / 2 <= MouseY && MouseY <= cy + Height / 2 ){
-		if( MouseMiddleClick == 1 && ReturnMomentFlag == 1 )
-			return 2;
-		else if( MouseMiddleClick != 0 )
-			return MouseMiddleClick;
-
-		return 1;
-	}
-
-	return 0;
+unsigned int Key::getKeyState(unsigned char key_index) {
+	return key_state[key_index];
 }
 
-//スクリーン利用で拡大or縮小描画したときの補正用
-int HelpLeftClickAdvance( int x1, int y1, int x2, int y2, int sx1, int sy1, int sx2, int sy2, int WindowWidth, int WindowHeight, char ReturnMomentFlag ){
-	int mx = (MouseX + sx1) * (double)WindowWidth / (double)(sx2 - sx1);
-	int my = (MouseY + sy1) * (double)WindowHeight / (double)(sy2 - sy1);
-	//DrawFormatString( 0, 160, GetColor( 255,255,255 ), "mx:%d my:%d", mx, my );
-
-	if( x1 <= mx && mx <= x2 && y1 <= my && my <= y2 ){
-		if( MouseLeftClick == 1 && ReturnMomentFlag == 1 )
-			return 2;
-		else if( MouseLeftClick != 0 )
-			return MouseLeftClick;
-
-		return 1;
-	}
-
-	return 0;
-}
-
-int HelpLeftClickAdvance2( int cx, int cy, int Width, int Height, int sx1, int sy1, int sx2, int sy2, int WindowWidth, int WindowHeight, char ReturnMomentFlag ){
-	int mx = (MouseX + sx1) * (double)WindowWidth / (double)(sx2 - sx1);
-	int my = (MouseY + sy1) * (double)WindowHeight / (double)(sy2 - sy1);
-	//DrawFormatString( 0, 180, GetColor( 255,255,255 ), "mx:%d my:%d", mx, my );
-
-	if( cx - Width / 2 <= mx && mx <= cx + Width / 2 && cy - Height / 2 <= my && my <= cy + Height / 2 ){
-		if( MouseLeftClick == 1 && ReturnMomentFlag == 1 )
-			return 2;
-		else if( MouseLeftClick != 0 )
-			return MouseLeftClick;
-
-		return 1;
-	}
-
-	return 0;
-}
-
-/*
-mx = Width / WindowWidth * MouseX - (cx - Width / 2)
-mx + (cx - Width / 2) = Width / WindowWidth * MouseX
-(mx + (cx - Width / 2)) * WindowWidth / Width = MouseX
-mx = (MouseX + (cx - Width / 2)) * WindowWidth / Width
-*/
-
-int HelpRightClickAdvance( int x1, int y1, int x2, int y2, int sx1, int sy1, int sx2, int sy2, int WindowWidth, int WindowHeight, char ReturnMomentFlag ){
-	int mx = (MouseX + sx1) * (double)WindowWidth / (double)(sx2 - sx1);
-	int my = (MouseY + sy1) * (double)WindowHeight / (double)(sy2 - sy1);
-
-	if( x1 <= mx && mx <= x2 && y1 <= my && my <= y2 ){
-		if( MouseRightClick == 1 && ReturnMomentFlag == 1 )
-			return 2;
-		else if( MouseRightClick != 0 )
-			return MouseRightClick;
-
-		return 1;
-	}
-
-	return 0;
-}
-
-int HelpRightClickAdvance2( int cx, int cy, int Width, int Height, int sx1, int sy1, int sx2, int sy2, int WindowWidth, int WindowHeight, char ReturnMomentFlag ){
-	int mx = (MouseX + sx1) * (double)WindowWidth / (double)(sx2 - sx1);
-	int my = (MouseY + sy1) * (double)WindowHeight / (double)(sy2 - sy1);
-	//DrawFormatString( 0, 100, GetColor( 255,255,255 ), "mx:%d my:%d", mx, my );
-
-	if( cx - Width / 2 <= mx && mx <= cx + Width / 2 && cy - Height / 2 <= my && my <= cy + Height / 2 ){
-		if( MouseRightClick == 1 && ReturnMomentFlag == 1 )
-			return 2;
-		else if( MouseRightClick != 0 )
-			return MouseRightClick;
-
-		return 1;
-	}
-
-	return 0;
+unsigned int Key::operator[](unsigned char key_index) {
+	return key_state[key_index];
 }

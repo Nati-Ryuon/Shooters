@@ -1,8 +1,8 @@
 #pragma once
 
-#include"player.h"
-#include"zakoenemy.h"
-#include"item.h"
+#include "Player.h"
+#include "Zakoenemy.h"
+#include "Item.h"
 //#include"Kuratas.h"
 
 //いずれも衝突していたらtrueを返す　＊注意＊すり抜けアリ そんなに高速で動くとは思いませんが…

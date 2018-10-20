@@ -1,7 +1,7 @@
 #include "TitleScene.h"
 #include "SceneManager.h"
 #include "DxLib.h"
-#include "main.h"
+#include "Main.h"
 #include "Vec2.h"
 
 #define GROUND_MIN MAINSCREEN_HEIGHT / 3

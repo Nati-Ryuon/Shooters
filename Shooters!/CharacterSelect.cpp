@@ -1,13 +1,16 @@
 #include "DxLib.h"
-#include "data.h"
+#include "Help.h"
+#include "Data.h"
 #include "SceneManager.h"
 #include "CharacterSelect.h"
-#include "player.h"
+#include "Player.h"
+#include "Shooter.h"
 #include "Vec2.h"
-#include "main.h"
+#include "Main.h"
+#include "StrLikeExcel.h"
 
-extern unsigned int KeyState[256];
-extern Shooter Shooters[SHOOTER_MAX];
+extern Key key;
+extern Shooter shooters[SHOOTER_MAX];
 
 /*
 画面は3部構成
@@ -35,7 +38,7 @@ void drawCSelect() {
 void updateCSelect() {
 
 	//タイトルに戻る用
-	if(KeyState[KEY_INPUT_ESCAPE] == 1){
+	if(key[KEY_INPUT_ESCAPE] == 1){
 		deleteCSelect();
 		changeScene(TITLE);
 	}
@@ -44,9 +47,6 @@ void updateCSelect() {
 	updateCSInfo();
 	updateCSChoice();
 }
-
-
-
 
 const int SelectionWidth = MAINSCREEN_WIDTH / 4 * 3;
 const int SelectionHeight = MAINSCREEN_HEIGHT / 4 * 3;
@@ -59,7 +59,7 @@ const int ChoiceHeight = MAINSCREEN_HEIGHT / 4;
 const int SelectionIconSize = 100;
 const int SelectionRows = 3;
 const int SelectionColumns = 7;
-int Icons[SelectionRows * SelectionColumns];
+int icons[SelectionRows * SelectionColumns];
 
 struct Selector {
 	int row;
@@ -68,28 +68,31 @@ struct Selector {
 
 Selector selector;
 
-int SelectionScreen;
-int InfoScreen;
-int ChoiceScreen;
+//スクリーンハンドル
+int select_scr_handle;
+int info_scr_handle;
+int choice_scr_handle;
 
 void initCSSelection() {
-	char filename[256];
-	ShooterName end = ShooterEnd;
+	//char file_name[256];
+	string file_name;
+	enShooter end = enShooter::shShooterEnd;
 
-	for (int i = 0; i < SelectionRows * SelectionColumns && i < ShooterEnd; i++) {
-		sprintf_s(filename, "./Shooter/%s_Icon.png", Shooters[i].Name);
-		Icons[i] = LoadGraph(filename);
+	for (int i = 0; i < SelectionRows * SelectionColumns && i < static_cast<int>(end); i++) {
+		//sprintf_s(file_name, "./Shooter/%s_Icon.png", shooters[i].name);
+		file_name = "./Shooter/%s" + shooters[i].name + "_Icon.png";
+		icons[i] = LoadGraph(file_name.c_str);
 	}
 	selector.row = 0;
 	selector.column = 0;
 
-	SelectionScreen = MakeScreen(SelectionWidth, SelectionHeight);
+	select_scr_handle = MakeScreen(SelectionWidth, SelectionHeight);
 }
 
 void drawCSSelection() {
-	ShooterName end = ShooterEnd;
+	enShooter end = enShooter::shShooterEnd;
 
-	SetDrawScreen(SelectionScreen);
+	SetDrawScreen(select_scr_handle);
 	ClearDrawScreen();
 
 	//7列*3行で最後はランダム用
@@ -101,8 +104,8 @@ void drawCSSelection() {
 			int y = SelectionHeight / (SelectionRows + 1) * (i + 1);
 			int number = i * SelectionColumns + j;//通し番号0～20
 			
-			if (number < end) {
-				DrawRotaGraph(x, y, 3.0, 0, Icons[number], 1);
+			if (number < static_cast<int>(end)) {
+				DrawRotaGraph(x, y, 3.0, 0, icons[number], 1);
 				DrawBox(x - SelectionIconSize / 2, y - SelectionIconSize / 2, x + SelectionIconSize / 2, y + SelectionIconSize / 2, GetColor(100, 100, 100), 0);
 			}
 
@@ -115,23 +118,23 @@ void drawCSSelection() {
 	}
 
 	SetDrawScreen(DX_SCREEN_BACK);
-	DrawGraph(0, 0, SelectionScreen, 1);
+	DrawGraph(0, 0, select_scr_handle, 1);
 }
 
 void updateCSSelection() {
-	ShooterName end = ShooterEnd;
+	enShooter end = enShooter::shShooterEnd;
 	int number = selector.row * SelectionColumns + selector.column;
 
-	if (KeyState[KEY_INPUT_UP] == 1 || KeyState[KEY_INPUT_W] == 1) {
+	if (key[KEY_INPUT_UP] == 1 || key[KEY_INPUT_W] == 1) {
 		if (selector.row - 1 >= 0) selector.row--;
-	}else if (KeyState[KEY_INPUT_DOWN] == 1 || KeyState[KEY_INPUT_S] == 1) {
+	}else if (key[KEY_INPUT_DOWN] == 1 || key[KEY_INPUT_S] == 1) {
 		if (selector.row + 1 < SelectionRows)
-			if (number + SelectionColumns < end) selector.row++;
-	}else if (KeyState[KEY_INPUT_LEFT] == 1 || KeyState[KEY_INPUT_A] == 1) {
+			if (number + SelectionColumns < static_cast<int>(end)) selector.row++;
+	}else if (key[KEY_INPUT_LEFT] == 1 || key[KEY_INPUT_A] == 1) {
 		if (selector.column - 1 >= 0) selector.column--;
-	}else if (KeyState[KEY_INPUT_RIGHT] == 1 || KeyState[KEY_INPUT_D] == 1) {
+	}else if (key[KEY_INPUT_RIGHT] == 1 || key[KEY_INPUT_D] == 1) {
 		if (selector.column + 1 < SelectionColumns)
-			if (number + 1 < end) selector.column++;
+			if (number + 1 < static_cast<int>(end)) selector.column++;
 	}
 
 	/*
@@ -147,28 +150,28 @@ void updateCSSelection() {
 }
 
 void deleteCSelect() {
-	ShooterName end = ShooterEnd;
-	for (int i = 0; i < SelectionRows * SelectionColumns && i < ShooterEnd; i++) {
-		DeleteGraph(Icons[i]);
+	enShooter end = enShooter::shShooterEnd;
+	for (int i = 0; i < SelectionRows * SelectionColumns && i < enShooter::shShooterEnd; i++) {
+		DeleteGraph(icons[i]);
 	}
-	DeleteGraph(SelectionScreen);
-	DeleteGraph(InfoScreen);
-	DeleteGraph(ChoiceScreen);
+	DeleteGraph(select_scr_handle);
+	DeleteGraph(info_scr_handle);
+	DeleteGraph(choice_scr_handle);
 }
 
 void initCSInfo() {
-	InfoScreen = MakeScreen(InfoWidth, InfoHeight);
+	info_scr_handle = MakeScreen(InfoWidth, InfoHeight);
 }
 
 void drawCSInfo() {
-	SetDrawScreen(InfoScreen);
+	SetDrawScreen(info_scr_handle);
 	ClearDrawScreen();
 
 	//DrawBoxAA(0, 0, InfoWidth, InfoHeight, GetColor(255, 255, 255), 0, 10);
 	DrawBox(0, 0, InfoWidth, InfoHeight, GetColor(200, 200, 200), 1);
 
 	SetDrawScreen(DX_SCREEN_BACK);
-	DrawGraph(MAINSCREEN_WIDTH / 4 * 3, 0, InfoScreen, 1);
+	DrawGraph(MAINSCREEN_WIDTH / 4 * 3, 0, info_scr_handle, 1);
 }
 
 void updateCSInfo() {
@@ -176,25 +179,25 @@ void updateCSInfo() {
 }
 
 void initCSChoice() {
-	ChoiceScreen = MakeScreen(ChoiceWidth, ChoiceHeight);
+	choice_scr_handle = MakeScreen(ChoiceWidth, ChoiceHeight);
 }
 
 void drawCSChoice() {
 
-	SetDrawScreen(ChoiceScreen);
+	SetDrawScreen(choice_scr_handle);
 	ClearDrawScreen();
 
 	//DrawBox(0, MAINSCREEN_HEIGHT / 4 * 3, ChoiceWidth, MAINSCREEN_HEIGHT / 4 * 3 + ChoiceHeight, GetColor(0, 0, 255), 0);
-	DrawRotaGraph(ChoiceWidth / 2, ChoiceHeight / 2, 3.0, 0, Icons[selector.row * SelectionColumns + selector.column], 1);
+	DrawRotaGraph(ChoiceWidth / 2, ChoiceHeight / 2, 3.0, 0, icons[selector.row * SelectionColumns + selector.column], 1);
 	
 	SetDrawScreen(DX_SCREEN_BACK);
-	DrawGraph(0, MAINSCREEN_HEIGHT / 4 * 3, ChoiceScreen, 1);
+	DrawGraph(0, MAINSCREEN_HEIGHT / 4 * 3, choice_scr_handle, 1);
 }
 
 void updateCSChoice() {
-	if (KeyState[KEY_INPUT_RETURN] == 1 || KeyState[KEY_INPUT_SPACE] == 1) {
+	if (key[KEY_INPUT_RETURN] == 1 || key[KEY_INPUT_SPACE] == 1) {
 		//決定
-		PlayerInit(0, Shooters[selector.row * SelectionColumns + selector.column].sn);
+		PlayerInit(0, shooters[selector.row * SelectionColumns + selector.column].sn);
 		deleteCSelect();
 		changeScene(GAME);
 	}

@@ -1,17 +1,18 @@
-#include"Item.h"
-#include"DxLib.h"
+#include "Item.h"
+#include "Data.h"
+#include "DxLib.h"
 
 //ÉAÉCÉeÉÄèâä˙âª
-void initItem(Vec2 pos, int graph_handle, ItemType type, Item &item) {
+void initItem(Vec2 pos, int graph_handle, enItemType item_type, Item &item) {
 	item.pos = pos;
 	item.graph_handle = graph_handle;
 	item.draw_flag = true;
 	item.count = 0;
-	item.type = type;
-	switch (item.type){
-	case EXP:
+	item.type = item_type;
+	switch (item.item_type){
+	case itEXP:
 		break;
-	case Gem:
+	case itGem:
 		break;
 	default:
 		break;
@@ -29,11 +30,11 @@ void drawItem(Item &item) {
 void updateItem(Item &item) {
 	if (item.draw_flag == true) {
 		switch (item.type){
-		case EXP:
+		case itEXP:
 			break;
-		case Gem:
+		case itGem:
 			break;
-		case Item1:
+		case itItem1:
 			break;
 		default:
 			break;

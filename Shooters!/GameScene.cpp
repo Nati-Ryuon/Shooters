@@ -1,16 +1,19 @@
-#include"GameScene.h"
-#include"player.h"
-#include"ZakoEnemy.h"
-#include"CollisionDetection.h"
-#include"SceneManager.h"
-#include"DxLib.h"
-#include"Random.h"
-#include"skill.h"
-#include"Kuratas.h"
-#include"Golem.h"
-#include"ArchGolem.h"
+#include "DxLib.h"
+#include "Vec2.h"
+#include "Main.h"
+#include "StrLikeExcel.h"
+#include "CollisionDetection.h"
+#include "SceneManager.h"
+#include "GameScene.h"
+#include "Skill.h"
+#include "ZakoEnemy.h"
+#include "Random.h"
+#include "Kuratas.h"
+#include "Golem.h"
+#include "ArchGolem.h"
 
 
+#define MSECOND_PER_ROW 500 
 #define STAGE_NUM 2
 
 extern unsigned int KeyState[256];
@@ -28,6 +31,7 @@ static int pop_flag;//エネミーがその時間に出現したかどうか
 static void Stage1();
 static void CollisionControll();
 
+std::unique_ptr<Stage> stage;
 
 ////空いてるオブジェクトを返す draw_flag持ってないとあかん
 //template <typename Object>
@@ -47,14 +51,17 @@ void initStage() {
 		stage_counter[i] = 0;
 	}
 	enemies.clear();
-	current_stage = 1;
-	refresh_time = GetNowCount();
-	pop_flag = false;
+	Players[0].shot.clear();//仮
+	stage->setStage("TestStage2");
+	stage->start();
+	//current_stage = 1;
+	//refresh_time = GetNowCount();
+	//pop_flag = false;
 }
 
 //ゲーム画面描画
 void drawGame(){
-	int i;
+	/*
 	if (IntroFlag == 1) {
 		SkillIntroDraw();
 	}
@@ -62,6 +69,8 @@ void drawGame(){
 		e->draw();
 	}
 	PlayerDraw();
+	*/
+	stage->draw();
 }
 
 //ゲーム画面の処理
@@ -144,7 +153,7 @@ void CollisionControll() {
 					if (e->isAlive()) {
 						if (ShotCollisionDetection(pshot, *e)) {
 							e->damage(pshot.damage);
-							pshot.SetFlag(0);
+							pshot.setFlag(0);
 //							shot_itr = Players[i].shot.erase(shot_itr);
 						}
 					}
@@ -211,79 +220,240 @@ void CollisionControll() {
 					}
 				}
 			}
-			//for (list<Kuratas>::iterator kuratas_itr = kuratas.begin(); kuratas_itr != kuratas.end(); kuratas_itr++) {
-			//	if (kuratas_itr->draw_flag == true) {
-			//		if (CollisionDetection(Players[i], *kuratas_itr)) {
-			//			damagePlayer(i);
-			//			damageKuratas(*kuratas_itr, 10);//マジックナンバー、衝突時のダメージ
-			//			goto nextPlayer;
-			//		}
-			//		for (list<Shot>::iterator eshot_itr = kuratas_itr->shot.begin(); eshot_itr != kuratas_itr->shot.end();) {
-			//			if (ShotCollisionDetection(*eshot_itr, Players[i])) {
-			//				damagePlayer(i);
-			//				kuratas_itr->shot.erase(eshot_itr);
-			//				goto nextPlayer;
-			//			}
-			//			eshot_itr++;
-			//		}
-			//	}
-			//}
-			//
-			//for (list<ZakoEnemy>::iterator zako_itr = zakoenemy.begin(); zako_itr != zakoenemy.end(); zako_itr++) {
-			//	if (zako_itr->draw_flag == true) {
-			//		if (CollisionDetection(Players[i], *zako_itr)) {
-			//			damagePlayer(i);
-			//			damageZakoEnemy(*zako_itr, 10);//マジックナンバー、衝突時のダメージ
-			//			goto nextPlayer;
-			//		}
-			//		for (list<Shot>::iterator eshot_itr = zako_itr->shot.begin(); eshot_itr != zako_itr->shot.end();) {
-			//			if (ShotCollisionDetection(*eshot_itr, Players[i])) {
-			//				damagePlayer(i);
-			//				eshot_itr = zako_itr->shot.erase(eshot_itr);
-			//				goto nextPlayer;
-			//			}
-			//			eshot_itr++;
-			//		}
-			//	}
-			//}
-			//
-			//for (list<Golem>::iterator golem_itr = golem.begin(); golem_itr != golem.end(); golem_itr++) {
-			//	if (golem_itr->draw_flag == true) {
-			//		if (CollisionDetection(Players[i], *golem_itr)) {
-			//			damagePlayer(i);
-			//			damageGolem(*golem_itr, 10);//マジックナンバー、衝突時のダメージ
-			//			goto nextPlayer;
-			//		}
-			//		for (list<Shot>::iterator eshot_itr = golem_itr->shot.begin(); eshot_itr != golem_itr->shot.end();) {
-			//			if (ShotCollisionDetection(*eshot_itr, Players[i])) {
-			//				damagePlayer(i);
-			//				eshot_itr = golem_itr->shot.erase(eshot_itr);
-			//				goto nextPlayer;
-			//			}
-			//			eshot_itr++;
-			//		}
-			//	}
-			//}
-			//
-			//for (list<ArchGolem>::iterator archgolem_itr = archgolem.begin(); archgolem_itr != archgolem.end(); archgolem_itr++) {
-			//	if (archgolem_itr->draw_flag == true) {
-			//		if (CollisionDetection(Players[i], *archgolem_itr)) {
-			//			damagePlayer(i);
-			//			damageArchGolem(*archgolem_itr, 10);//マジックナンバー、衝突時のダメージ
-			//			goto nextPlayer;
-			//		}
-			//		for (list<Shot>::iterator eshot_itr = archgolem_itr->shot.begin(); eshot_itr != archgolem_itr->shot.end();) {
-			//			if (ShotCollisionDetection(*eshot_itr, Players[i])) {
-			//				damagePlayer(i);
-			//				eshot_itr = archgolem_itr->shot.erase(eshot_itr);
-			//				goto nextPlayer;
-			//			}
-			//			eshot_itr++;
-			//		}
-			//	}
-			//}
+
 		}
-	//nextPlayer:
-	//	continue;
+	}
+}
+
+
+Condition::Condition() {
+}
+
+Condition::~Condition() {
+	//if (condition_name != NULL)
+		//free(condition_name);
+}
+
+void Condition::setConditionName(string name) {
+	cond_name = name;
+}
+
+void Condition::resetConditionName() {
+	cond_name.clear();
+}
+
+TimeLine::TimeLine() : frame(0), xpos(0), id(0) {
+}
+
+EnemyList::EnemyList() : id(0), level(1) {
+}
+
+EnemyList::~EnemyList() {
+}
+
+void EnemyList::setEnemyName(string name) {
+	EnemyList::name = StrToEN(name);
+}
+
+Stage::Stage() : starttime(0) {
+}
+
+Stage::~Stage() {
+	tl.clear();
+}
+
+void Stage::setStage(string name) {
+	string buff;
+
+	stage_name = name;
+
+	buff = "./Stage/" + stage_name + "/" + stage_name + ".txt";
+	readStage(buff);
+
+	Replace(buff, ".txt", "_EnemyList.txt");
+	readEnemyList(buff);
+}
+
+/*
+void Stage::setBGMName(string name) {
+	//stage_name.reset(new char(Len(name) + 1));
+	//BGM = (char *)malloc(Len(name) + 1);
+	BGM[0] = '\0';
+	JointStr(stage_name, stage_name, name);
+}
+*/
+
+void Stage::addTimeLine(TimeLine timeline) {
+	tl.push_back(timeline);
+}
+
+void Stage::addEnemyList(EnemyList enemylist) {
+	en.push_back(enemylist);
+}
+
+void Stage::resetTimeLine() {
+	tl.clear();
+}
+
+void Stage::resetEnemyList() {
+	en.clear();
+}
+
+void Stage::start() {
+	Stage::starttime = GetNowCount();
+}
+
+void Stage::update() {
+
+	//5行で1秒,1行で0.2秒 1s=1000ms, 0.2s = 200ms
+	const int time = (GetNowCount() - Stage::starttime) / MSECOND_PER_ROW;
+
+	setEnemy(time);
+
+	if (IntroFlag != 1) {
+		PlayerUpdate();
+		for (auto & e : enemies) {
+			e->update();
+		}
+
+		if (KeyState[KEY_INPUT_ESCAPE] == 1) {
+			changeScene(TITLE);
+		}
+	} else {
+		SkillIntroUpdate();
+	}
+
+	//当たり判定
+	CollisionControll();
+}
+
+void Stage::draw() {
+	if (IntroFlag == 1) {
+		SkillIntroDraw();
+	}
+	for (auto & e : enemies) {
+		e->draw();
+	}
+	PlayerDraw();
+}
+
+int Stage::readEnemyList(string filename) {
+
+	int f_handle;
+	if ((f_handle = FileRead_open(filename.c_str)) == 0)
+		return -1;
+
+	int id = 0;
+
+	//const int BufferSize = 256;
+	//char buff1[STRING_SIZE], buff2[STRING_SIZE];
+	string buff;
+
+	stage->resetEnemyList();
+	EnemyList el;
+
+	while (FileRead_eof(f_handle) == 0) {
+		FileRead_gets(&buff[0], STRING_SIZE, f_handle);
+		if (InStr(buff, "{") != 0) {
+			//Mid(buff2, buff1, 1, InStr(buff1, "=") - 1);
+			el.id = id;
+		}
+		else if (InStr(buff, "Color") != 0) {
+			//Mid(buff2, buff1, 1, InStr(buff1, "=") - 1);
+		}
+		else if (InStr(buff, "EnemyName") != 0) {
+			el.setEnemyName(Mid(buff, InStr(buff, "=") + 1, Len(buff)));
+		}
+		else if (InStr(buff, "Level") != 0) {
+			el.level = Value(Mid(buff, InStr(buff, "=") + 1, Len(buff)));
+		}
+		else if (InStr(buff, "Item") != 0) {
+			Mid(buff, InStr(buff, "=") + 1, Len(buff));
+			el.item_type = itItem1;
+		}
+		else if (InStr(buff, "Condition") != 0) {
+			el.cond.setConditionName(Mid(buff, InStr(buff, "=") + 1, Len(buff)));
+		}
+		else if (InStr(buff, "}") != 0) {
+			stage->addEnemyList(el);
+			id++;
+		}
+	}
+
+	//el.cond.resetConditionName();
+
+	FileRead_close(f_handle);
+
+	return 0;
+}
+
+int Stage::readStage(string filename) {
+
+	int f_handle;
+	if ((f_handle = FileRead_open(filename.c_str)) == 0)
+		return -1;
+
+	string buff;
+
+	stage->resetTimeLine();
+	TimeLine tl;
+
+	while (FileRead_eof(f_handle) == 0) {
+		FileRead_gets(&buff[0], STRING_SIZE, f_handle);
+		if (InStr(buff, ",") != 0) {
+			buff += ",";
+			tl.frame = Value(Left(buff, InStr(buff, ",") - 1));
+			buff = Mid(buff, InStr(buff, ",") + 1, Len(buff));
+
+			tl.xpos = Value(Left(buff, InStr(buff, ",") - 1)) * MAINSCREEN_WIDTH / 32;
+			buff = Mid(buff, InStr(buff, ",") + 1, Len(buff));
+
+			tl.id = Value(Left(buff, InStr(buff, ",") - 1));
+
+			stage->addTimeLine(tl);
+		}
+	}
+	FileRead_close(f_handle);
+
+	return 0;
+}
+
+void Stage::setEnemy(const int time) {
+	int count = 0;
+	for (auto itr : tl) {
+		if (itr.frame <= time) {
+			summonEnemy(itr.id, itr.xpos);
+			count++;
+		}
+		else {
+			break;
+		}
+	}
+	for (; count > 0; count--) tl.pop_front();
+}
+
+void Stage::summonEnemy(int id, int xpos) {
+	//idからエネミーの種類を特定してswitchで呼び出しか
+	int i = 0;
+	for (auto itr : en) {
+		if (itr.id == id) {
+			switch (itr.name) {
+			case enZakoEnemy:
+				enemies.push_back(std::make_unique<ZakoEnemy>(Vec2(xpos, 0)));
+				return;
+			case enKuratas:
+				enemies.push_back(std::make_unique<Kuratas>(Vec2(xpos, 0)));
+				return;
+			case enGolem:
+				enemies.push_back(std::make_unique<Golem>(Vec2(xpos, 0)));
+				return;
+			case enArchGolem:
+				enemies.push_back(std::make_unique<ArchGolem>(Vec2(xpos, 0)));
+				return;
+			default:
+				break;
+			}
+			break;
+		}
 	}
 }

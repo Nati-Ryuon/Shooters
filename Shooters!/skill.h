@@ -1,12 +1,11 @@
-#ifndef SKILL_H
-#define SKILL_H
+#pragma once
 
-#include "data.h"
+#include "Data.h"
 
 #define SHOTOVERRIDE_RAINBOW 100
 
 
-void SkillInit( PLAYER *player );
+void SkillInit( Player *player );
 void SkillDraw();
 void SkillUpdate();
 void SkillEnd();
@@ -16,33 +15,31 @@ void SkillIntroUpdate();
 void SkillIntroDraw();
 int SkillIntroEnd();
 
-void RainbowShotInit( SHOTTYPE *st );
-void RainbowOverRide( SHOTTYPE *st );
+void RainbowShotInit( ShotType *st );
+void RainbowOverRide( ShotType *st );
 void RainbowShotUpdate();
 void RainbowShotDraw();
 void RainbowShotEnd();
 
-void HyperRayInit( PLAYER *player );
+void HyperRayInit( Player *player );
 void HyperRayUpdate();
 void HyperRayDraw();
 void HyperRayEnd();
 
-void BCInit( SHOTTYPE *st );
-void BCOverRide( SHOTTYPE *st );
+void BCInit( ShotType *st );
+void BCOverRide( ShotType *st );
 void BCUpdate();
 void BCDraw();
 void BCEnd();
 
-void DoubleShotInit( SHOTTYPE *st );
-void DoubleShotOverRide( SHOTTYPE *st );
+void DoubleShotInit( ShotType *st );
+void DoubleShotOverRide( ShotType *st );
 void DoubleShotUpdate();
 void DoubleShotDraw();
 void DoubleShotEnd();
 
-int OnTheFilmInit( PLAYER *player );
+int OnTheFilmInit( Player *player );
 void OnTheFilmUpdate();
 void OnTheFilmMakePhoto();
 void OnTheFilmDraw();
 void OnTheFilmEnd();
-
-#endif

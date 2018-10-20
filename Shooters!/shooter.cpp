@@ -1,7 +1,8 @@
 #include "DxLib.h"
-#include "shooter.h"
-#include "data.h"
+#include "Shooter.h"
+#include "Data.h"
 #include <stdio.h>
+#include <memory>
 
 /*
 #define SHOOTER_PRIM 0
@@ -16,256 +17,260 @@
 #define SHOOTER_ABEL 9
 */
 
-SHOOTER Shooters[SHOOTER_MAX];
-ShooterName name;
+using namespace std;
+
+//unique_ptr<Shooter> ShooterList;
+Shooter ShooterList[enShooter(shShooterEnd)];
+enShooter name;
 
 void ShooterInit(){
 
 	//プリム※ショットタイプ＆必殺技確定
-	name = Prim;
-	Shooters[name].sn = name;
-	sprintf_s( Shooters[name].Name, "Prim" );
+	name = shPrim;
+	ShooterList[name].shooter_name = name;
+	//sprintf_s( ShooterList[name].Name, "Prim" );
+	ShooterList[name].name = "Prim";
 
 	//アイコン
-	Shooters[name].Icon = LoadGraph( "./Shooter/Prim_Icon.png" );
+	ShooterList[name].icon_handle = LoadGraph( "./Shooter/Prim_Icon.png" );
 
 	//グラフィックはキャラクター選択時に読み込み？
-	//Shooters[name].Graph = NULL;
+	//ShooterList[name].Graph = NULL;
 
 	//移動速度
-	Shooters[name].Speed = 5.0;
+	ShooterList[name].speed = 5.0;
 	
 	//必要ポイント
-	Shooters[name].NeedMagicPoint = 10000;//10000
+	ShooterList[name].need_magic_point = 10000;//10000
 
 	//ショットタイプ
-	Shooters[name].st = Normal;
+	ShooterList[name].shot_type = stNormal;
 
 	//必殺技タイプ
-	Shooters[name].SkillName = RainbowShot;
+	ShooterList[name].skill = skRainbowShot;
 
 	//------------------------------------------------------
 
 	//ルピ※ショットタイプ＆必殺技確定
 	name = Rupi;
-	Shooters[name].sn = name;
-	sprintf_s( Shooters[name].Name, "Rupi" );
+	ShooterList[name].sn = name;
+	sprintf_s( ShooterList[name].Name, "Rupi" );
 
 	//アイコン
-	Shooters[name].Icon = LoadGraph( "./Shooter/Rupi_Icon.png" );
+	ShooterList[name].Icon = LoadGraph( "./Shooter/Rupi_Icon.png" );
 
 	//グラフィックはキャラクター選択時に読み込み？
-	//Shooters[name].Graph = NULL;
+	//ShooterList[name].Graph = NULL;
 
 	//移動速度
-	Shooters[name].Speed = 4.0;
+	ShooterList[name].Speed = 4.0;
 	
 	//必要ポイント
-	Shooters[name].NeedMagicPoint = 7000;//7000
+	ShooterList[name].NeedMagicPoint = 7000;//7000
 
 	//ショットタイプ
-	Shooters[name].st = Beam;
+	ShooterList[name].st = Beam;
 
 	//必殺技タイプ
-	Shooters[name].SkillName = HyperRay;
+	ShooterList[name].SkillName = HyperRay;
 
 	//------------------------------------------------------
 
 	//シエル※ショットタイプ＆必殺技確定
 	name = Ciel;
-	Shooters[name].sn = name;
-	sprintf_s( Shooters[name].Name, "Ciel" );
+	ShooterList[name].sn = name;
+	sprintf_s( ShooterList[name].Name, "Ciel" );
 
 	//アイコン
-	Shooters[name].Icon = LoadGraph( "./Shooter/Ciel_Icon.png" );
+	ShooterList[name].Icon = LoadGraph( "./Shooter/Ciel_Icon.png" );
 
 	//グラフィックはキャラクター選択時に読み込み？
-	//Shooters[name].Graph = NULL;
+	//ShooterList[name].Graph = NULL;
 
 	//移動速度
-	Shooters[name].Speed = 4.5;
+	ShooterList[name].Speed = 4.5;
 	
 	//必要ポイント
-	Shooters[name].NeedMagicPoint = 13000;
+	ShooterList[name].NeedMagicPoint = 13000;
 
 	//ショットタイプ
-	Shooters[name].st = Machinegun;
+	ShooterList[name].st = Machinegun;
 
 	//必殺技タイプ
-	Shooters[name].SkillName = IllustPark;
+	ShooterList[name].SkillName = IllustPark;
 
 	//------------------------------------------------------
 
 	//アッシュ※ショットタイプ＆必殺技確定
 	name = Ash;
-	Shooters[name].sn = name;
-	sprintf_s( Shooters[name].Name, "Ash" );
+	ShooterList[name].sn = name;
+	sprintf_s( ShooterList[name].Name, "Ash" );
 
 	//アイコン
-	Shooters[name].Icon = LoadGraph( "./Shooter/Ash_Icon.png" );
+	ShooterList[name].Icon = LoadGraph( "./Shooter/Ash_Icon.png" );
 
 	//グラフィックはキャラクター選択時に読み込み？
-	//Shooters[name].Graph = NULL;
+	//ShooterList[name].Graph = NULL;
 
 	//移動速度
-	Shooters[name].Speed = 5.5;
+	ShooterList[name].Speed = 5.5;
 	
 	//必要ポイント
-	Shooters[name].NeedMagicPoint = 7000;
+	ShooterList[name].NeedMagicPoint = 7000;
 
 	//ショットタイプ
-	Shooters[name].st = Sword;
+	ShooterList[name].st = Sword;
 
 	//必殺技タイプ
-	Shooters[name].SkillName = BackwaterCamp;
+	ShooterList[name].SkillName = BackwaterCamp;
 
 	//------------------------------------------------------
 
 	//マスター※ショットタイプ確定
 	name = Master;
-	Shooters[name].sn = name;
-	sprintf_s( Shooters[name].Name, "Master" );
+	ShooterList[name].sn = name;
+	sprintf_s( ShooterList[name].Name, "Master" );
 
 	//アイコン
-	Shooters[name].Icon = LoadGraph( "./Shooter/Master_Icon.png" );
+	ShooterList[name].Icon = LoadGraph( "./Shooter/Master_Icon.png" );
 
 	//グラフィックはキャラクター選択時に読み込み？
-	//Shooters[name].Graph = NULL;
+	//ShooterList[name].Graph = NULL;
 
 	//移動速度
-	Shooters[name].Speed = 4.0;
+	ShooterList[name].Speed = 4.0;
 	
 	//必要ポイント
-	Shooters[name].NeedMagicPoint = 13000;
+	ShooterList[name].NeedMagicPoint = 13000;
 
 	//ショットタイプ
-	Shooters[name].st = Shotgun;
+	ShooterList[name].st = Shotgun;
 
 	//必殺技タイプ
-	Shooters[name].SkillName = OnTheFilm;
+	ShooterList[name].SkillName = OnTheFilm;
 
 	//------------------------------------------------------
 
 	//カリン
 	name = Karin;
-	Shooters[name].sn = name;
-	sprintf_s( Shooters[name].Name, "Karin" );
+	ShooterList[name].sn = name;
+	sprintf_s( ShooterList[name].Name, "Karin" );
 
 	//アイコン
-	Shooters[name].Icon = LoadGraph( "./Shooter/Karin_Icon.png" );
+	ShooterList[name].Icon = LoadGraph( "./Shooter/Karin_Icon.png" );
 
 	//グラフィックはキャラクター選択時に読み込み？
-	//Shooters[name].Graph = NULL;
+	//ShooterList[name].Graph = NULL;
 
 	//移動速度
-	Shooters[name].Speed = 4.5;
+	ShooterList[name].Speed = 4.5;
 	
 	//必要ポイント
-	Shooters[name].NeedMagicPoint = 13000;
+	ShooterList[name].NeedMagicPoint = 13000;
 
 	//ショットタイプ
-	Shooters[name].st = Machinegun;
+	ShooterList[name].st = Machinegun;
 
 	//必殺技タイプ
-	Shooters[name].SkillName = BadLuck;
+	ShooterList[name].SkillName = BadLuck;
 
 	//------------------------------------------------------
 
 	//アリス※必殺技確定
 	name = Alice;
-	Shooters[name].sn = name;
-	sprintf_s( Shooters[name].Name, "Alice" );
+	ShooterList[name].sn = name;
+	sprintf_s( ShooterList[name].Name, "Alice" );
 
 	//アイコン
-	Shooters[name].Icon = LoadGraph( "./Shooter/Alice_Icon.png" );
+	ShooterList[name].Icon = LoadGraph( "./Shooter/Alice_Icon.png" );
 
 	//グラフィックはキャラクター選択時に読み込み？
-	//Shooters[name].Graph = NULL;
+	//ShooterList[name].Graph = NULL;
 
 	//移動速度
-	Shooters[name].Speed = 4.5;
+	ShooterList[name].Speed = 4.5;
 	
 	//必要ポイント
-	Shooters[name].NeedMagicPoint = 13000;
+	ShooterList[name].NeedMagicPoint = 13000;
 
 	//ショットタイプ
-	Shooters[name].st = Rose;
+	ShooterList[name].st = Rose;
 
 	//必殺技タイプ
-	Shooters[name].SkillName = MissileParty;//WonderLandもあり？
+	ShooterList[name].SkillName = MissileParty;//WonderLandもあり？
 
 	//------------------------------------------------------
 
 	//ナティ※必殺技確定
 	name = Nati;
-	Shooters[name].sn = name;
-	sprintf_s( Shooters[name].Name, "Nati" );
+	ShooterList[name].sn = name;
+	sprintf_s( ShooterList[name].Name, "Nati" );
 
 	//アイコン
-	Shooters[name].Icon = LoadGraph( "./Shooter/Nati_Icon.png" );
+	ShooterList[name].Icon = LoadGraph( "./Shooter/Nati_Icon.png" );
 
 	//グラフィックはキャラクター選択時に読み込み？
-	//Shooters[name].Graph = NULL;
+	//ShooterList[name].Graph = NULL;
 
 	//移動速度
-	Shooters[name].Speed = 5.0;
+	ShooterList[name].Speed = 5.0;
 	
 	//必要ポイント
-	Shooters[name].NeedMagicPoint = 15000;
+	ShooterList[name].NeedMagicPoint = 15000;
 
 	//ショットタイプ
-	Shooters[name].st = Fireflower;
+	ShooterList[name].st = Fireflower;
 
 	//必殺技タイプ
-	Shooters[name].SkillName = DoubleShot;
+	ShooterList[name].SkillName = DoubleShot;
 
 	//------------------------------------------------------
 
 	//リュオン
 	name = Ryuon;
-	Shooters[name].sn = name;
-	sprintf_s( Shooters[name].Name, "Ryuon" );
+	ShooterList[name].sn = name;
+	sprintf_s( ShooterList[name].Name, "Ryuon" );
 
 	//アイコン
-	Shooters[name].Icon = LoadGraph( "./Shooter/Ryuon_Icon.png" );
+	ShooterList[name].Icon = LoadGraph( "./Shooter/Ryuon_Icon.png" );
 
 	//グラフィックはキャラクター選択時に読み込み？
-	//Shooters[name].Graph = NULL;
+	//ShooterList[name].Graph = NULL;
 
 	//移動速度
-	Shooters[name].Speed = 5.0;
+	ShooterList[name].Speed = 5.0;
 	
 	//必要ポイント
-	Shooters[name].NeedMagicPoint = 15000;
+	ShooterList[name].NeedMagicPoint = 15000;
 
 	//ショットタイプ
-	Shooters[name].st = Fireflower;
+	ShooterList[name].st = Fireflower;
 
 	//必殺技タイプ
-	Shooters[name].SkillName = DoubleShot;
+	ShooterList[name].SkillName = DoubleShot;
 
 	//------------------------------------------------------
 
 	//アベル※ショットタイプ＆必殺技確定
 	name = Abel;
-	Shooters[name].sn = name;
-	sprintf_s( Shooters[name].Name, "Abel" );
+	ShooterList[name].sn = name;
+	sprintf_s( ShooterList[name].Name, "Abel" );
 
 	//アイコン
-	Shooters[name].Icon = LoadGraph( "./Shooter/Abel_Icon.png" );
+	ShooterList[name].Icon = LoadGraph( "./Shooter/Abel_Icon.png" );
 
 	//グラフィックはキャラクター選択時に読み込み？
-	//Shooters[name].Graph = NULL;
+	//ShooterList[name].Graph = NULL;
 
 	//移動速度
-	Shooters[name].Speed = 4.0;
+	ShooterList[name].Speed = 4.0;
 	
 	//必要ポイント
-	Shooters[name].NeedMagicPoint = 20000;
+	ShooterList[name].NeedMagicPoint = 20000;
 
 	//ショットタイプ
-	Shooters[name].st = Cross;
+	ShooterList[name].st = Cross;
 
 	//必殺技タイプ
-	Shooters[name].SkillName = GodMouse;
+	ShooterList[name].SkillName = GodMouse;
 }

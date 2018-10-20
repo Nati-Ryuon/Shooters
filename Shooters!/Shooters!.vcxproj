@@ -149,29 +149,33 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ResourceCompile Include="Resorce.rc" />
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="ArchGolem.cpp" />
     <ClCompile Include="CharacterSelect.cpp" />
     <ClCompile Include="CollisionControl.cpp" />
     <ClCompile Include="CollisionDetection.cpp" />
+    <ClCompile Include="Data.cpp" />
     <ClCompile Include="Enemy.cpp" />
-    <ClCompile Include="enemyShot.cpp" />
+    <ClCompile Include="EnemyShot.cpp" />
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="Golem.cpp" />
+    <ClCompile Include="Help.cpp" />
+    <ClCompile Include="Item.cpp" />
     <ClCompile Include="Kuratas.cpp" />
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="Random.cpp" />
-    <ClCompile Include="SceneBase.cpp" />
     <ClCompile Include="SceneManager.cpp" />
-    <ClCompile Include="shooter.cpp" />
-    <ClCompile Include="shot.cpp" />
-    <ClCompile Include="skill.cpp" />
+    <ClCompile Include="Shooter.cpp" />
+    <ClCompile Include="Shot.cpp" />
+    <ClCompile Include="Skill.cpp" />
+    <ClCompile Include="Sound.cpp" />
     <ClCompile Include="StrLikeExcel.cpp" />
     <ClCompile Include="TitleScene.cpp" />
     <ClCompile Include="Vec2.cpp" />
     <ClCompile Include="ZakoEnemy.cpp" />
-    <ClCompile Include="help.cpp" />
-    <ClCompile Include="Item.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="player.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArchGolem.h" />
@@ -179,32 +183,27 @@
     <ClInclude Include="CollisionCell.h" />
     <ClInclude Include="CollisionControl.h" />
     <ClInclude Include="CollisionDetection.h" />
-    <ClInclude Include="data.h" />
+    <ClInclude Include="Data.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="Golem.h" />
+    <ClInclude Include="Help.h" />
+    <ClInclude Include="Item.h" />
     <ClInclude Include="Kuratas.h" />
+    <ClInclude Include="Main.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="Random.h" />
+    <ClInclude Include="ReadMe.h" />
     <ClInclude Include="SceneBase.h" />
     <ClInclude Include="SceneManager.h" />
-    <ClInclude Include="shooter.h" />
-    <ClInclude Include="shot.h" />
-    <ClInclude Include="skill.h" />
+    <ClInclude Include="Shooter.h" />
+    <ClInclude Include="Shot.h" />
+    <ClInclude Include="Skill.h" />
+    <ClInclude Include="Sound.h" />
     <ClInclude Include="StrLikeExcel.h" />
     <ClInclude Include="TitleScene.h" />
     <ClInclude Include="Vec2.h" />
     <ClInclude Include="ZakoEnemy.h" />
-    <ClInclude Include="help.h" />
-    <ClInclude Include="Item.h" />
-    <ClInclude Include="main.h" />
-    <ClInclude Include="player.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="Prim_Graph.bmp" />
-    <Image Include="Prim_Icon.bmp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="Resorce.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

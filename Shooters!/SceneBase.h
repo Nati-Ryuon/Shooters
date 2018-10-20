@@ -2,6 +2,6 @@
 
 class SceneBase {
 public:
-	int* currentScene;
-	int* prevScene;
+	virtual void draw() = 0;
+	virtual void update() = 0;
 };

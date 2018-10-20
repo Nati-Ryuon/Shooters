@@ -1,6 +1,6 @@
 #pragma once
-#include"Enemy.h"
-#include<memory>
+#include "Enemy.h"
+#include <memory>
 
 #define ARCHGOLEM_GRAPH_NUM 3
 #define ARCHGOLEM_SIZE 32

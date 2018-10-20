@@ -1,6 +1,7 @@
 #pragma once
-#include"Vec2.h"
+#include "Vec2.h"
 
+/*
 enum ItemType {
 	EXP,
 	Gem,
@@ -10,6 +11,8 @@ enum ItemType {
 	Item4,
 	ItemTypeEnd
 };
+Data.hへ移動
+*/
 
 struct Item {
 	Vec2 pos;
@@ -17,10 +20,10 @@ struct Item {
 	bool draw_flag;
 	int graph_handle;
 	int count;
-	ItemType type;//アイテムの種類
+	enItemType type;//アイテムの種類
 };
 
-void initItem(Vec2 pos, int graph_handle, ItemType type, Item &item);
+void initItem(Vec2 pos, int graph_handle, enItemType type, Item &item);
 
 void drawItem(const Item &item);
 

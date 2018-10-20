@@ -1,8 +1,8 @@
-#include"Kuratas.h"
-#include"DxLib.h"
-#include"Random.h"
-#include"main.h"
-#include<math.h>
+#include "Kuratas.h"
+#include "DxLib.h"
+#include "Random.h"
+#include "Main.h"
+#include <math.h>
 
 //‚±‚ÌŠÖ”‚Í‚ ‚Æ‚Å‚¿‚á‚ñ‚Æshot.h‚É‘‚¢‚Æ‚­
 extern void EnemyShotUpdate(list<Shot> &ShotList);
