@@ -7,5 +7,7 @@
 #define PI 3.141592
 
 void endMain();
+void debugPrint(const char *str);
+void debugPrint(int i);
 
 #endif

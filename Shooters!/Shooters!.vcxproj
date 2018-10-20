@@ -163,6 +163,7 @@
     <ClCompile Include="shooter.cpp" />
     <ClCompile Include="shot.cpp" />
     <ClCompile Include="skill.cpp" />
+    <ClCompile Include="Sound.cpp" />
     <ClCompile Include="StrLikeExcel.cpp" />
     <ClCompile Include="TitleScene.cpp" />
     <ClCompile Include="Vec2.cpp" />
@@ -187,6 +188,7 @@
     <ClInclude Include="shooter.h" />
     <ClInclude Include="shot.h" />
     <ClInclude Include="skill.h" />
+    <ClInclude Include="Sound.h" />
     <ClInclude Include="StrLikeExcel.h" />
     <ClInclude Include="TitleScene.h" />
     <ClInclude Include="Vec2.h" />

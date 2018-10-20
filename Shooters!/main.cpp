@@ -13,11 +13,13 @@
 #include "ArchGolem.h"
 #include "StrLikeExcel.h"
 #include "GameScene.h"
+#include "Sound.h"
 
 extern unsigned int KeyState[256];
 extern unsigned int MouseLeftClick, MouseRightClick, MouseMiddleClick;
 extern int MouseX, MouseY;
 //extern Scene scene;
+//extern BGM *bgm_head;
 
 char end_flag = 0;
 int ProgramStartTime;
@@ -80,6 +82,10 @@ int WINAPI WinMain(HINSTANCE,HINSTANCE,LPSTR,int){
 	//const char *test = "Nati-chan";
 	//char buff[STRING_SIZE];
 	//Replace(buff, test, "-chan", "");
+
+	//SE test("./BGM/coffeeandcigarette.mp3");
+	//test.setVolume(50);
+	//test.play();
 
 	while( ScreenFlip()==0 && ProcessMessage()==0 && ClearDrawScreen()==0 ){
 
@@ -163,4 +169,12 @@ void FPSWait(){
 
 void endMain() {
 	end_flag = 1;
+}
+
+void debugPrint(const char *str) {
+	DrawFormatString(0, MAINSCREEN_HEIGHT / 2, GetColor(255, 255, 255), "%s", str);
+}
+
+void debugPrint(int i) {
+	DrawFormatString(0, MAINSCREEN_HEIGHT / 2, GetColor(255, 255, 255), "%d", i);
 }

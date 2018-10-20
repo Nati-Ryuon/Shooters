@@ -162,11 +162,7 @@ void CollisionControll() {
 		if (Players[i].alive == 1 && Players[i].invisible == 0) {
 			//----------------------------------------
 			shot_itr = Players[i].shot.begin();
-			while (1) {
-			continueLabel:
-				if (shot_itr == Players[i].shot.end()) {
-					break;
-				}
+			while (shot_itr != Players[i].shot.end()) {
 				//Kuratus
 				for (list<Kuratas>::iterator kuratas_itr = kuratas.begin(); kuratas_itr != kuratas.end(); kuratas_itr++) {
 					if (kuratas_itr->draw_flag == true) {
@@ -210,7 +206,11 @@ void CollisionControll() {
 						}
 					}
 				}
-				shot_itr++;
+
+			continueLabel:
+				if (shot_itr != Players[i].shot.end()) {
+					shot_itr++;
+				}
 			}
 			//----------------------------------------
 			
@@ -517,14 +517,15 @@ int Stage::readStage(const char *FileName) {
 void Stage::setEnemy(const int time) {
 	int count = 0;
 	for (auto itr : tl) {
-		if (itr.frame == time) {
+		if (itr.frame <= time) {
 			summonEnemy(itr.id, itr.xpos);
+			//tl.pop_front();
 			count++;
 		} else {
-			for (int i = 0; i < count; i++) tl.pop_front();
-			return;
+			break;
 		}
 	}
+	for (; count > 0; count--) tl.pop_front();
 }
 
 void Stage::summonEnemy(int id, int xpos) {

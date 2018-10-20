@@ -93,6 +93,9 @@
     <ClCompile Include="data.cpp">
       <Filter>ソース ファイル\ナティ</Filter>
     </ClCompile>
+    <ClCompile Include="Sound.cpp">
+      <Filter>ソース ファイル\ナティ</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CollisionCell.h">
@@ -159,6 +162,9 @@
       <Filter>ヘッダー ファイル\ナティ</Filter>
     </ClInclude>
     <ClInclude Include="StrLikeExcel.h">
+      <Filter>ヘッダー ファイル\ナティ</Filter>
+    </ClInclude>
+    <ClInclude Include="Sound.h">
       <Filter>ヘッダー ファイル\ナティ</Filter>
     </ClInclude>
   </ItemGroup>

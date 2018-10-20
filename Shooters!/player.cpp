@@ -4,6 +4,7 @@
 #include "player.h"
 #include "skill.h"
 #include "shot.h"
+#include "Sound.h"
 #include <stdio.h>
 #include <math.h>
 
@@ -39,6 +40,8 @@ const unsigned int ColorWhite = GetColor( 255, 255, 255 );
 PLAYER Players[PLAYER_MAX];
 //list<Player> PlayerList;
 
+//SE test;
+
 //プレイヤー人数
 char player_num = 1;
 
@@ -49,7 +52,7 @@ void PlayerLevelUp( Player *player );
 void PlayerLevelDown( Player *player );
 
 int PlayerInit( char player_number, ShooterName name ){
-
+	//test.set("./SE/shot1.mp3");
 	char InstantFileName[FILENAME_MAX];
 
 	//名前と番号を一致させる
@@ -191,7 +194,7 @@ int PlayerUpdate(){
 						Players[i1].pos.x -= PLAYERSIZE / 2;
 					}
 					Players[i1].double_flag ^= 1;
-				}else
+				} else
 					ShotMake( Players[i1].pos, Players[i1].shot, Players[i1].shottype );
 				Players[i1].reload += Players[i1].shottype.CoolTime;
 			}else{

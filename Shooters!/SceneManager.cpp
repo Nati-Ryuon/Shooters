@@ -2,9 +2,13 @@
 #include "GameScene.h"
 #include "TitleScene.h"
 #include "CharacterSelect.h"
+#include "Sound.h"
 
 static Scene scene = TITLE;
 
+BGM title;
+BGM cselect;
+BGM game;
 
 //äeÉVÅ[ÉìÇÃï`âÊ
 void drawSceneManager(){
@@ -52,14 +56,32 @@ void changeScene(const Scene nextScene){
 		initStage();
 	}
 	*/
+	if (title.get() == -1) {
+		title.set("./BGM/minus.mp3");
+	}
+	if (cselect.get() == -1) {
+		cselect.set("./BGM/may.mp3");
+	}
+	if (game.get() == -1) {
+		game.set("./BGM/meandyou.mp3");
+	}
+	title.stop();
+	cselect.stop();
+	game.stop();
 	switch (scene) {
 	case TITLE:
+		title.setVolume(50);
+		title.play(true);
 		initTitle();
 		break;
 	case CHARACTER_SELECT:
+		cselect.setVolume(50);
+		cselect.play(true);
 		initCSelect();
 		break;
 	case GAME:
+		game.setVolume(50);
+		game.play(true);
 		initStage();
 		break;
 	case RESULT:
