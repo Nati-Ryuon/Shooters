@@ -51,6 +51,7 @@ enum ShooterName{
 	Nati,
 	Ryuon,
 	Abel,
+	snBlue,
 	ShooterEnd
 };
 
