@@ -14,7 +14,7 @@ void loadKuratasGraph() {
 }
 
 //エネミー初期化および設置
-Kuratas::Kuratas(Vec2 & pos)
+Kuratas::Kuratas(Vec2 pos)
 	: Enemy(pos, kuratas_graph[0], 1, 0.5, 16, 200, 2), shot_multiple(8), shoot_interval(3)
 {
 

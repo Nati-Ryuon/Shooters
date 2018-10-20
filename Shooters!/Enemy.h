@@ -25,8 +25,12 @@ protected:
 	bool shoot_flag;//弾を発射したかどうか
 	const int shot_speed;//弾の速度(スカラー)
 public:
-	Enemy(Vec2 &pos, int graph_handle, int hp, int speed, int range, int anime_interval, int shot_speed = 0);
+	Enemy(Vec2 &pos, int graph_handle, int hp, float speed, int range, int anime_interval, int shot_speed = 0);
 	virtual void draw() = 0;
 	virtual void update() = 0;
 	void damage(const int damage);
+	bool isAlive() { return draw_flag; }
+	bool isFinished() { return erase_flag; }
+	Vec2 getPos() const { return pos; }
+	int getRange() const { return range; }
 };
