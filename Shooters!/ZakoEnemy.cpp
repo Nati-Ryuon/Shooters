@@ -37,7 +37,7 @@ void loadZakoEnemyGraph() {
 //}
 
 ZakoEnemy::ZakoEnemy(Vec2 pos)
-	: Enemy(pos, zakoenemy_graph[0], 20, 1.1, 16, 200, 2), stop_pos(getRandom(100, 300)), stop_time(4),
+	: Enemy(pos, zakoenemy_graph[0], 20, 1.1f, 16, 200, 2), stop_pos(getRandom(100, 300)), stop_time(4),
 	stopped_time(0), stop_flag(false)
 {
 
@@ -46,7 +46,7 @@ ZakoEnemy::ZakoEnemy(Vec2 pos)
 //エネミー描画
 void ZakoEnemy::draw() {
 	if (draw_flag) {
-		DrawGraph(pos.x, pos.y, graph_handle, TRUE);
+		DrawGraphF(pos.x, pos.y, graph_handle, TRUE);
 	}
 	EnemyShotDraw(shots);
 }
@@ -177,6 +177,6 @@ void ZakoEnemy::Pattern() {//一番弱いエネミーの行動パターン
 
 void ZakoEnemy::Shoot() {
 	Shot shot;
-	shot.SetShot(pos, Vec2(0, shot_speed), 0, 1, 1);/*posを画像のサイズだけ移動させようかなぁ*/
+	shot.setShot(pos, Vec2(0, shot_speed), enShotGraph::sgRed, 1, 1);/*posを画像のサイズだけ移動させようかなぁ*/
 	shots.push_back(shot);
 }

@@ -28,10 +28,17 @@ enum class enClick {
 
 class Mouse	{
 public:
-	Mouse() : x(0), y(0), wheel(0), left_click(0), right_click(0), middle_click(0), visible(false), force_in_window(false){}
+	Mouse() : visible(false), force_in_window(false){
+		x = 0;
+		y = 0;
+		wheel = 0;
+		left_click = 0;
+		right_click = 0;
+		middle_click = 0;
+	}
 	~Mouse(){}
 	void update();
-	unsigned int getClickState(enClick clCtg);
+	static unsigned int getClickState(enClick clCtg);
 	bool isInRange(int x1, int x2, int y1, int y2);
 	bool isInRange2(int x, int y, int width, int hegiht);
 	bool isVisible() {return visible;}
@@ -43,25 +50,28 @@ public:
 		force_in_window = flag;
 	}
 public:
-	int x;
-	int y;
+	static int x;
+	static int y;
 private:
-	int wheel;
-	unsigned int left_click;
-	unsigned int right_click;
-	unsigned int middle_click;
+	static int wheel;
+	static unsigned int left_click;
+	static unsigned int right_click;
+	static unsigned int middle_click;
 	bool visible;
 	bool force_in_window;
 };
 
 class Key {
 public:
-	Key() {}
+	Key() {
+		for (int i = 0; i < 256; i++)
+			key_state[i] = 0;
+	}
 	~Key() {}
 	void update();
-	unsigned int getKeyState(unsigned char key_index);
+	static unsigned int getKeyState(unsigned char key_index);
 	unsigned int operator[](unsigned char key_index);
 private:
 	char key_buff[256];
-	unsigned int key_state[256] = { 0 };
+	static unsigned int key_state[256];
 };

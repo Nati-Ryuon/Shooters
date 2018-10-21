@@ -27,7 +27,8 @@ void endPlayerDoubleShot();
 
 class Player {
 public:
-	Player() {}
+	Player() : alive(true), can_move(true), can_back(true), can_shoot(true), 
+				skill_flag(false), double_shot(false), invincible(false), invisible(false) {}
 	~Player() {}
 public:
 	int player_index;
@@ -47,6 +48,7 @@ public:
 
 	bool alive;
 	bool can_move;//0:ˆÚ“®‚Å‚«‚È‚¢ 1:ˆÚ“®‚Å‚«‚é
+	bool can_back;//0:Œã‘Ş‚Å‚«‚È‚¢ 1:Œã‘Ş‚Å‚«‚é
 	bool can_shoot;//0:Œ‚‚Ä‚È‚¢ 1:Œ‚‚Ä‚é
 	bool skill_flag;//1:ƒXƒLƒ‹”­“®’†
 	bool double_shot;//0:¶ 1:‰E

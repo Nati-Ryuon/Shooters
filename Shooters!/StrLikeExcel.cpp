@@ -81,7 +81,7 @@ char* Mid(char buff[], const char *str, int start, int length) {
 	return buff;
 }
 
-string Mid(string str, int start, int length) {
+string Mid(string str, int start, unsigned int length) {
 	if (str.length() > length)
 		length = str.length();
 	return str.substr(start - 1, length);
@@ -98,7 +98,7 @@ char* Left(char buff[], const char *str, int length) {
 	return buff;
 }
 
-string Left(string str, int length) {
+string Left(string str, unsigned int length) {
 	if (str.length() > length)
 		return str;
 	return str.substr(0, length);
@@ -111,10 +111,10 @@ char* Right(char buff[], const char *str, int length) {
 	return Mid(buff, str, len - length + 1, len);
 }
 
-string Right(string str, int length) {
-	if (length > str.length)
+string Right(string str, unsigned int length) {
+	if (length > str.length())
 		return str;
-	return str.substr(str.length - length, length);
+	return str.substr(str.length() - length, length);
 }
 
 char* Replace(char buff[], const char *str, const char *keyword, const char *replace){

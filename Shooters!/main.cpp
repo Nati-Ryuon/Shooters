@@ -17,10 +17,10 @@
 //extern unsigned int MouseLeftClick, MouseRightClick, MouseMiddleClick;
 //extern int MouseX, MouseY;
 //extern Scene scene;
-extern Key key;
-extern Mouse mouse;
+//extern Key key;
+//extern Mouse mouse;
 
-char end_flag = 0;
+static bool end_flag = 0;
 int ProgramStartTime;
 
 //FPSÇà¿íËÇ≥ÇπÇÈÇΩÇﬂÇÃä÷êîÇΩÇø
@@ -71,7 +71,7 @@ int WINAPI WinMain(HINSTANCE,HINSTANCE,LPSTR,int){
 	//PlayerInit( 6, Rupi );
 	//PlayerInit( 7, Rupi );
 
-	srand( time(0) );
+	srand( (unsigned int)time(0) );
 
 	ProgramStartTime = GetNowCount();
 
@@ -93,10 +93,10 @@ int WINAPI WinMain(HINSTANCE,HINSTANCE,LPSTR,int){
 		updateSceneManager();
 		drawSceneManager();
 		
-		if (key[KEY_INPUT_ESCAPE] == 30)
+		if (Key::getKeyState(KEY_INPUT_ESCAPE) == 30)
 			end_flag = 1;
 
-		if (key[KEY_INPUT_F1] == 1)
+		if (Key::getKeyState(KEY_INPUT_F1) == 1)
 			SaveDrawScreenToJPEG(0, 0, MAINSCREEN_WIDTH, MAINSCREEN_HEIGHT, "SS.jpg");
 
 		if( end_flag )

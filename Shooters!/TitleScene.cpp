@@ -3,6 +3,7 @@
 #include "DxLib.h"
 #include "Main.h"
 #include "Vec2.h"
+#include "Shooter.h"
 
 #define GROUND_MIN MAINSCREEN_HEIGHT / 3
 #define WALKER_MAX 6
@@ -20,7 +21,7 @@
 
 const int white = GetColor(255, 255, 255);
 extern unsigned int KeyState[256];
-extern SHOOTER Shooters[SHOOTER_MAX];
+extern Shooter Shooters[SHOOTER_MAX];
 
 int titleGraph = 0;
 Walker walker[WALKER_MAX];
@@ -71,9 +72,9 @@ void initWalker() {
 
 //ウォーカーの生成
 void makeWalker(){
-	ShooterName end = ShooterEnd;
+	enShooter end = enShooter::shShooterEnd;
 	int sID;
-	char sFileName[255];
+	string sFileName;
 	int sLR;
 	int wIndex = 0;
 	char unique_flag = 0, loop_count = 0;
@@ -81,7 +82,7 @@ void makeWalker(){
 	if (walker_num + 1 < WALKER_MAX) {
 		while (walker[wIndex].exist == TRUE && wIndex < WALKER_MAX) wIndex++;
 		do{
-			sID = GetRand(end - 1);
+			sID = GetRand(static_cast<int>(end) - 1);
 			unique_flag = TRUE;
 			for (int i = 0; i < WALKER_MAX; i++) {
 				if (walker[i].exist == FALSE) continue;
@@ -94,19 +95,20 @@ void makeWalker(){
 		}while (!unique_flag && loop_count < 20);
 		
 		walker[wIndex].nameID = sID;
-		sprintf_s(sFileName, "./Shooter/_%s.png", Shooters[sID].Name);
-		walker[wIndex].srcgraph = LoadGraph(sFileName);
+		//sprintf_s(sFileName, "./Shooter/_%s.png", Shooters[sID].name);
+		sFileName = "./Shooter/_" + Shooters[sID].name + ".png";
+		walker[wIndex].srcgraph = LoadGraph(&sFileName[0]);
 		sLR = GetRand(1);//0なら左向き、1なら右向き
 		walker[wIndex].ghundle[0] = DerivationGraph(WALKER_SIZE * 0, WALKER_SIZE * (sLR + 1), WALKER_SIZE, WALKER_SIZE, walker[wIndex].srcgraph);
 		walker[wIndex].ghundle[1] = DerivationGraph(WALKER_SIZE * 1, WALKER_SIZE * (sLR + 1), WALKER_SIZE, WALKER_SIZE, walker[wIndex].srcgraph);
 		walker[wIndex].ghundle[2] = DerivationGraph(WALKER_SIZE * 2, WALKER_SIZE * (sLR + 1), WALKER_SIZE, WALKER_SIZE, walker[wIndex].srcgraph);
 		walker[wIndex].ghundle[3] = walker[wIndex].ghundle[1];
 		if(sLR == 0)
-			walker[wIndex].pos.x = MAINSCREEN_WIDTH + (WALKER_SIZE / 2 * EXRATE_MAX) + GetRand(200);
+			walker[wIndex].pos.x = (float)(MAINSCREEN_WIDTH + (WALKER_SIZE / 2 * EXRATE_MAX) + GetRand(200));
 		else
-			walker[wIndex].pos.x = -(WALKER_SIZE / 2 * EXRATE_MAX) - GetRand(200);
-		walker[wIndex].pos.y = MAINSCREEN_HEIGHT - GetRand(GROUND_MIN);
-		walker[wIndex].exrate = (GROUND_MIN - (MAINSCREEN_HEIGHT - (float)walker[wIndex].pos.y)) / GROUND_MIN * (EXRATE_MAX - 1.0) + 1.0;
+			walker[wIndex].pos.x = (float)(-(WALKER_SIZE / 2 * EXRATE_MAX) - GetRand(200));
+		walker[wIndex].pos.y = (float)(MAINSCREEN_HEIGHT - GetRand(GROUND_MIN));
+		walker[wIndex].exrate = (float)((GROUND_MIN - (MAINSCREEN_HEIGHT - walker[wIndex].pos.y)) / GROUND_MIN * (EXRATE_MAX - 1.0) + 1.0);
 		walker[wIndex].exrate *= 2;//調整用
 		walker[wIndex].alpha = (int)((walker[wIndex].exrate - 1.0) / (EXRATE_MAX - 1.0) * ALPHA_MAX);
 		walker[wIndex].speed.x = (sLR?1:-1) * BASE_SPEED * walker[wIndex].exrate;

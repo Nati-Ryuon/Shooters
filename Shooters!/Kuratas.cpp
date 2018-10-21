@@ -157,7 +157,7 @@ void Kuratas::Shoot() {
 	double angle = 0;
 	for (int i = 0; i < shot_multiple; i++) {
 		angle = 2* i * PI / shot_multiple;
-		shot.SetShot(pos, shot_speed * Vec2(cos(angle), sin(angle)), 0, 1, 1);
+		shot.setShot(pos, shot_speed * Vec2(cos(angle), sin(angle)), enShotGraph::sgRed, 1, 1);
 		shots.push_back(shot);
 	}
 }

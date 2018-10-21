@@ -104,6 +104,9 @@
     <ClCompile Include="ZakoEnemy.cpp">
       <Filter>ソース ファイル\リュオン</Filter>
     </ClCompile>
+    <ClCompile Include="SceneBase.cpp">
+      <Filter>ソース ファイル\リュオン</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArchGolem.h">

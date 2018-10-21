@@ -340,7 +340,7 @@ void Stage::draw() {
 int Stage::readEnemyList(string filename) {
 
 	int f_handle;
-	if ((f_handle = FileRead_open(filename.c_str)) == 0)
+	if ((f_handle = FileRead_open(&filename[0])) == 0)
 		return -1;
 
 	int id = 0;
@@ -369,7 +369,7 @@ int Stage::readEnemyList(string filename) {
 		}
 		else if (InStr(buff, "Item") != 0) {
 			Mid(buff, InStr(buff, "=") + 1, Len(buff));
-			el.item_type = itItem1;
+			el.item_type = enItemType::itItem1;
 		}
 		else if (InStr(buff, "Condition") != 0) {
 			el.cond.setConditionName(Mid(buff, InStr(buff, "=") + 1, Len(buff)));
@@ -390,7 +390,7 @@ int Stage::readEnemyList(string filename) {
 int Stage::readStage(string filename) {
 
 	int f_handle;
-	if ((f_handle = FileRead_open(filename.c_str)) == 0)
+	if ((f_handle = FileRead_open(&filename[0])) == 0)
 		return -1;
 
 	string buff;
@@ -438,16 +438,16 @@ void Stage::summonEnemy(int id, int xpos) {
 	for (auto itr : en) {
 		if (itr.id == id) {
 			switch (itr.name) {
-			case enZakoEnemy:
+			case enEnemy::enZakoEnemy:
 				enemies.push_back(std::make_unique<ZakoEnemy>(Vec2(xpos, 0)));
 				return;
-			case enKuratas:
+			case enEnemy::enKuratas:
 				enemies.push_back(std::make_unique<Kuratas>(Vec2(xpos, 0)));
 				return;
-			case enGolem:
+			case enEnemy::enGolem:
 				enemies.push_back(std::make_unique<Golem>(Vec2(xpos, 0)));
 				return;
-			case enArchGolem:
+			case enEnemy::enArchGolem:
 				enemies.push_back(std::make_unique<ArchGolem>(Vec2(xpos, 0)));
 				return;
 			default:

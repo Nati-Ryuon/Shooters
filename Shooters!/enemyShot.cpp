@@ -1,7 +1,8 @@
-#include"shot.h"
-#include"Vec2.h"
-#include"DxLib.h"
-#include"main.h"
+#include "shot.h"
+#include "Vec2.h"
+#include "DxLib.h"
+#include "main.h"
+#include "Data.h"
 
 #define SHOT_RANGE 5
 //弾の当たり判定。仮の値
@@ -10,7 +11,7 @@
 #define SHOTGUN_ANGLE 30//拡散する角度
 #define MACHINEGUN_ANGLE 20
 
-
+/*
 extern enum ShotGraph {
 	Red,
 	Orange,
@@ -25,6 +26,7 @@ extern enum ShotGraph {
 	Red2,
 	ShotGraphMax//必ず最終メンバーにすること
 };
+*/
 
 //void EnemyShotMake(Vec2 pos, list<Shot> &ShotList, SHOTTYPE st) {
 //	//listを受け取って処理するだけの関数
@@ -145,14 +147,14 @@ shot.move_distance = 0;
 */
 
 
-extern int ShotGraph[ShotGraphMax];
+extern int ShotGraph[static_cast<int>(enShotGraph::sgShotGraphEnd)];
 
 void EnemyShotDraw(list<Shot> &ShotList) {
 	int count = 0;
 
 	SetDrawBlendMode(DX_BLENDMODE_ADD, 255);
 	for (list<Shot>::iterator itr = ShotList.begin(); itr != ShotList.end(); itr++) {
-		DrawRotaGraph((int)itr->pos.x, (int)itr->pos.y, 1.0, 0, ShotGraph[itr->shot_graph], 1);
+		DrawRotaGraph((int)itr->pos.x, (int)itr->pos.y, 1.0, 0, ShotGraph[static_cast<int>(itr->graph)], 1);
 		//DrawCircle( (int)itr -> pos.x, (int)itr -> pos.y, itr -> range, GetColor( 255, 0, 0 ) );
 		count++;
 	}
@@ -172,9 +174,9 @@ void EnemyShotUpdate(list<Shot> &ShotList) {
 
 		itr->count++;
 		itr->pos = itr->pos + itr->speed;
-		itr->move_distance += getNorm(itr->speed);
+		itr->move_distance += (float)getNorm(itr->speed);
 
-		if ((int)itr->move_distance >= itr->MoveRange && itr->MoveRange != 0) {
+		if ((int)itr->move_distance >= itr->rifle_range && itr->rifle_range != 0) {
 			itr = ShotList.erase(itr);//ショットの移動距離が射程を超えたら削除
 			continue;
 		}

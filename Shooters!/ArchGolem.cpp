@@ -172,6 +172,6 @@ void ArchGolem::Pattern() {//
 void ArchGolem::Shoot() {
 	Shot shot;
 	double angle = getRandom(0, 360) * 2 * PI / 360;
-	shot.SetShot(pos, shot_speed * Vec2(cos(angle), sin(angle)), 0, 1, 1);/*posを画像のサイズだけ移動させようかなぁ*/
+	shot.setShot(pos, shot_speed * Vec2(cos(angle), sin(angle)), enShotGraph::sgRed, 1, 1);/*posを画像のサイズだけ移動させようかなぁ*/
 	shots.push_back(shot);
 }

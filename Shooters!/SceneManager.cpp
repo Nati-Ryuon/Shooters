@@ -71,7 +71,7 @@ void changeScene(const Scene nextScene){
 
 void SceneManager::update(){
 	if (currentScene != nullptr) currentScene->update();
-	if (currentScene->IsFinished()) {
+	if (currentScene->isFinished()) {
 		prevScene = std::move(currentScene);
 		currentScene = currentScene->getNextScene();
 	}

@@ -9,10 +9,10 @@ void initItem(Vec2 pos, int graph_handle, enItemType item_type, Item &item) {
 	item.draw_flag = true;
 	item.count = 0;
 	item.type = item_type;
-	switch (item.item_type){
-	case itEXP:
+	switch (item.type){
+	case enItemType::itEXP:
 		break;
-	case itGem:
+	case enItemType::itGem:
 		break;
 	default:
 		break;
@@ -22,7 +22,7 @@ void initItem(Vec2 pos, int graph_handle, enItemType item_type, Item &item) {
 //ƒAƒCƒeƒ€•`‰æ
 void drawItem(Item &item) {
 	if (item.draw_flag == true) {
-		DrawGraph(item.pos.x, item.pos.y, item.graph_handle, TRUE);
+		DrawGraphF(item.pos.x, item.pos.y, item.graph_handle, TRUE);
 	}
 }
 
@@ -30,11 +30,11 @@ void drawItem(Item &item) {
 void updateItem(Item &item) {
 	if (item.draw_flag == true) {
 		switch (item.type){
-		case itEXP:
+		case enItemType::itEXP:
 			break;
-		case itGem:
+		case enItemType::itGem:
 			break;
-		case itItem1:
+		case enItemType::itItem1:
 			break;
 		default:
 			break;

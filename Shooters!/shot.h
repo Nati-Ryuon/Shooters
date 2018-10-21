@@ -18,14 +18,6 @@ ChargeTime:チャージがないものは0
 */
 
 
-int ShotInit();
-void ShotMake( Vec2 pos, list<Shot> &ShotList, ShotType st );
-//void SetShot( Vec2 &pos, Vec2 &speed, int damage, char shot_graph, int range, SHOT & shot, int MoveRange = 0, char shot_flag = 1 );
-
-void ShotDraw( list<Shot> &ShotList );
-void ShotUpdate( list<Shot> &ShotList, ShotType st );
-void ShotDelete( Shot &shot );
-
 class ShotType {
 public:
 	ShotType() : level(1), damage(1), multiple(1), rifle_range(0), cool_time(1), charge_time(0) {}
@@ -62,3 +54,11 @@ public:
 	int count;//制御用カウンター
 	bool pene;//1:貫通あり
 };
+
+int ShotInit();
+void ShotMake(Vec2 pos, list<Shot> &shots, ShotType shot_type);
+//void SetShot( Vec2 &pos, Vec2 &speed, int damage, char shot_graph, int range, SHOT & shot, int MoveRange = 0, char shot_flag = 1 );
+
+void ShotDraw(list<Shot> &shots);
+void ShotUpdate(list<Shot> &shots, ShotType shot_type);
+void ShotDelete(Shot &shot);

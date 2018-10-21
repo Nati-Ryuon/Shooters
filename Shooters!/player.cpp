@@ -1,5 +1,5 @@
 #include "DxLib.h"
-//#include "Help.h"
+#include "Help.h"
 #include "Main.h"
 #include "Player.h"
 #include "Skill.h"
@@ -16,9 +16,9 @@
 #define BAR_WIDTH 10
 #define BAR_HEIGHT 80
 
-extern unsigned int KeyState[256];
-extern unsigned int MouseLeftClick, MouseRightClick, MouseMiddleClick;
-extern int MouseX, MouseY;
+//extern unsigned int KeyState[256];
+//extern unsigned int MouseLeftClick, MouseRightClick, MouseMiddleClick;
+//extern int MouseX, MouseY;
 
 //extern float ShotDefaultCoolTime[SHOTTYPE_MAX];
 extern Shooter shooters[SHOOTER_MAX];
@@ -41,7 +41,7 @@ Player players[PLAYER_MAX];
 //list<Player> players;
 
 //プレイヤー人数
-unsigned int player_count = 1;
+int player_count = 1;
 
 bool double_shot_flag = 0;//1ならDoubleShot中(ShotMakeに渡す座標をずらす)
 
@@ -60,7 +60,7 @@ int PlayerInit( char player_number, enShooter name ){
 	players[player_number].shooter_name = name;
 
 	//名前からシューターのデータを参照して保持する
-	players[player_number].shooter = shooters[players[player_number].sn];
+	players[player_number].shooter = shooters[static_cast<int>(players[player_number].shooter_name)];
 
 	//シューターのデータからショットタイプのデータを参照して保持する
 	players[player_number].shot_type = shot_types[(static_cast<int>(players[player_number].shooter.shot_type) - 1) * SHOTTYPE_LEVELMAX];
@@ -71,8 +71,8 @@ int PlayerInit( char player_number, enShooter name ){
 	players[player_number].EXP = 0;
 	players[player_number].level = 1;
 
-	players[player_number].pos.x = MAINSCREEN_WIDTH / (player_count + 1) * (player_number+1);
-	players[player_number].pos.y = MAINSCREEN_HEIGHT / 8 * 6;//初期の座標だけど仮の値
+	players[player_number].pos.x = (float)(MAINSCREEN_WIDTH / (player_count + 1) * (player_number+1));
+	players[player_number].pos.y = (float)(MAINSCREEN_HEIGHT / 8 * 6);//初期の座標だけど仮の値
 
 	players[player_number].magic_point = 0;
 
@@ -82,7 +82,7 @@ int PlayerInit( char player_number, enShooter name ){
 	players[player_number].invincible = 0;
 	players[player_number].invisible = 0;
 
-	sprintf_s( InstantFileName, "./Shooter/%s_Graph.png", players[player_number].shooter.name );
+	sprintf_s( InstantFileName, "./Shooter/%s_Graph.png", &players[player_number].shooter.name[0] );
 
 	LoadDivGraph( InstantFileName, 3, 3, 1, PLAYERSIZE, PLAYERSIZE, players[player_number].shooter.graph );
 
@@ -115,7 +115,7 @@ int PlayerDraw(){
 		DrawRotaGraph( MAINSCREEN_WIDTH / (player_count + 1) * (i1+1), MAINSCREEN_HEIGHT - ICON_DRAWSIZE / 2, ICON_DRAWSIZE / ICON_SIZE, 0, players[i1].shooter.icon_handle, 1 );
 
 		//必殺ゲージ表示
-		DrawBox( MAINSCREEN_WIDTH / (player_count + 1) * (i1+1) - ICON_DRAWSIZE / 2 - BAR_WIDTH, MAINSCREEN_HEIGHT - (ICON_DRAWSIZE - BAR_HEIGHT) / 2, MAINSCREEN_WIDTH / (player_count + 1) * (i1+1) - ICON_DRAWSIZE / 2, MAINSCREEN_HEIGHT - (ICON_DRAWSIZE - BAR_HEIGHT) / 2 - (int)((float)players[i1].magic_point / (float)players[i1].shooter.NeedMagicPoint * BAR_HEIGHT), ColorLBlue, 1 );
+		DrawBox( MAINSCREEN_WIDTH / (player_count + 1) * (i1+1) - ICON_DRAWSIZE / 2 - BAR_WIDTH, MAINSCREEN_HEIGHT - (ICON_DRAWSIZE - BAR_HEIGHT) / 2, MAINSCREEN_WIDTH / (player_count + 1) * (i1+1) - ICON_DRAWSIZE / 2, MAINSCREEN_HEIGHT - (ICON_DRAWSIZE - BAR_HEIGHT) / 2 - (int)((float)players[i1].magic_point / (float)players[i1].shooter.req_magic_point * BAR_HEIGHT), ColorLBlue, 1 );
 		DrawBox( MAINSCREEN_WIDTH / (player_count + 1) * (i1+1) - ICON_DRAWSIZE / 2 - BAR_WIDTH, MAINSCREEN_HEIGHT - (ICON_DRAWSIZE - BAR_HEIGHT) / 2, MAINSCREEN_WIDTH / (player_count + 1) * (i1+1) - ICON_DRAWSIZE / 2, MAINSCREEN_HEIGHT - (ICON_DRAWSIZE - BAR_HEIGHT) / 2 - BAR_HEIGHT , ColorWhite, 0 );
 
 		//経験値ゲージ表示
@@ -140,7 +140,7 @@ int PlayerUpdate(){
 	for( int i1 = 0; i1 < player_count; i1++ ){
 		if( players[i1].alive ){
 
-			int prex = players[i1].pos.x;//更新前の座標
+			int prex = (int)players[i1].pos.x;//更新前の座標
 			//int prey = players[i1].pos.y;
 
 
@@ -157,16 +157,16 @@ int PlayerUpdate(){
 			*/
 
 			if( players[i1].can_move == 1 ){
-				if( KeyState[MOVE_LEFT] && players[i1].pos.x - players[i1].shooter.speed > 0 )
+				if( Key::getKeyState(MOVE_LEFT) && players[i1].pos.x - players[i1].shooter.speed > 0 )
 					players[i1].pos.x -= players[i1].shooter.speed;
 
-				if( KeyState[MOVE_RIGHT] && players[i1].pos.x + players[i1].shooter.speed < MAINSCREEN_WIDTH )
+				if( Key::getKeyState(MOVE_RIGHT) && players[i1].pos.x + players[i1].shooter.speed < MAINSCREEN_WIDTH )
 					players[i1].pos.x += players[i1].shooter.speed;
 
-				if( KeyState[MOVE_UP] && players[i1].pos.y  - players[i1].shooter.speed > 0 )
+				if( Key::getKeyState(MOVE_UP) && players[i1].pos.y  - players[i1].shooter.speed > 0 )
 					players[i1].pos.y -= players[i1].shooter.speed;
 
-				if( KeyState[MOVE_DOWN] && players[i1].pos.y + players[i1].shooter.speed < MAINSCREEN_HEIGHT )
+				if( Key::getKeyState(MOVE_DOWN) && players[i1].pos.y + players[i1].shooter.speed < MAINSCREEN_HEIGHT )
 					players[i1].pos.y += players[i1].shooter.speed;
 			}
 
@@ -179,7 +179,7 @@ int PlayerUpdate(){
 				players[i1].graph_handle = players[i1].shooter.graph[PLAYERMOVING_DEFAULT];
 
 			//ショット入力
-			if( players[i1].can_shoot == 1 && MouseLeftClick != 0 && players[i1].reload <= 0 ){
+			if( players[i1].can_shoot == 1 && Mouse::getClickState(enClick::clLeft) != 0 && players[i1].reload <= 0 ){
 				//シュートフラグが1かつマウスをクリックしているかつリロードが終わっていれば発射
 				if( double_shot_flag == 1 ){
 					if( players[i1].double_shot ){
@@ -209,38 +209,38 @@ int PlayerUpdate(){
 		
 			//必殺技更新
 			if (players[i1].skill_flag == 0) {
-				if (players[i1].magic_point < players[i1].shooter.need_magic_point)
+				if (players[i1].magic_point < players[i1].shooter.req_magic_point)
 					players[i1].magic_point++;
 				else
-					players[i1].magic_point = players[i1].shooter.need_magic_point;
+					players[i1].magic_point = players[i1].shooter.req_magic_point;
 			}
 
-			if( players[i1].magic_point == players[i1].shooter.need_magic_point ){
-				if( KeyState[KEY_INPUT_Q] == 1 ){
+			if( players[i1].magic_point == players[i1].shooter.req_magic_point ){
+				if( Key::getKeyState(KEY_INPUT_Q) == 1 ){
 					for( int j = 0; j < player_count; j++ ){
 						if( players[j].skill_flag == 1 )
 							break;
 						else if( (j + 1) == player_count ){
 							//自分含む全プレイヤーが必殺技中でないなら発動可能
-							SkillInit( &players[i1] );
+							SkillInit( players[i1] );
 						}
 					}
 				}
 			}
 
-			if( players[i1].skill_flag == 1 )
+			if( players[i1].skill_flag == true )
 				SkillUpdate();
 
 			//デバッグ欄
-			if( KeyState[KEY_INPUT_UP] == 1 )
+			if( Key::getKeyState(KEY_INPUT_UP) == 1 )
 				upPlayerLevel( players[i1] );
-			if( KeyState[KEY_INPUT_DOWN] == 1 )
+			if( Key::getKeyState(KEY_INPUT_DOWN) == 1 )
 				downPlayerLevel( players[i1] );
-			if (KeyState[KEY_INPUT_1] == 1)
+			if (Key::getKeyState(KEY_INPUT_1) == 1)
 				players[i1].invincible ^= 1;
-			if (KeyState[KEY_INPUT_2] == 1)
+			if (Key::getKeyState(KEY_INPUT_2) == 1)
 				players[i1].magic_point += 10000;
-			if (KeyState[KEY_INPUT_3] == 1)
+			if (Key::getKeyState(KEY_INPUT_3) == 1)
 				players[i1].invisible ^= 1;
 		}
 

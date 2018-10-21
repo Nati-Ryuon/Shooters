@@ -1,5 +1,6 @@
 #pragma once
 #include "Enemy.h"
+#include "Player.h"
 #include <memory>
 
 #define GOLEM_GRAPH_NUM 3

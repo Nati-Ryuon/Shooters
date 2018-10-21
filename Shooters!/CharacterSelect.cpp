@@ -81,7 +81,7 @@ void initCSSelection() {
 	for (int i = 0; i < SelectionRows * SelectionColumns && i < static_cast<int>(end); i++) {
 		//sprintf_s(file_name, "./Shooter/%s_Icon.png", shooters[i].name);
 		file_name = "./Shooter/%s" + shooters[i].name + "_Icon.png";
-		icons[i] = LoadGraph(file_name.c_str);
+		icons[i] = LoadGraph(&file_name[0]);
 	}
 	selector.row = 0;
 	selector.column = 0;
@@ -151,7 +151,7 @@ void updateCSSelection() {
 
 void deleteCSelect() {
 	enShooter end = enShooter::shShooterEnd;
-	for (int i = 0; i < SelectionRows * SelectionColumns && i < enShooter::shShooterEnd; i++) {
+	for (int i = 0; i < SelectionRows * SelectionColumns && i < static_cast<int>(enShooter::shShooterEnd); i++) {
 		DeleteGraph(icons[i]);
 	}
 	DeleteGraph(select_scr_handle);
@@ -195,9 +195,9 @@ void drawCSChoice() {
 }
 
 void updateCSChoice() {
-	if (key[KEY_INPUT_RETURN] == 1 || key[KEY_INPUT_SPACE] == 1) {
+	if (Key::getKeyState(KEY_INPUT_RETURN) == 1 || Key::getKeyState(KEY_INPUT_SPACE) == 1) {
 		//Œˆ’è
-		PlayerInit(0, shooters[selector.row * SelectionColumns + selector.column].sn);
+		PlayerInit(0, shooters[selector.row * SelectionColumns + selector.column].shooter_name);
 		deleteCSelect();
 		changeScene(GAME);
 	}

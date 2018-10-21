@@ -237,7 +237,7 @@ bool Mouse::isInRange(int x1, int x2, int y1, int y2) {
 }
 
 bool Mouse::isInRange2(int x, int y, int width, int height) {
-	if (x + width >> 1 > x && x > x - width >> 1 && y + height >> 1 > y && y > y - height >> 1) return true;
+	if (x + (width >> 1) > x && x > x - (width >> 1) && y + (height >> 1) > y && y > y - (height >> 1)) return true;
 	return false;
 }
 

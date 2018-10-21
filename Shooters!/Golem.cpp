@@ -154,6 +154,6 @@ void Golem::Pattern() {//
 
 void Golem::Shoot() {
 	Shot shot;
-	shot.SetShot(pos, Vec2(0, 2), 0, 1, 1);/*posを画像のサイズだけ移動させようかなぁ*/
+	shot.setShot(pos, Vec2(0, 2), enShotGraph::sgRed, 1, 1);/*posを画像のサイズだけ移動させようかなぁ*/
 	shots.push_back(shot);
 }
