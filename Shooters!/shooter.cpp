@@ -294,4 +294,33 @@ void ShooterInit(){
 
 	//必殺技タイプ
 	shooters[index].skill = enSkill::skGodMouse;
+
+	//------------------------------------------------------
+
+	//プリム※ショットタイプ＆必殺技確定
+	name = enShooter::shBlue;
+	index = static_cast<int>(name);
+	shooters[index].shooter_name = name;
+	//sprintf_s( shooters[index].Name, "Blue" );
+	shooters[index].name = "Blue";
+
+	//アイコン
+	shooters[index].icon_handle = LoadGraph("./Shooter/Blue_Icon.png");
+
+	//グラフィックはキャラクター選択時に読み込み？
+	//shooters[index].Graph = NULL;
+
+	//移動速度
+	shooters[index].speed = 5.0;
+
+	//必要ポイント
+	shooters[index].req_magic_point = 10000;//10000
+
+	//ショットタイプ
+	shooters[index].shot_type = enShotType::stNormal;
+
+	//必殺技タイプ
+	shooters[index].skill = enSkill::skRainbowShot;
+
+	//------------------------------------------------------
 }

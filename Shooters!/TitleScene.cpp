@@ -240,7 +240,8 @@ void Title::makeWalker() {
 
 		walker[wIndex].nameID = sID;
 		//sprintf_s(sFileName, "./Shooter/_%s.png", shooters[sID].name);
-		file_name = "./Shooter/_%s" + shooters[sID].name + ".png";
+		file_name = "./Shooter/_" + shooters[sID].name + ".png";
+		
 		walker[wIndex].srcgraph = LoadGraph(&file_name[0]);
 		sLR = GetRand(1);//0Ç»ÇÁç∂å¸Ç´ÅA1Ç»ÇÁâEå¸Ç´
 		walker[wIndex].ghundle[0] = DerivationGraph(WALKER_SIZE * 0, WALKER_SIZE * (sLR + 1), WALKER_SIZE, WALKER_SIZE, walker[wIndex].srcgraph);
