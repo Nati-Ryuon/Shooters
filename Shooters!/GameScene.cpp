@@ -22,7 +22,7 @@ extern char IntroFlag;
 
 list<std::unique_ptr<Enemy>> enemies;
 
-extern Player Players[PLAYER_MAX];
+extern Player players[PLAYER_MAX];
 
 static int current_stage;//現在のステージ
 static int stage_counter[STAGE_NUM];//ステージが開始してからの時刻
@@ -52,7 +52,7 @@ void initStage() {
 		stage_counter[i] = 0;
 	}
 	enemies.clear();
-	Players[0].shot.clear();//仮
+	players[0].shot.clear();//仮
 	stage->setStage("TestStage2");
 	stage->start();
 	//current_stage = 1;
@@ -147,23 +147,23 @@ void CollisionControll() {
 //	bool break_flag = false;//多重ループ脱出用フラグ
 //	list<Shot>::iterator shot_itr;
 	for (i = 0; i < PLAYER_MAX; i++) {
-		if (Players[i].alive == 1 && Players[i].invisible == 0) {
+		if (players[i].alive == 1 && players[i].invisible == 0) {
 			//----------------------------------------
-			for (auto & pshot : Players[i].shot) {
+			for (auto & pshot : players[i].shot) {
 				for (auto & e : enemies) {
 					if (e->isAlive()) {
 						if (ShotCollisionDetection(pshot, *e)) {
 							e->damage(pshot.damage);
 							pshot.setFlag(0);
-//							shot_itr = Players[i].shot.erase(shot_itr);
+//							shot_itr = players[i].shot.erase(shot_itr);
 						}
 					}
 				}
 			}
-//			shot_itr = Players[i].shot.begin();
+//			shot_itr = players[i].shot.begin();
 //			while (1) {
 
-//				if (shot_itr == Players[i].shot.end()) {
+//				if (shot_itr == players[i].shot.end()) {
 //					break;
 //				}
 				////Kuratus
@@ -171,7 +171,7 @@ void CollisionControll() {
 				//	if (kuratas_itr->draw_flag == true) {
 				//		if (ShotCollisionDetection(*shot_itr, *kuratas_itr)) {
 				//			damageKuratas(*kuratas_itr, shot_itr->damage);
-				//			shot_itr = Players[i].shot.erase(shot_itr);
+				//			shot_itr = players[i].shot.erase(shot_itr);
 				//			goto continueLabel;
 				//		}
 				//	}
@@ -182,7 +182,7 @@ void CollisionControll() {
 				//	if (zako_itr->draw_flag == true) {
 				//		if (ShotCollisionDetection(*shot_itr, *zako_itr)) {
 				//			damageZakoEnemy(*zako_itr, shot_itr->damage);
-				//			shot_itr = Players[i].shot.erase(shot_itr);
+				//			shot_itr = players[i].shot.erase(shot_itr);
 				//			goto continueLabel;
 				//		}
 				//	}
@@ -193,7 +193,7 @@ void CollisionControll() {
 				//	if (golem_itr->draw_flag == true) {
 				//		if (ShotCollisionDetection(*shot_itr, *golem_itr)) {
 				//			damageGolem(*golem_itr, shot_itr->damage);
-				//			shot_itr = Players[i].shot.erase(shot_itr);
+				//			shot_itr = players[i].shot.erase(shot_itr);
 				//			goto continueLabel;
 				//		}
 				//	}
@@ -204,7 +204,7 @@ void CollisionControll() {
 				//	if (archgolem_itr->draw_flag == true) {
 				//		if (ShotCollisionDetection(*shot_itr, *archgolem_itr)) {
 				//			damageArchGolem(*archgolem_itr, shot_itr->damage);
-				//			shot_itr = Players[i].shot.erase(shot_itr);
+				//			shot_itr = players[i].shot.erase(shot_itr);
 				//			goto continueLabel;
 				//		}
 				//	}
@@ -215,7 +215,7 @@ void CollisionControll() {
 			
 			for (auto & e : enemies) {
 				if (e->isAlive()) {
-					if (CollisionDetection(Players[i], *e)) {
+					if (CollisionDetection(players[i], *e)) {
 						damagePlayer(i);
 						e->damage(10);//マジックナンバー、衝突時のダメージ
 					}
@@ -500,10 +500,10 @@ void Stage::summonEnemy(int id, int xpos) {
 				enemies.push_back(std::make_unique<Kuratas>(Vec2(xpos, 0)));
 				return;
 			case enEnemy::enGolem:
-				enemies.push_back(std::make_unique<Golem>(Vec2(xpos, 0)));
+				//enemies.push_back(std::make_unique<Golem>(Vec2(xpos, 0)));
 				return;
 			case enEnemy::enArchGolem:
-				enemies.push_back(std::make_unique<ArchGolem>(Vec2(xpos, 0)));
+				//enemies.push_back(std::make_unique<ArchGolem>(Vec2(xpos, 0)));
 				return;
 			default:
 				break;

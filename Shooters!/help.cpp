@@ -13,8 +13,15 @@ int CS_Black = GetColor( 0,0,0 );
 int CS_Gray = GetColor( 100,100,100 );
 int CS_LightGray = GetColor( 200,200,200 );
 
-static Key key;
-static Mouse mouse;
+Key key;
+Mouse mouse;
+int Mouse::x;
+int Mouse::y;
+int Mouse::wheel;
+unsigned int Mouse::left_click;
+unsigned int Mouse::right_click;
+unsigned int Mouse::middle_click;
+unsigned int Key::key_state[256];
 
 /*
 void updateKeyState(){

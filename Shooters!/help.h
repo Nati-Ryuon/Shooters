@@ -29,12 +29,12 @@ enum class enClick {
 class Mouse	{
 public:
 	Mouse() : visible(false), force_in_window(false){
-		x = 0;
-		y = 0;
-		wheel = 0;
-		left_click = 0;
-		right_click = 0;
-		middle_click = 0;
+		Mouse::x = 0;
+		Mouse::y = 0;
+		Mouse::wheel = 0;
+		Mouse::left_click = 0;
+		Mouse::right_click = 0;
+		Mouse::middle_click = 0;
 	}
 	~Mouse(){}
 	void update();

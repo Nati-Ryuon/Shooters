@@ -5,6 +5,7 @@
 #include "Vec2.h"
 #include "CharacterSelect.h"
 #include "Shooter.h"
+#include "Help.h"
 
 #define GROUND_MIN MAINSCREEN_HEIGHT / 3
 #define WALKER_SIZE 32
@@ -20,7 +21,7 @@
 #define CYCLE_SPEED 10
 
 const int white = GetColor(255, 255, 255);
-extern unsigned int KeyState[256];
+//extern unsigned int KeyState[256];
 extern Shooter shooters[SHOOTER_MAX];
 
 int Walker::walker_num = 0;
@@ -166,11 +167,11 @@ void Title::draw(){
 }
 
 void Title::update(){
-	if (KeyState[KEY_INPUT_ESCAPE] == 1) {
+	if (Key::getKeyState(KEY_INPUT_ESCAPE) == 1) {
 		endMain();
 	}
 
-	if (KeyState[KEY_INPUT_RETURN] == 1) {//エンターでゲーム画面
+	if (Key::getKeyState(KEY_INPUT_RETURN) == 1) {//エンターでゲーム画面
 										  //changeScene(GAME);
 		for (int i = 0; i < WALKER_MAX; i++) {
 			if (walker[i].exist == FALSE) continue;
