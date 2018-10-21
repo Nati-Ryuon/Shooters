@@ -54,7 +54,6 @@ void initStage() {
 
 //ゲーム画面描画
 void drawGame(){
-	int i;
 	if (IntroFlag == 1) {
 		SkillIntroDraw();
 	}
@@ -286,4 +285,58 @@ void CollisionControll() {
 	//nextPlayer:
 	//	continue;
 	}
+}
+
+GameScene::GameScene()
+	: SceneBase(){
+}
+
+void GameScene::draw(){
+	if (IntroFlag == 1) {
+		SkillIntroDraw();
+	}
+	for (auto & e : enemies) {
+		e->draw();
+	}
+	PlayerDraw();
+}
+
+void GameScene::update(){
+	//各ステージの時間計測
+	if (GetNowCount() - refresh_time > 1000) {//一秒経過したら
+		stage_counter[current_stage - 1]++;
+		refresh_time = GetNowCount();
+		pop_flag = false;
+	}
+
+	//ステージごとの処理分岐
+	switch (current_stage) {
+	case 1:
+		Stage1();
+		break;
+	default:
+
+		changeScene(TITLE);
+		break;
+	}
+
+	//各オブジェクトの処理
+	//int i;
+	if (IntroFlag != 1) {
+		PlayerUpdate();
+		for (auto & e : enemies) {
+			e->update();
+		}
+
+		if (KeyState[KEY_INPUT_ESCAPE] == 1) {
+
+			changeScene(TITLE);
+		}
+	}
+	else {
+		SkillIntroUpdate();
+	}
+
+	//当たり判定
+	CollisionControll();
 }

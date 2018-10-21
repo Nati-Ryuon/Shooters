@@ -57,7 +57,8 @@ int WINAPI WinMain(HINSTANCE,HINSTANCE,LPSTR,int){
 	loadKuratasGraph();
 	loadGolemGraph();
 	loadArchGolemGraph();
-	changeScene(TITLE);
+	std::unique_ptr<SceneManager> sceneManager = std::make_unique<SceneManager>();
+//	changeScene(TITLE);
 
 	//PlayerInit( 0, Prim );
 	//PlayerInit( 1, Rupi );
@@ -97,8 +98,10 @@ int WINAPI WinMain(HINSTANCE,HINSTANCE,LPSTR,int){
 				SetMousePoint(MouseX, MAINSCREEN_HEIGHT);
 		}
 
-		updateSceneManager();
-		drawSceneManager();
+		sceneManager->update();
+		sceneManager->draw();
+//		updateSceneManager();
+//		drawSceneManager();
 		
 		if( KeyState[KEY_INPUT_ESCAPE] == 30 )
 			end_flag = 1;

@@ -5,15 +5,40 @@
 
 static Scene scene = TITLE;
 
+void SceneManager::update() {
+	if (currentScene != nullptr) {
+		currentScene->update();
+
+		if (!currentScene->IsFinished()) {
+			return;
+		}
+		if (currentScene->getReturnScene() && prevScene != nullptr) {
+			currentScene = std::move(prevScene);
+			prevScene = nullptr;
+		}
+		else if (currentScene->nextSceneNullCheck()) {
+			auto nextScene = currentScene->getNextScene();
+			if (currentScene->getSaveScene()) {
+				prevScene = std::move(currentScene);
+			}
+			currentScene = move(nextScene);
+		}
+	}
+}
+
+void SceneManager::draw() {
+	if(currentScene != nullptr) currentScene->draw();
+}
+
 
 //ŠeƒV[ƒ“‚Ì•`‰æ
 void drawSceneManager(){
 	switch (scene) {
 	case TITLE:
-		drawTitle();
+//		drawTitle();
 		break;
 	case CHARACTER_SELECT:
-		drawCSelect();
+//		drawCSelect();
 		break;
 	case GAME:
 		drawGame();
@@ -29,10 +54,10 @@ void drawSceneManager(){
 void updateSceneManager() {
 	switch (scene) {
 	case TITLE:
-		updateTitle();
+//		updateTitle();
 		break;
 	case CHARACTER_SELECT:
-		updateCSelect();
+//		updateCSelect();
 		break;
 	case GAME:
 		updateGame();
@@ -54,10 +79,10 @@ void changeScene(const Scene nextScene){
 	*/
 	switch (scene) {
 	case TITLE:
-		initTitle();
+//		initTitle();
 		break;
 	case CHARACTER_SELECT:
-		initCSelect();
+//		initCSelect();
 		break;
 	case GAME:
 		initStage();
@@ -67,20 +92,4 @@ void changeScene(const Scene nextScene){
 	default:
 		break;
 	}
-}
-
-void SceneManager::update(){
-	if (currentScene != nullptr) currentScene->update();
-	if (currentScene->IsFinished()) {
-		prevScene = std::move(currentScene);
-		currentScene = currentScene->getNextScene();
-	}
-	else if (currentScene->getReturnScene() && prevScene != nullptr) {
-		currentScene = std::move(prevScene);
-		prevScene = nullptr;//‰¼
-	}
-}
-
-void SceneManager::draw(){
-	if (currentScene != nullptr) currentScene->draw();
 }
