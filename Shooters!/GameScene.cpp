@@ -1,6 +1,7 @@
 #include "DxLib.h"
 #include "Vec2.h"
 #include "Main.h"
+#include "Help.h"
 #include "StrLikeExcel.h"
 #include "CollisionDetection.h"
 #include "SceneManager.h"
@@ -16,7 +17,7 @@
 #define MSECOND_PER_ROW 500 
 #define STAGE_NUM 2
 
-extern unsigned int KeyState[256];
+//extern unsigned int KeyState[256];
 extern char IntroFlag;
 
 list<std::unique_ptr<Enemy>> enemies;
@@ -100,7 +101,7 @@ void updateGame(){
 			e->update();
 		}
 
-		if (KeyState[KEY_INPUT_ESCAPE] == 1) {
+		if (Key::getKeyState(KEY_INPUT_ESCAPE) == 1) {
 
 			changeScene(TITLE);
 		}
@@ -225,6 +226,60 @@ void CollisionControll() {
 	}
 }
 
+GameScene::GameScene()
+	: SceneBase() {
+}
+
+void GameScene::draw() {
+	if (IntroFlag == 1) {
+		SkillIntroDraw();
+	}
+	for (auto & e : enemies) {
+		e->draw();
+	}
+	PlayerDraw();
+}
+
+void GameScene::update() {
+	//各ステージの時間計測
+	if (GetNowCount() - refresh_time > 1000) {//一秒経過したら
+		stage_counter[current_stage - 1]++;
+		refresh_time = GetNowCount();
+		pop_flag = false;
+	}
+
+	//ステージごとの処理分岐
+	switch (current_stage) {
+	case 1:
+		Stage1();
+		break;
+	default:
+
+		changeScene(TITLE);
+		break;
+	}
+
+	//各オブジェクトの処理
+	//int i;
+	if (IntroFlag != 1) {
+		PlayerUpdate();
+		for (auto & e : enemies) {
+			e->update();
+		}
+
+		if (Key::getKeyState(KEY_INPUT_ESCAPE) == 1) {
+
+			changeScene(TITLE);
+		}
+	}
+	else {
+		SkillIntroUpdate();
+	}
+
+	//当たり判定
+	CollisionControll();
+}
+
 
 Condition::Condition() {
 }
@@ -316,7 +371,7 @@ void Stage::update() {
 			e->update();
 		}
 
-		if (KeyState[KEY_INPUT_ESCAPE] == 1) {
+		if (Key::getKeyState(KEY_INPUT_ESCAPE) == 1) {
 			changeScene(TITLE);
 		}
 	} else {

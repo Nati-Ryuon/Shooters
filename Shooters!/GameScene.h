@@ -1,5 +1,5 @@
 #pragma once
-
+#include "SceneBase.h"
 #include "Data.h"
 #include <string>
 
@@ -10,6 +10,13 @@ void drawGame();
 void updateGame();
 
 using namespace std;
+
+class GameScene : public SceneBase {
+public:
+	GameScene();
+	void draw();
+	void update();
+};
 
 class TimeLine {
 public:

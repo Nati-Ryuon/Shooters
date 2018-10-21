@@ -1,6 +1,7 @@
 #pragma once
 
 #include "SceneBase.h"
+#include "TitleScene.h"
 #include <memory>
 
 enum Scene {
@@ -14,7 +15,7 @@ class SceneManager {
 	std::unique_ptr<SceneBase> currentScene;
 	std::unique_ptr<SceneBase> prevScene;
 public:
-	SceneManager() : currentScene(nullptr), prevScene(nullptr) {}
+	SceneManager() : currentScene(std::make_unique<Title>()), prevScene(nullptr) {}
 	void update();
 	void draw();
 };
