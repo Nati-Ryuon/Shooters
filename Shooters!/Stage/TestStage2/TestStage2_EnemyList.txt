@@ -1,0 +1,35 @@
+ZakoEnemyA={
+	Color=11892015
+	EnemyName=ZakoEnemy
+	Level=1
+	Item=None
+	Condition=None
+}
+ZakoEnemyB={
+	Color=7884319
+	EnemyName=ZakoEnemy
+	Level=1
+	Item=Item1
+	Condition=HP_UP_50
+}
+GolemA={
+	Color=49407
+	EnemyName=Golem
+	Level=1
+	Item=None
+	Condition=None
+}
+KuratasA={
+	Color=3506772
+	EnemyName=Kuratas
+	Level=1
+	Item=None
+	Condition=None
+}
+ArchGolem={
+	Color=8696052
+	EnemyName=ArchGolem
+	Level=1
+	Item=Item1
+	Condition=HP_UP_200
+}
