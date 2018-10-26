@@ -536,6 +536,11 @@ void ShotUpdate( list<Shot> &shots, ShotType st ){
 			itr = shots.erase( itr );//次の要素を指すイテレーターを返してくるので受け取る
 			continue;
 		}
+		//範囲forで当たり判定してるのでここで消すしかなさそう
+		if ( itr->flag == 0 ) {
+			itr = shots.erase( itr );
+			continue;
+		}
 
 		itr++;//終了処理にするとitrがendを指していたときに継続判定でループを抜けるよりも先にendの先へ飛ぼうとして壊れる。
 	}

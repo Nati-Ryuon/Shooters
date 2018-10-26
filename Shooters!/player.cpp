@@ -199,7 +199,6 @@ int PlayerUpdate(){
 				if( players[i1].reload > 0 )
 					players[i1].reload--;
 			}
-
 			ShotUpdate( players[i1].shot, players[i1].shot_type );
 
 
