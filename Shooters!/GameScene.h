@@ -69,7 +69,36 @@ private:
 	//int readEnemyList(const char *FileName);
 	int readEnemyList(string FileName);
 	//int readStage(const char *FileName);
-	int readStage(string FileName);
+	int readStage(string FileName) {
+
+		int f_handle;
+		if ((f_handle = FileRead_open(&filename[0])) == 0)
+			return -1;
+
+		string buff;
+
+		stage->resetTimeLine();
+		TimeLine tl;
+
+		while (FileRead_eof(f_handle) == 0) {
+			FileRead_gets(&buff[0], STRING_SIZE, f_handle);
+			if (InStr(buff, ",") != 0) {
+				buff += ",";
+				tl.frame = Value(Left(buff, InStr(buff, ",") - 1));
+				buff = Mid(buff, InStr(buff, ",") + 1, Len(buff));
+
+				tl.xpos = Value(Left(buff, InStr(buff, ",") - 1)) * MAINSCREEN_WIDTH / 32;
+				buff = Mid(buff, InStr(buff, ",") + 1, Len(buff));
+
+				tl.id = Value(Left(buff, InStr(buff, ",") - 1));
+
+				stage->addTimeLine(tl);
+			}
+		}
+		FileRead_close(f_handle);
+
+		return 0;
+	}
 	void setEnemy(const int time);
 	void summonEnemy(int id, int xpos);
 private:

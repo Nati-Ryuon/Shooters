@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include <math.h>
 
+#define PF_INDEX(var) static_cast<int>(enPlayerFlag::pf##var)
+
 #define PLAYERMOVING_LEFT 0
 #define PLAYERMOVING_DEFAULT 1
 #define PLAYERMOVING_RIGHT 2
@@ -22,7 +24,7 @@
 
 //extern float ShotDefaultCoolTime[SHOTTYPE_MAX];
 extern Shooter shooters[SHOOTER_MAX];
-extern ShotType shot_types[static_cast<int>(enShotType(enShotType::stShotTypeEnd)) * SHOTTYPE_LEVELMAX];
+extern ShotType shot_types[static_cast<int>(enShotType::stShotTypeEnd) * SHOTTYPE_LEVELMAX];
 
 //操作用
 unsigned char MOVE_LEFT = KEY_INPUT_A;
@@ -41,7 +43,7 @@ Player players[PLAYER_MAX];
 //list<Player> players;
 
 //プレイヤー人数
-int player_count = 1;
+int Player::player_count;
 
 bool double_shot_flag = 0;//1ならDoubleShot中(ShotMakeに渡す座標をずらす)
 
@@ -65,7 +67,7 @@ int PlayerInit( char player_number, enShooter name ){
 	//シューターのデータからショットタイプのデータを参照して保持する
 	players[player_number].shot_type = shot_types[(static_cast<int>(players[player_number].shooter.shot_type) - 1) * SHOTTYPE_LEVELMAX];
 
-	players[player_number].alive = TRUE;
+	//players[player_number].flag[enPlayerFlag::pfAlive] = TRUE;
 	players[player_number].range = 12;//マジックナンバー
 
 	players[player_number].EXP = 0;
@@ -303,3 +305,64 @@ void endPlayerDoubleShot(){
 プレイヤーに持たせるSHOTTYPEをポインターにする案はなかなか魅力的だが、
 一部を引き継ぐようにオーバーライドするときに面倒になる。
 */
+
+Player::Player(int player_number, enShooter name) : flag{ true, true, true, true, false, false, false, false } {
+	//char InstantFileName[FILENAME_MAX];
+	string file_name;
+
+	//名前と番号を一致させる
+	players[player_number].player_index = player_number;
+
+	//予約されてる名前以外は無理
+	players[player_number].shooter_name = name;
+
+	//名前からシューターのデータを参照して保持する
+	players[player_number].shooter = shooters[static_cast<int>(players[player_number].shooter_name)];
+
+	//シューターのデータからショットタイプのデータを参照して保持する
+	players[player_number].shot_type = shot_types[(static_cast<int>(players[player_number].shooter.shot_type) - 1) * SHOTTYPE_LEVELMAX];
+
+	//players[player_number].alive = TRUE;
+	players[player_number].range = 12;//マジックナンバー
+
+	players[player_number].EXP = 0;
+	players[player_number].level = 1;
+	players[player_number].magic_point = 0;
+
+	players[player_number].pos.x = (float)(MAINSCREEN_WIDTH / (player_count + 1) * (player_number + 1));
+	players[player_number].pos.y = (float)(MAINSCREEN_HEIGHT / 8 * 6);//初期の座標だけど仮の値
+
+
+	//sprintf_s(InstantFileName, "./Shooter/%s_Graph.png", &players[player_number].shooter.name[0]);
+	file_name = "./Shooter/" + players[player_number].shooter.name + "_Graph.png";
+
+	LoadDivGraph(&file_name[0], 3, 3, 1, PLAYERSIZE, PLAYERSIZE, players[player_number].shooter.graph);
+
+	players[player_number].graph_handle = players[player_number].shooter.graph[PLAYERMOVING_DEFAULT];
+}
+
+void Player::updatePlayer(){
+
+
+}
+
+void Player::drawPlayer(){
+
+}
+
+bool Player::isAlive(){
+	return getFlag(enPlayerFlag::pfAlive);
+}
+
+bool Player::kill(){
+
+	return false;
+}
+
+bool Player::setFlag(enPlayerFlag pf_name, bool param){
+	return flag[static_cast<int>(pf_name)] = param;
+}
+
+bool Player::getFlag(enPlayerFlag pf_name){
+	return flag[static_cast<int>(pf_name)];
+}

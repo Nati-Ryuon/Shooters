@@ -21,10 +21,10 @@ int InStr(const char *str, const char *keyword, int start) {
 
 int InStr(string str, string keyword, int start) {
 	int i = str.find(keyword, start - 1);
-	if (i == -1)
+	if (i == string::npos)
 		return 0;
 	else
-		return i;
+		return i + 1;
 }
 
 int Len(const char *str) {

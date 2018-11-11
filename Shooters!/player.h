@@ -24,12 +24,30 @@ void resetPlayerShotType( char player_bitflag );
 void beginPlayerDoubleShot();
 void endPlayerDoubleShot();
 
+enum class enPlayerFlag {
+	pfAlive,
+	pfCanMove,
+	pfCanBack,
+	pfCanShoot,
+	pfSkillFlag,
+	pfDoubleShot,
+	pfInvincible,
+	pfInvisible,
+	pfPlayerFlagEnd
+};
 
 class Player {
 public:
-	Player() : alive(true), can_move(true), can_back(true), can_shoot(true), 
-				skill_flag(false), double_shot(false), invincible(false), invisible(false) {}
+	//Player() : alive(true), can_move(true), can_back(true), can_shoot(true), 
+	//			skill_flag(false), double_shot(false), invincible(false), invisible(false) {}
+	Player(int player_number, enShooter name);
 	~Player() {}
+	void updatePlayer();
+	void drawPlayer();
+	bool isAlive();
+	bool kill();
+	bool setFlag(enPlayerFlag pf_name, bool param);
+	bool getFlag(enPlayerFlag pf_name);
 public:
 	int player_index;
 	enShooter shooter_name;
@@ -41,11 +59,13 @@ public:
 	int height;
 
 	Vec2 pos;
+	int hp;
 	int level;
 	int EXP;
 	float reload;
 	int magic_point;
 
+	/*
 	bool alive;
 	bool can_move;//0:ˆÚ“®‚Å‚«‚È‚¢ 1:ˆÚ“®‚Å‚«‚é
 	bool can_back;//0:Œã‘Ş‚Å‚«‚È‚¢ 1:Œã‘Ş‚Å‚«‚é
@@ -54,6 +74,11 @@ public:
 	bool double_shot;//0:¶ 1:‰E
 	bool invincible;//0:•’Ê 1:–³“G
 	bool invisible;//0:•’Ê 1:Œ©‚¦‚È‚¢
+	*/
+
+	bool flag[static_cast<int>(enPlayerFlag::pfPlayerFlagEnd)];
 
 	list<Shot> shot;
+public:
+	static int player_count;
 };
