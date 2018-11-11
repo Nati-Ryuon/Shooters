@@ -20,7 +20,8 @@ int InStr(const char *str, const char *keyword, int start) {
 }
 
 int InStr(string str, string keyword, int start) {
-	int i = str.find(keyword, start - 1);
+//	int i = str.find(keyword, start - 1);
+	int i = (int)str.find(keyword);
 	if (i == -1)
 		return 0;
 	else

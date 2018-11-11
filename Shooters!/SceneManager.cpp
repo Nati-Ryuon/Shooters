@@ -41,7 +41,7 @@ void drawSceneManager(){
 //		drawCSelect();
 		break;
 	case GAME:
-		drawGame();
+//		drawGame();
 		break;
 	case RESULT:
 		break;
@@ -60,7 +60,7 @@ void updateSceneManager() {
 //		updateCSelect();
 		break;
 	case GAME:
-		updateGame();
+//		updateGame();
 		break;
 	case RESULT:
 		break;
@@ -85,7 +85,7 @@ void changeScene(const Scene nextScene){
 //		initCSelect();
 		break;
 	case GAME:
-		initStage();
+//		initStage();
 		break;
 	case RESULT:
 		break;

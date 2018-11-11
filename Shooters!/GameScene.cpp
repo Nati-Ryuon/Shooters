@@ -32,7 +32,7 @@ static int pop_flag;//エネミーがその時間に出現したかどうか
 static void Stage1();
 static void CollisionControll();
 
-std::unique_ptr<Stage> stage;
+//std::unique_ptr<Stage> GameScene::stage;
 
 ////空いてるオブジェクトを返す draw_flag持ってないとあかん
 //template <typename Object>
@@ -47,99 +47,99 @@ std::unique_ptr<Stage> stage;
 //}
 
 //ステージ最低限初期化
-void initStage() {
-	for (int i = 0; i < STAGE_NUM; i++) {
-		stage_counter[i] = 0;
-	}
-	enemies.clear();
-	players[0].shot.clear();//仮
-	stage->setStage("TestStage2");
-	stage->start();
-	//current_stage = 1;
-	//refresh_time = GetNowCount();
-	//pop_flag = false;
-}
+//void initStage() {
+//	for (int i = 0; i < STAGE_NUM; i++) {
+//		stage_counter[i] = 0;
+//	}
+//	enemies.clear();
+//	players[0].shot.clear();//仮
+//	stage->setStage("TestStage2");
+//	stage->start();
+//	//current_stage = 1;
+//	//refresh_time = GetNowCount();
+//	//pop_flag = false;
+//}
 
 //ゲーム画面描画
-void drawGame(){
-	/*
-	if (IntroFlag == 1) {
-		SkillIntroDraw();
-	}
-	for (auto & e : enemies) {
-		e->draw();
-	}
-	PlayerDraw();
-	*/
-	stage->draw();
-}
+//void drawGame(){
+//	/*
+//	if (IntroFlag == 1) {
+//		SkillIntroDraw();
+//	}
+//	for (auto & e : enemies) {
+//		e->draw();
+//	}
+//	PlayerDraw();
+//	*/
+//	stage->draw();
+//}
 
-//ゲーム画面の処理
-void updateGame(){
-	//各ステージの時間計測
-	if (GetNowCount() - refresh_time > 1000) {//一秒経過したら
-		stage_counter[current_stage - 1]++;
-		refresh_time = GetNowCount();
-		pop_flag = false;
-	}
-
-	//ステージごとの処理分岐
-	switch (current_stage){
-	case 1:
-		Stage1();
-		break;
-	default:
-		changeScene(TITLE);
-		break;
-	}
-
-	//各オブジェクトの処理
-	//int i;
-	if (IntroFlag != 1) {
-		PlayerUpdate();
-		for (auto & e : enemies) {
-			e->update();
-		}
-
-		if (Key::getKeyState(KEY_INPUT_ESCAPE) == 1) {
-
-			changeScene(TITLE);
-		}
-	}
-	else {
-		SkillIntroUpdate();
-	}
-
-	//当たり判定
-	CollisionControll();
-}
-
-void Stage1(){
-	//オブジェクトの出現
-	switch (stage_counter[0]){
-	case 1:
-		if (pop_flag == false) {
-			enemies.push_back(std::make_unique<Kuratas>(Vec2(getRandom(16, 1264), 0)));
-			pop_flag = true;
-		}
-		break;
-	case 3:
-	case 5:
-	case 6:
-	case 8:
-	case 10:
-	case 11:
-		if (pop_flag == false) {
-			enemies.push_back(std::make_unique<ZakoEnemy>(Vec2(getRandom(16, 1264), 0)));
-			enemies.push_back(std::make_unique<ZakoEnemy>(Vec2(getRandom(16, 1264), 0)));
-			enemies.push_back(std::make_unique<ZakoEnemy>(Vec2(getRandom(16, 1264), 0)));
-//			enemies.push_back(std::make_unique<ArchGolem>(Vec2(getRandom(16, 1264), 0)));
-			pop_flag = true;
-		}
-	default:
-		break;
-	}
-}
+////ゲーム画面の処理
+//void updateGame(){
+//	//各ステージの時間計測
+//	if (GetNowCount() - refresh_time > 1000) {//一秒経過したら
+//		stage_counter[current_stage - 1]++;
+//		refresh_time = GetNowCount();
+//		pop_flag = false;
+//	}
+//
+//	//ステージごとの処理分岐
+//	switch (current_stage){
+//	case 1:
+//		Stage1();
+//		break;
+//	default:
+//		changeScene(TITLE);
+//		break;
+//	}
+//
+//	//各オブジェクトの処理
+//	//int i;
+//	if (IntroFlag != 1) {
+//		PlayerUpdate();
+//		for (auto & e : enemies) {
+//			e->update();
+//		}
+//
+//		if (Key::getKeyState(KEY_INPUT_ESCAPE) == 1) {
+//
+//			changeScene(TITLE);
+//		}
+//	}
+//	else {
+//		SkillIntroUpdate();
+//	}
+//
+//	//当たり判定
+//	CollisionControll();
+//}
+//
+//void Stage1(){
+//	//オブジェクトの出現
+//	switch (stage_counter[0]){
+//	case 1:
+//		if (pop_flag == false) {
+//			enemies.push_back(std::make_unique<Kuratas>(Vec2(getRandom(16, 1264), 0)));
+//			pop_flag = true;
+//		}
+//		break;
+//	case 3:
+//	case 5:
+//	case 6:
+//	case 8:
+//	case 10:
+//	case 11:
+//		if (pop_flag == false) {
+//			enemies.push_back(std::make_unique<ZakoEnemy>(Vec2(getRandom(16, 1264), 0)));
+//			enemies.push_back(std::make_unique<ZakoEnemy>(Vec2(getRandom(16, 1264), 0)));
+//			enemies.push_back(std::make_unique<ZakoEnemy>(Vec2(getRandom(16, 1264), 0)));
+////			enemies.push_back(std::make_unique<ArchGolem>(Vec2(getRandom(16, 1264), 0)));
+//			pop_flag = true;
+//		}
+//	default:
+//		break;
+//	}
+//}
 
 //当たり判定をまとめてるところ
 void CollisionControll() {
@@ -227,40 +227,27 @@ void CollisionControll() {
 }
 
 GameScene::GameScene()
-	: SceneBase() {
+	: stage(std::make_unique<Stage>()) , SceneBase() {
+	for (int i = 0; i < STAGE_NUM; i++) {
+		stage_counter[i] = 0;
+	}
+	enemies.clear();
+	players[0].shot.clear();//仮
+
+	setStage("TestStage2");
+	stage->start();
 }
 
 void GameScene::draw() {
-	if (IntroFlag == 1) {
-		SkillIntroDraw();
-	}
-	for (auto & e : enemies) {
-		e->draw();
-	}
-	PlayerDraw();
+	stage->draw();
 }
 
 void GameScene::update() {
-	//各ステージの時間計測
-	if (GetNowCount() - refresh_time > 1000) {//一秒経過したら
-		stage_counter[current_stage - 1]++;
-		refresh_time = GetNowCount();
-		pop_flag = false;
-	}
+	//5行で1秒,1行で0.2秒 1s=1000ms, 0.2s = 200ms
+	const int time = (GetNowCount() - stage->starttime) / MSECOND_PER_ROW;
 
-	//ステージごとの処理分岐
-	switch (current_stage) {
-	case 1:
-		Stage1();
-		break;
-	default:
+	stage->setEnemy(time);
 
-		changeScene(TITLE);
-		break;
-	}
-
-	//各オブジェクトの処理
-	//int i;
 	if (IntroFlag != 1) {
 		PlayerUpdate();
 		for (auto & e : enemies) {
@@ -268,16 +255,51 @@ void GameScene::update() {
 		}
 
 		if (Key::getKeyState(KEY_INPUT_ESCAPE) == 1) {
-
 			changeScene(TITLE);
 		}
-	}
-	else {
+	} else {
 		SkillIntroUpdate();
 	}
 
 	//当たり判定
 	CollisionControll();
+	////各ステージの時間計測
+	//if (GetNowCount() - refresh_time > 1000) {//一秒経過したら
+	//	stage_counter[current_stage - 1]++;
+	//	refresh_time = GetNowCount();
+	//	pop_flag = false;
+	//}
+
+	////ステージごとの処理分岐
+	//switch (current_stage) {
+	//case 1:
+	//	Stage1();
+	//	break;
+	//default:
+
+	//	changeScene(TITLE);
+	//	break;
+	//}
+
+	////各オブジェクトの処理
+	////int i;
+	//if (IntroFlag != 1) {
+	//	PlayerUpdate();
+	//	for (auto & e : enemies) {
+	//		e->update();
+	//	}
+
+	//	if (Key::getKeyState(KEY_INPUT_ESCAPE) == 1) {
+
+	//		changeScene(TITLE);
+	//	}
+	//}
+	//else {
+	//	SkillIntroUpdate();
+	//}
+
+	////当たり判定
+	//CollisionControll();
 }
 
 
@@ -317,12 +339,12 @@ Stage::~Stage() {
 	tl.clear();
 }
 
-void Stage::setStage(string name) {
+void GameScene::setStage(string name) {
 	string buff;
 
-	stage_name = name;
+	stage->stage_name = name;
 
-	buff = "./Stage/" + stage_name + "/" + stage_name + ".txt";
+	buff = "./Stage/" + stage->stage_name + "/" + stage->stage_name + ".txt";
 	readStage(buff);
 
 	Replace(buff, ".txt", "_EnemyList.txt");
@@ -392,7 +414,7 @@ void Stage::draw() {
 	PlayerDraw();
 }
 
-int Stage::readEnemyList(string filename) {
+int GameScene::readEnemyList(string filename) {
 
 	int f_handle;
 	if ((f_handle = FileRead_open(&filename[0])) == 0)
@@ -430,7 +452,7 @@ int Stage::readEnemyList(string filename) {
 			el.cond.setConditionName(Mid(buff, InStr(buff, "=") + 1, Len(buff)));
 		}
 		else if (InStr(buff, "}") != 0) {
-			stage->addEnemyList(el);
+			GameScene::stage->addEnemyList(el);
 			id++;
 		}
 	}
@@ -442,7 +464,7 @@ int Stage::readEnemyList(string filename) {
 	return 0;
 }
 
-int Stage::readStage(string filename) {
+int GameScene::readStage(string filename) {
 
 	int f_handle;
 	if ((f_handle = FileRead_open(&filename[0])) == 0)
@@ -455,6 +477,7 @@ int Stage::readStage(string filename) {
 
 	while (FileRead_eof(f_handle) == 0) {
 		FileRead_gets(&buff[0], STRING_SIZE, f_handle);
+		int a = InStr(buff, ",");
 		if (InStr(buff, ",") != 0) {
 			buff += ",";
 			tl.frame = Value(Left(buff, InStr(buff, ",") - 1));

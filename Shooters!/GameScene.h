@@ -11,12 +11,7 @@ void updateGame();
 
 using namespace std;
 
-class GameScene : public SceneBase {
-public:
-	GameScene();
-	void draw();
-	void update();
-};
+
 
 class TimeLine {
 public:
@@ -52,10 +47,12 @@ public:
 
 class Stage {
 public:
+	string stage_name;
+	int starttime;
+
 	Stage();
 	~Stage();
 	//void setStage(const char *name);
-	void setStage(string name);
 	//void setBGMName(const char *name);
 	//void setBGMName(string name);
 	void addTimeLine(TimeLine timeline);
@@ -65,18 +62,25 @@ public:
 	void start();
 	void update();
 	void draw();
+	void setEnemy(const int time);
 private:
 	//int readEnemyList(const char *FileName);
-	int readEnemyList(string FileName);
 	//int readStage(const char *FileName);
-	int readStage(string FileName);
-	void setEnemy(const int time);
 	void summonEnemy(int id, int xpos);
 private:
-	string stage_name;
 	//char BGM[STRING_SIZE];
 	//int BGMhundle;
 	list<TimeLine> tl;
 	list<EnemyList> en;
-	int starttime;
+};
+
+class GameScene : public SceneBase {
+	std::unique_ptr<Stage> stage;
+	void setStage(string name);
+	int readStage(string FileName);
+	int readEnemyList(string FileName);
+public:
+	GameScene();
+	void draw();
+	void update();
 };
