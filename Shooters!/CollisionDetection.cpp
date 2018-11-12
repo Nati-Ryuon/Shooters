@@ -3,16 +3,16 @@
 
 
 //プレイヤーとアイテム
-bool CollisionDetection(const Player &player, const Item &item) {
-	Vec2 reletivePos = item.pos - player.pos;
-	double distance = getNorm(reletivePos);
-	if (distance <= player.range + item.range) {
-		return true;
-	}
-	else {
-		return false;
-	}
-}
+//bool CollisionDetection(const Player &player, const Item &item) {
+//	Vec2 reletivePos = item.pos - player.pos;
+//	double distance = getNorm(reletivePos);
+//	if (distance <= player.range + item.range) {
+//		return true;
+//	}
+//	else {
+//		return false;
+//	}
+//}
 
 
 

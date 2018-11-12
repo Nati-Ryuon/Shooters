@@ -2,6 +2,7 @@
 #include "Vec2.h"
 #include "Data.h"
 
+#define ITEM_SIZE 32
 /*
 enum ItemType {
 	EXP,
@@ -15,19 +16,21 @@ enum ItemType {
 Data.hへ移動
 */
 
-struct Item {
+class Item {
+protected:
 	Vec2 pos;
 	int range;
 	bool draw_flag;
 	int graph_handle;
 	int count;
 	enItemType type;//アイテムの種類
+public :
+	Item(Vec2 pos, enItemType item_type);
+
+	void Draw();
+	virtual void Update() = 0;
+	Vec2 getPos() const { return pos; }
+	int getRange() const { return range; }
 };
 
-void initItem(Vec2 pos, int graph_handle, enItemType type, Item &item);
 
-void drawItem(const Item &item);
-
-void updateItem(Item &item);
-
-void destroyItem(Item &item);//デストロイとか言ってるけど描画フラグ切るだけ

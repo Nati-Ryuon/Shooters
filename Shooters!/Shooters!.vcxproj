@@ -160,6 +160,7 @@
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="EnemyShot.cpp" />
     <ClCompile Include="GameScene.cpp" />
+    <ClCompile Include="Gem.cpp" />
     <ClCompile Include="Golem.cpp" />
     <ClCompile Include="Help.cpp" />
     <ClCompile Include="Item.cpp" />
@@ -187,6 +188,7 @@
     <ClInclude Include="Data.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="GameScene.h" />
+    <ClInclude Include="Gem.h" />
     <ClInclude Include="Golem.h" />
     <ClInclude Include="Help.h" />
     <ClInclude Include="Item.h" />

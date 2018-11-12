@@ -234,8 +234,9 @@ GameScene::GameScene()
 	enemies.clear();
 	players[0].shot.clear();//‰¼
 
-	setStage("TestStage2");
+	setStage("TestStage");
 	stage->start();
+	stage->addItemList(Vec2(400, 300), enItemType::itGem);
 }
 
 void GameScene::draw() {
@@ -255,7 +256,8 @@ void GameScene::update() {
 		}
 
 		if (Key::getKeyState(KEY_INPUT_ESCAPE) == 1) {
-			changeScene(TITLE);
+			//changeScene(TITLE);
+			nextScene = std::make_unique<Title>();
 		}
 	} else {
 		SkillIntroUpdate();
@@ -346,8 +348,7 @@ void GameScene::setStage(string name) {
 
 	buff = "./Stage/" + stage->stage_name + "/" + stage->stage_name + ".txt";
 	readStage(buff);
-
-	Replace(buff, ".txt", "_EnemyList.txt");
+	buff = "./Stage/" + stage->stage_name + "/" + stage->stage_name + "_EnemyList.txt";
 	readEnemyList(buff);
 }
 
@@ -366,6 +367,16 @@ void Stage::addTimeLine(TimeLine timeline) {
 
 void Stage::addEnemyList(EnemyList enemylist) {
 	en.push_back(enemylist);
+}
+
+void Stage::addItemList(Vec2 pos, enItemType item_type) {
+	switch (item_type)
+	{
+	case enItemType::itGem:
+		items.push_back(std::make_unique<Gem>(pos));
+	default:
+		break;
+	}
 }
 
 void Stage::resetTimeLine() {
@@ -411,6 +422,9 @@ void Stage::draw() {
 	for (auto & e : enemies) {
 		e->draw();
 	}
+	for (auto & i : items) {
+		i->Draw();
+	}
 	PlayerDraw();
 }
 
@@ -424,13 +438,15 @@ int GameScene::readEnemyList(string filename) {
 
 	//const int BufferSize = 256;
 	//char buff1[STRING_SIZE], buff2[STRING_SIZE];
+	char buff1[STRING_SIZE];
 	string buff;
 
 	stage->resetEnemyList();
 	EnemyList el;
 
 	while (FileRead_eof(f_handle) == 0) {
-		FileRead_gets(&buff[0], STRING_SIZE, f_handle);
+		FileRead_gets(buff1, STRING_SIZE, f_handle);
+		buff = buff1;
 		if (InStr(buff, "{") != 0) {
 			//Mid(buff2, buff1, 1, InStr(buff1, "=") - 1);
 			el.id = id;
@@ -470,14 +486,15 @@ int GameScene::readStage(string filename) {
 	if ((f_handle = FileRead_open(&filename[0])) == 0)
 		return -1;
 
+	char buff1[STRING_SIZE];
 	string buff;
 
 	stage->resetTimeLine();
 	TimeLine tl;
 
 	while (FileRead_eof(f_handle) == 0) {
-		FileRead_gets(&buff[0], STRING_SIZE, f_handle);
-		int a = InStr(buff, ",");
+		FileRead_gets(buff1, STRING_SIZE, f_handle);
+		buff = buff1;
 		if (InStr(buff, ",") != 0) {
 			buff += ",";
 			tl.frame = Value(Left(buff, InStr(buff, ",") - 1));
@@ -498,7 +515,7 @@ int GameScene::readStage(string filename) {
 
 void Stage::setEnemy(const int time) {
 	int count = 0;
-	for (auto itr : tl) {
+	for (auto& itr : tl) {
 		if (itr.frame <= time) {
 			summonEnemy(itr.id, itr.xpos);
 			count++;

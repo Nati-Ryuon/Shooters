@@ -20,12 +20,11 @@ int InStr(const char *str, const char *keyword, int start) {
 }
 
 int InStr(string str, string keyword, int start) {
-//	int i = str.find(keyword, start - 1);
-	int i = (int)str.find(keyword);
-	if (i == -1)
+	int i = str.find(keyword, start - 1);
+	if (i == string::npos)
 		return 0;
 	else
-		return i;
+		return i + 1;
 }
 
 int Len(const char *str) {
@@ -83,7 +82,7 @@ char* Mid(char buff[], const char *str, int start, int length) {
 }
 
 string Mid(string str, int start, unsigned int length) {
-	if (str.length() > length)
+	if (length > str.length())
 		length = str.length();
 	return str.substr(start - 1, length);
 }
@@ -100,7 +99,7 @@ char* Left(char buff[], const char *str, int length) {
 }
 
 string Left(string str, unsigned int length) {
-	if (str.length() > length)
+	if (length > str.length())
 		return str;
 	return str.substr(0, length);
 }

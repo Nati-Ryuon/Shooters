@@ -1,6 +1,7 @@
 #pragma once
 #include "SceneBase.h"
 #include "Data.h"
+#include "Gem.h"
 #include <string>
 
 void initStage();
@@ -57,6 +58,7 @@ public:
 	//void setBGMName(string name);
 	void addTimeLine(TimeLine timeline);
 	void addEnemyList(EnemyList enemylist);
+	void addItemList(Vec2 pos, enItemType item_type);
 	void resetTimeLine();
 	void resetEnemyList();
 	void start();
@@ -72,6 +74,7 @@ private:
 	//int BGMhundle;
 	list<TimeLine> tl;
 	list<EnemyList> en;
+	list<std::unique_ptr<Item>> items;
 };
 
 class GameScene : public SceneBase {
