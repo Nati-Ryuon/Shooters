@@ -1,6 +1,7 @@
 #pragma once
 #include "Vec2.h"
 #include "Data.h"
+#include "player.h"
 
 #define ITEM_SIZE 32
 /*
@@ -29,8 +30,10 @@ public :
 
 	void Draw();
 	virtual void Update() = 0;
+	virtual void Affect(Player& player) = 0;
 	Vec2 getPos() const { return pos; }
 	int getRange() const { return range; }
+	bool getDrawFlag() const { return draw_flag; }
 };
 
 

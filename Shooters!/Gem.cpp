@@ -10,3 +10,7 @@ Gem::Gem(Vec2 pos)
 void Gem::Update() {
 
 }
+
+void Gem::Affect(Player & player) {
+
+}

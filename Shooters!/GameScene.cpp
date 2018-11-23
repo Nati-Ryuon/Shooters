@@ -20,7 +20,6 @@
 //extern unsigned int KeyState[256];
 extern char IntroFlag;
 
-list<std::unique_ptr<Enemy>> enemies;
 
 extern Player players[PLAYER_MAX];
 
@@ -30,7 +29,6 @@ static int refresh_time;//時間計測用
 static int pop_flag;//エネミーがその時間に出現したかどうか
 
 static void Stage1();
-static void CollisionControll();
 
 //std::unique_ptr<Stage> GameScene::stage;
 
@@ -142,84 +140,48 @@ static void CollisionControll();
 //}
 
 //当たり判定をまとめてるところ
-void CollisionControll() {
+void Stage::CollisionControll() {
+	DrawFormatString(0, 80, GetColor(255, 255, 255), "%d", enemies.size());
 	int i;
 //	bool break_flag = false;//多重ループ脱出用フラグ
 //	list<Shot>::iterator shot_itr;
 	for (i = 0; i < PLAYER_MAX; i++) {
 		if (players[i].alive == 1 && players[i].invisible == 0) {
 			//----------------------------------------
-			for (auto & pshot : players[i].shot) {
-				for (auto & e : enemies) {
-					if (e->isAlive()) {
-						if (ShotCollisionDetection(pshot, *e)) {
-							e->damage(pshot.damage);
+			auto e_end = enemies.end();//汚い
+			for (auto e_itr = enemies.begin(); e_itr != e_end;) {
+				if ((*e_itr)->isAlive()) {
+					for (auto & pshot : players[i].shot) {
+						if (ShotCollisionDetection(pshot, **e_itr)) {
+							(*e_itr)->damage(pshot.damage);
 							pshot.setFlag(0);
-//							shot_itr = players[i].shot.erase(shot_itr);
+							//							shot_itr = players[i].shot.erase(shot_itr);
+						}
+					}
+					if (CollisionDetection(players[i], **e_itr)) {
+						damagePlayer(i);
+						(*e_itr)->damage(10);//マジックナンバー、衝突時のダメージ
+						if ( !((*e_itr)->isAlive()) ) {
+							addItemList((*e_itr)->getPos(), enItemType::itGem);
 						}
 					}
 				}
+				if((*e_itr)->isFinished()) {
+					e_itr = enemies.erase(e_itr);
+					continue;
+				}
+				++e_itr;
 			}
-//			shot_itr = players[i].shot.begin();
-//			while (1) {
-
-//				if (shot_itr == players[i].shot.end()) {
-//					break;
-//				}
-				////Kuratus
-				//for (list<Kuratas>::iterator kuratas_itr = kuratas.begin(); kuratas_itr != kuratas.end(); kuratas_itr++) {
-				//	if (kuratas_itr->draw_flag == true) {
-				//		if (ShotCollisionDetection(*shot_itr, *kuratas_itr)) {
-				//			damageKuratas(*kuratas_itr, shot_itr->damage);
-				//			shot_itr = players[i].shot.erase(shot_itr);
-				//			goto continueLabel;
-				//		}
-				//	}
-				//}
-
-				////ZakoEnemy
-				//for (list<ZakoEnemy>::iterator zako_itr = zakoenemy.begin(); zako_itr != zakoenemy.end(); zako_itr++) {
-				//	if (zako_itr->draw_flag == true) {
-				//		if (ShotCollisionDetection(*shot_itr, *zako_itr)) {
-				//			damageZakoEnemy(*zako_itr, shot_itr->damage);
-				//			shot_itr = players[i].shot.erase(shot_itr);
-				//			goto continueLabel;
-				//		}
-				//	}
-				//}
-
-				////Golem
-				//for (list<Golem>::iterator golem_itr = golem.begin(); golem_itr != golem.end(); golem_itr++) {
-				//	if (golem_itr->draw_flag == true) {
-				//		if (ShotCollisionDetection(*shot_itr, *golem_itr)) {
-				//			damageGolem(*golem_itr, shot_itr->damage);
-				//			shot_itr = players[i].shot.erase(shot_itr);
-				//			goto continueLabel;
-				//		}
-				//	}
-				//}
-
-				////ArchGolem
-				//for (list<ArchGolem>::iterator archgolem_itr = archgolem.begin(); archgolem_itr != archgolem.end(); archgolem_itr++) {
-				//	if (archgolem_itr->draw_flag == true) {
-				//		if (ShotCollisionDetection(*shot_itr, *archgolem_itr)) {
-				//			damageArchGolem(*archgolem_itr, shot_itr->damage);
-				//			shot_itr = players[i].shot.erase(shot_itr);
-				//			goto continueLabel;
-				//		}
-				//	}
-				//}
-	//			shot_itr++;
-	//		}
-			//----------------------------------------
-			
-			for (auto & e : enemies) {
-				if (e->isAlive()) {
-					if (CollisionDetection(players[i], *e)) {
-						damagePlayer(i);
-						e->damage(10);//マジックナンバー、衝突時のダメージ
+			auto i_end = items.end();//汚い
+			for (auto i_itr = items.begin() ; i_itr != i_end;) {
+				if ((*i_itr)->getDrawFlag()) {
+					if (CollisionDetection(players[i], **i_itr)) {
+						(*i_itr)->Affect(players[i]);
+						i_itr = items.erase(i_itr);
+						continue;
 					}
 				}
+				++i_itr;
 			}
 
 		}
@@ -231,7 +193,6 @@ GameScene::GameScene()
 	for (int i = 0; i < STAGE_NUM; i++) {
 		stage_counter[i] = 0;
 	}
-	enemies.clear();
 	players[0].shot.clear();//仮
 
 	setStage("TestStage");
@@ -248,23 +209,28 @@ void GameScene::update() {
 	const int time = (GetNowCount() - stage->starttime) / MSECOND_PER_ROW;
 
 	stage->setEnemy(time);
-
-	if (IntroFlag != 1) {
-		PlayerUpdate();
-		for (auto & e : enemies) {
-			e->update();
-		}
-
-		if (Key::getKeyState(KEY_INPUT_ESCAPE) == 1) {
-			//changeScene(TITLE);
-			nextScene = std::make_unique<Title>();
-		}
-	} else {
-		SkillIntroUpdate();
+	stage->update();
+	if (Key::getKeyState(KEY_INPUT_ESCAPE) == 1) {
+		//		//changeScene(TITLE);
+		nextScene = std::make_unique<Title>();
 	}
+	//if (IntroFlag != 1) {
+	//	PlayerUpdate();
+	//	stage->update();
+	//	for (auto & e : enemies) {
+	//		e->update();
+	//	}
 
-	//当たり判定
-	CollisionControll();
+	//	if (Key::getKeyState(KEY_INPUT_ESCAPE) == 1) {
+	//		//changeScene(TITLE);
+	//		nextScene = std::make_unique<Title>();
+	//	}
+	//} else {
+	//	SkillIntroUpdate();
+	//}
+
+	////当たり判定
+	//CollisionControll();
 	////各ステージの時間計測
 	//if (GetNowCount() - refresh_time > 1000) {//一秒経過したら
 	//	stage_counter[current_stage - 1]++;
@@ -335,6 +301,7 @@ void EnemyList::setEnemyName(string name) {
 }
 
 Stage::Stage() : starttime(0) {
+	enemies.clear();
 }
 
 Stage::~Stage() {
@@ -402,10 +369,6 @@ void Stage::update() {
 		PlayerUpdate();
 		for (auto & e : enemies) {
 			e->update();
-		}
-
-		if (Key::getKeyState(KEY_INPUT_ESCAPE) == 1) {
-			changeScene(TITLE);
 		}
 	} else {
 		SkillIntroUpdate();

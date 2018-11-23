@@ -3,6 +3,7 @@
 #include "Data.h"
 #include "Gem.h"
 #include <string>
+#include "Enemy.h"
 
 void initStage();
 
@@ -69,12 +70,14 @@ private:
 	//int readEnemyList(const char *FileName);
 	//int readStage(const char *FileName);
 	void summonEnemy(int id, int xpos);
+	void CollisionControll();
 private:
 	//char BGM[STRING_SIZE];
 	//int BGMhundle;
 	list<TimeLine> tl;
 	list<EnemyList> en;
 	list<std::unique_ptr<Item>> items;
+	list<std::unique_ptr<Enemy>> enemies;
 };
 
 class GameScene : public SceneBase {
