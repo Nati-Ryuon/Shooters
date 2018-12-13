@@ -302,3 +302,7 @@ void endPlayerDoubleShot(){
 プレイヤーに持たせるSHOTTYPEをポインターにする案はなかなか魅力的だが、
 一部を引き継ぐようにオーバーライドするときに面倒になる。
 */
+
+void Player::gainExp(int exp){
+	EXP += exp;
+}

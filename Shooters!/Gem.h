@@ -2,6 +2,7 @@
 #include "Item.h"
 
 class Gem : public Item {
+	int exp;
 public:
 	Gem(Vec2 pos);
 	void Update() override;

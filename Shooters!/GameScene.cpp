@@ -156,12 +156,18 @@ void Stage::CollisionControll() {
 							(*e_itr)->damage(pshot.damage);
 							pshot.setFlag(0);
 							//							shot_itr = players[i].shot.erase(shot_itr);
+
+							if (!((*e_itr)->isAlive())) {
+								addItemList((*e_itr)->getPos(), enItemType::itGem);
+							}
+							
 						}
 					}
 					if (CollisionDetection(players[i], **e_itr)) {
 						damagePlayer(i);
 						(*e_itr)->damage(10);//マジックナンバー、衝突時のダメージ
-						if ( !((*e_itr)->isAlive()) ) {
+
+						if (!((*e_itr)->isAlive())) {
 							addItemList((*e_itr)->getPos(), enItemType::itGem);
 						}
 					}
@@ -197,7 +203,6 @@ GameScene::GameScene()
 
 	setStage("TestStage");
 	stage->start();
-	stage->addItemList(Vec2(400, 300), enItemType::itGem);
 }
 
 void GameScene::draw() {
@@ -369,6 +374,9 @@ void Stage::update() {
 		PlayerUpdate();
 		for (auto & e : enemies) {
 			e->update();
+		}
+		for (auto &i : items) {
+			i->Update();
 		}
 	} else {
 		SkillIntroUpdate();

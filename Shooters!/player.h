@@ -55,5 +55,7 @@ public:
 	bool invincible;//0:•’Ê 1:–³“G
 	bool invisible;//0:•’Ê 1:Œ©‚¦‚È‚¢
 
+	void gainExp(int exp);
+
 	list<Shot> shot;
 };

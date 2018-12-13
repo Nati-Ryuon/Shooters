@@ -29,7 +29,12 @@ public:
 	virtual void draw() = 0;
 	virtual void update() = 0;
 	void damage(const int damage);
-	bool isAlive() { return draw_flag; }
+	bool isAlive() {
+		if (hp <= 0) {
+			draw_flag = false;
+		}
+		return draw_flag;
+	}
 	bool isFinished() { return erase_flag; }
 	Vec2 getPos() const { return pos; }
 	int getRange() const { return range; }
