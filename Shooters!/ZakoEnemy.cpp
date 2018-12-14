@@ -36,8 +36,8 @@ void loadZakoEnemyGraph() {
 //	zakoenemyList.push_back(zakoenemy);
 //}
 
-ZakoEnemy::ZakoEnemy(Vec2 pos)
-	: Enemy(pos, zakoenemy_graph[0], 20, 1.1f, 16, 200, 2), stop_pos(getRandom(100, 300)), stop_time(4),
+ZakoEnemy::ZakoEnemy(Vec2 pos, enItemType item_type)
+	: Enemy(pos, zakoenemy_graph[0], 20, 1.1f, 16, 200, item_type, 2), stop_pos(getRandom(100, 300)), stop_time(4),
 	stopped_time(0), stop_flag(false)
 {
 

@@ -162,6 +162,7 @@
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="Gem.cpp" />
     <ClCompile Include="Golem.cpp" />
+    <ClCompile Include="HealingPotion.cpp" />
     <ClCompile Include="Help.cpp" />
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="Kuratas.cpp" />
@@ -190,6 +191,7 @@
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="Gem.h" />
     <ClInclude Include="Golem.h" />
+    <ClInclude Include="HealingPotion.h" />
     <ClInclude Include="Help.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="Kuratas.h" />

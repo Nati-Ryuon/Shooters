@@ -16,8 +16,8 @@ void loadArchGolemGraph() {
 }
 
 //エネミー初期化および設置
-ArchGolem::ArchGolem(Vec2 & pos, const list<std::shared_ptr<Player>> & pList) 
-	: Enemy(pos, archgolem_graph[0], 20, 1.5, 16, 200), players(pList), move_interval(200), refresh_move(0), shoot_interval(1)
+ArchGolem::ArchGolem(Vec2 & pos, const list<std::shared_ptr<Player>> & pList, enItemType item_type)
+	: Enemy(pos, archgolem_graph[0], 20, 1.5, 16, 200, item_type), players(pList), move_interval(200), refresh_move(0), shoot_interval(1)
 {
 	targetPlayer = players.begin();
 }

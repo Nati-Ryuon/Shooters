@@ -14,7 +14,7 @@ class ZakoEnemy : public Enemy {
 	void Pattern();
 	void Shoot();
 public:
-	ZakoEnemy(Vec2 pos);
+	ZakoEnemy(Vec2 pos, enItemType item_type);
 	void draw() override;
 	void update() override;
 };

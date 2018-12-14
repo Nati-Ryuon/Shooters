@@ -5,11 +5,12 @@
 
 class Enemy {
 protected:
+	enItemType item_type;
 	list<Shot> shots;
 	Vec2 pos;
 	int level;
-//	const int width;
-//	const int height;
+	//	const int width;
+	//	const int height;
 	const int range;//“–‚½‚è”»’è‚Ì‰~‚Ì”¼Œa
 	bool draw_flag;//•`‰æ‚·‚é‚©‚Ç‚¤‚©(¶‘¶ƒtƒ‰ƒO)
 	bool erase_flag;//¶‘¶‚µ‚Ä‚¢‚È‚¢‚©‚Â©•ª‚ª‘Å‚Á‚½‹…‚ª‘S•”‚È‚­‚È‚Á‚½‚É—§‚Â
@@ -25,7 +26,7 @@ protected:
 	bool shoot_flag;//’e‚ğ”­Ë‚µ‚½‚©‚Ç‚¤‚©
 	const int shot_speed;//’e‚Ì‘¬“x(ƒXƒJƒ‰[)
 public:
-	Enemy(Vec2 &pos, int graph_handle, int hp, float speed, int range, int anime_interval, int shot_speed = 0);
+	Enemy(Vec2 &pos, int graph_handle, int hp, float speed, int range, int anime_interval, enItemType item_type, int shot_speed = 0);
 	virtual void draw() = 0;
 	virtual void update() = 0;
 	void damage(const int damage);
@@ -38,4 +39,5 @@ public:
 	bool isFinished() { return erase_flag; }
 	Vec2 getPos() const { return pos; }
 	int getRange() const { return range; }
+	enItemType getItemType() { return item_type; }
 };

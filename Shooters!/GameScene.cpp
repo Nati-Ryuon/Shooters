@@ -12,6 +12,7 @@
 #include "Kuratas.h"
 #include "Golem.h"
 #include "ArchGolem.h"
+#include "HealingPotion.h"
 
 
 #define MSECOND_PER_ROW 500 
@@ -158,7 +159,7 @@ void Stage::CollisionControll() {
 							//							shot_itr = players[i].shot.erase(shot_itr);
 
 							if (!((*e_itr)->isAlive())) {
-								addItemList((*e_itr)->getPos(), enItemType::itGem);
+								addItemList((*e_itr)->getPos(), (*e_itr)->getItemType());
 							}
 							
 						}
@@ -168,7 +169,7 @@ void Stage::CollisionControll() {
 						(*e_itr)->damage(10);//マジックナンバー、衝突時のダメージ
 
 						if (!((*e_itr)->isAlive())) {
-							addItemList((*e_itr)->getPos(), enItemType::itGem);
+							addItemList((*e_itr)->getPos(), (*e_itr)->getItemType());
 						}
 					}
 				}
@@ -346,6 +347,10 @@ void Stage::addItemList(Vec2 pos, enItemType item_type) {
 	{
 	case enItemType::itGem:
 		items.push_back(std::make_unique<Gem>(pos));
+		break;
+	case enItemType::itHealingPotion:
+		items.push_back(std::make_unique<HealingPotion>(pos));
+		break;
 	default:
 		break;
 	}
@@ -433,7 +438,7 @@ int GameScene::readEnemyList(string filename) {
 		}
 		else if (InStr(buff, "Item") != 0) {
 			Mid(buff, InStr(buff, "=") + 1, Len(buff));
-			el.item_type = enItemType::itItem1;
+			el.item_type = enItemType::itHealingPotion;
 		}
 		else if (InStr(buff, "Condition") != 0) {
 			el.cond.setConditionName(Mid(buff, InStr(buff, "=") + 1, Len(buff)));
@@ -501,14 +506,14 @@ void Stage::setEnemy(const int time) {
 void Stage::summonEnemy(int id, int xpos) {
 	//idからエネミーの種類を特定してswitchで呼び出しか
 	int i = 0;
-	for (auto itr : en) {
+	for (auto & itr : en) {
 		if (itr.id == id) {
 			switch (itr.name) {
 			case enEnemy::enZakoEnemy:
-				enemies.push_back(std::make_unique<ZakoEnemy>(Vec2(xpos, 0)));
+				enemies.push_back(std::make_unique<ZakoEnemy>(Vec2(xpos, 0), itr.item_type));
 				return;
 			case enEnemy::enKuratas:
-				enemies.push_back(std::make_unique<Kuratas>(Vec2(xpos, 0)));
+				enemies.push_back(std::make_unique<Kuratas>(Vec2(xpos, 0), itr.item_type));
 				return;
 			case enEnemy::enGolem:
 				//enemies.push_back(std::make_unique<Golem>(Vec2(xpos, 0)));

@@ -45,6 +45,7 @@ public:
 	int EXP;
 	float reload;
 	int magic_point;
+	int hp;//HP‚Á‚Û‚¢‚à‚Ì‚ğ‚Ù‚©‚É’T‚µ‚Ü‚µ‚½‚ªŒ©‚Â‚©‚ç‚È‚©‚Á‚½‚Ì‚Åryuon‚ªì‚è‚Ü‚µ‚½B‚à‚µ‚·‚Å‚É—pˆÓ‚µ‚Ä‚¢‚½‚Ì‚Å‚ ‚ê‚ÎHeal‚ÌŠÖ”‚ğ’¼‚µ‚Ä‚¨‚¢‚Ä‚­‚¾‚³‚¢
 
 	bool alive;
 	bool can_move;//0:ˆÚ“®‚Å‚«‚È‚¢ 1:ˆÚ“®‚Å‚«‚é
@@ -56,6 +57,7 @@ public:
 	bool invisible;//0:•’Ê 1:Œ©‚¦‚È‚¢
 
 	void gainExp(int exp);
+	void Heal(int hp);
 
 	list<Shot> shot;
 };

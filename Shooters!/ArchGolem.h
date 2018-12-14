@@ -15,7 +15,7 @@ class ArchGolem : public Enemy {
 	void Pattern();
 	void Shoot();
 public:
-	ArchGolem(Vec2 & pos, const list<std::shared_ptr<Player>> & pList);
+	ArchGolem(Vec2 & pos, const list<std::shared_ptr<Player>> & pList, enItemType item_type);
 	void draw() override;
 	void update() override;
 };

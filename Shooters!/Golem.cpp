@@ -13,8 +13,8 @@ void loadGolemGraph() {
 }
 
 //エネミー初期化および設置
-Golem::Golem(Vec2 & pos, const list<std::shared_ptr<Player>> & pList)
-	: Enemy(pos, golem_graph[0], 20, 1.5, 16, 200), players(pList), move_interval(200), refresh_move(0)
+Golem::Golem(Vec2 & pos, const list<std::shared_ptr<Player>> & pList, enItemType item_type)
+	: Enemy(pos, golem_graph[0], 20, 1.5, 16, 200, item_type), players(pList), move_interval(200), refresh_move(0)
 {
 	targetPlayer = players.begin();
 }

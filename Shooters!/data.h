@@ -83,7 +83,7 @@ enum class enEnemy {
 enum class enItemType {
 	itEXP,
 	itGem,
-	itItem1,
+	itHealingPotion,
 	itItem2,
 	itItem3,
 	itItem4,

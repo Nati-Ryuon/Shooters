@@ -306,3 +306,7 @@ void endPlayerDoubleShot(){
 void Player::gainExp(int exp){
 	EXP += exp;
 }
+
+void Player::Heal(int hp){
+	Player::hp += hp;
+}

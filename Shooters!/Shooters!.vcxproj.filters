@@ -122,6 +122,9 @@
     <ClCompile Include="Golem.cpp">
       <Filter>ソース ファイル\リュオン\Enemies</Filter>
     </ClCompile>
+    <ClCompile Include="HealingPotion.cpp">
+      <Filter>ソース ファイル\リュオン\Items</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CollisionCell.h">
@@ -204,6 +207,9 @@
     </ClInclude>
     <ClInclude Include="ZakoEnemy.h">
       <Filter>ヘッダー ファイル\リュオン\Enemies</Filter>
+    </ClInclude>
+    <ClInclude Include="HealingPotion.h">
+      <Filter>ヘッダー ファイル\リュオン\Items</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

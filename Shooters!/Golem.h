@@ -14,7 +14,7 @@ class Golem : public Enemy {
 	void Pattern();
 	void Shoot();
 public:
-	Golem(Vec2 & pos, const list<std::shared_ptr<Player>> & pList);
+	Golem(Vec2 & pos, const list<std::shared_ptr<Player>> & pList, enItemType item_type);
 	void draw() override;
 	void update() override;
 };
