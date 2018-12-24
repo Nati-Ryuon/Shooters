@@ -12,5 +12,5 @@ void HealingPotion::Update() {
 }
 
 void HealingPotion::Affect(Player & player) {
-	player.Heal(healing_hp);
+	player.gainHeal(healing_hp);
 }

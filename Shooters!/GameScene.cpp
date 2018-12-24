@@ -22,7 +22,8 @@
 extern char IntroFlag;
 
 
-extern Player players[PLAYER_MAX];
+//extern Player players[PLAYER_MAX];
+extern list<std::shared_ptr<Player>> players;
 
 static int current_stage;//現在のステージ
 static int stage_counter[STAGE_NUM];//ステージが開始してからの時刻
@@ -143,16 +144,17 @@ static void Stage1();
 //当たり判定をまとめてるところ
 void Stage::CollisionControll() {
 	DrawFormatString(0, 80, GetColor(255, 255, 255), "%d", enemies.size());
-	int i;
+	//int i;
 //	bool break_flag = false;//多重ループ脱出用フラグ
 //	list<Shot>::iterator shot_itr;
-	for (i = 0; i < PLAYER_MAX; i++) {
-		if (players[i].alive == 1 && players[i].invisible == 0) {
+	for (auto p_itr : players) {
+		//if ((*p_itr).isAlive() && (*p_itr).isInvincible()) {
+		if ((*p_itr).isAlive()) {
 			//----------------------------------------
 			auto e_end = enemies.end();//汚い
 			for (auto e_itr = enemies.begin(); e_itr != e_end;) {
 				if ((*e_itr)->isAlive()) {
-					for (auto & pshot : players[i].shot) {
+					for (auto & pshot : (*p_itr).shot) {
 						if (ShotCollisionDetection(pshot, **e_itr)) {
 							(*e_itr)->damage(pshot.damage);
 							pshot.setFlag(0);
@@ -164,8 +166,9 @@ void Stage::CollisionControll() {
 							
 						}
 					}
-					if (CollisionDetection(players[i], **e_itr)) {
-						damagePlayer(i);
+					if (CollisionDetection(*p_itr, **e_itr)) {
+						//damagePlayer(i);
+						(*p_itr).gainDamage(10);
 						(*e_itr)->damage(10);//マジックナンバー、衝突時のダメージ
 
 						if (!((*e_itr)->isAlive())) {
@@ -182,8 +185,8 @@ void Stage::CollisionControll() {
 			auto i_end = items.end();//汚い
 			for (auto i_itr = items.begin() ; i_itr != i_end;) {
 				if ((*i_itr)->getDrawFlag()) {
-					if (CollisionDetection(players[i], **i_itr)) {
-						(*i_itr)->Affect(players[i]);
+					if (CollisionDetection(*p_itr, **i_itr)) {
+						(*i_itr)->Affect(*p_itr);
 						i_itr = items.erase(i_itr);
 						continue;
 					}
@@ -200,7 +203,9 @@ GameScene::GameScene()
 	for (int i = 0; i < STAGE_NUM; i++) {
 		stage_counter[i] = 0;
 	}
-	players[0].shot.clear();//仮
+
+	auto itr = players.begin();
+	(*itr)->shot.clear();//仮
 
 	setStage("TestStage");
 	stage->start();

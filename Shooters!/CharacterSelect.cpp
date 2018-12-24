@@ -138,6 +138,7 @@ bool CharacterSelectScene::CSChoice::update() {
 	if (Key::getKeyState(KEY_INPUT_RETURN) == 1 || Key::getKeyState(KEY_INPUT_SPACE) == 1) {
 		//Œˆ’è
 		PlayerInit(0, shooters[selector.row * SelectionColumns + selector.column].shooter_name);
+
 		CharacterSelectScene::deleteCSelect();
 		//		changeScene(GAME);
 		return true;

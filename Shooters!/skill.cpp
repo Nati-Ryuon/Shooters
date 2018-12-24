@@ -26,61 +26,62 @@ extern unsigned char SHOOT;
 
 //スキル使用中はレベル上がらないようにする？経験値の蓄積はありで。
 
-Player owner;//使用したプレイヤーの情報を残すための変数
+Player *owner;//使用したプレイヤーの情報を残すための変数
 ShotType st;//ショットオーバーライド系スキルを元に戻すため
 int EffectTime;//スキルの効果時間(使わない場合もあり)
 int SkillStartTime;//スキルの使用開始時間(主に時間計測)
 char IntroFlag = 0;//0:イントロしてないよ　1:イントロ中だよ　2:イントロ終わったよ
 
-void (*UsingSkillUpdate)();
+bool (*UsingSkillUpdate)();//実行中はtrueで終了時にfalseを返す
 void (*UsingSkillDraw)();
 void (*UsingSkillEnd)();
 
-void SkillInit( Player &player ){
-	//処理を止める関数
-	
+void SkillInit( Player *player ){
+	//nullチェック
+	if (player == nullptr)
+		return;
 
 	owner = player;
-	player.skill_flag = 1;//必殺技中であるというフラグ
-	owner.magic_point = 0;
+	//player.skill_flag = 1;//必殺技中であるというフラグ
+	owner->magic_point = 0;
 
 	if( IntroFlag == 0 )
-		SkillIntroInit( player.shooter.skill );
+		SkillIntroInit( owner->shooter.skill );
 
-	switch( player.shooter.skill ){
+	switch( owner->shooter.skill ){
 	case enSkill::skRainbowShot:
-		RainbowShotInit( player.shot_type );
+		RainbowShotInit( owner->shot_type );
 		UsingSkillUpdate = RainbowShotUpdate;
 		UsingSkillDraw = RainbowShotDraw;
 		UsingSkillEnd = RainbowShotEnd;
 		break;
 	case enSkill::skHyperRay:
-		HyperRayInit( player );
+		HyperRayInit( *owner );
 		UsingSkillUpdate = HyperRayUpdate;
 		UsingSkillDraw = HyperRayDraw;
 		UsingSkillEnd = HyperRayEnd;
 		break;
 	case enSkill::skBackwaterCamp:
-		BCInit( player.shot_type );
+		BCInit( owner->shot_type );
 		UsingSkillUpdate = BCUpdate;
 		UsingSkillDraw = BCDraw;
 		UsingSkillEnd = BCEnd;
 		break;
 	case enSkill::skDoubleShot:
-		DoubleShotInit( player.shot_type );
+		DoubleShotInit( owner->shot_type );
 		UsingSkillUpdate = DoubleShotUpdate;
 		UsingSkillDraw = DoubleShotDraw;
 		UsingSkillEnd = DoubleShotEnd;
 		break;
 	case enSkill::skOnTheFilm:
-		OnTheFilmInit( player );
+		OnTheFilmInit( *owner );
 		UsingSkillUpdate = OnTheFilmUpdate;
 		UsingSkillDraw = OnTheFilmDraw;
 		UsingSkillEnd = OnTheFilmEnd;
 		break;
 	default:
 		//ダミーとしてレインボーショット入れておくね
-		RainbowShotInit( player.shot_type );
+		RainbowShotInit( owner->shot_type );
 		UsingSkillUpdate = RainbowShotUpdate;
 		UsingSkillDraw = RainbowShotDraw;
 		UsingSkillEnd = RainbowShotEnd;
@@ -104,16 +105,15 @@ void SkillDraw(){
 
 }
 
-void SkillUpdate(){
+bool SkillUpdate(){
 	//switchで各スキルのUpdate関数を呼び出す
 
 	if( IntroFlag == 1 ){
 		SkillIntroUpdate();
-		return;
+		return true;
 	}
 
-	UsingSkillUpdate();
-
+	return UsingSkillUpdate();
 }
 
 //何らかの理由で緊急終了する場合には直接使用。基本は各自のUpdate関数から呼び出す。
@@ -121,9 +121,9 @@ void SkillEnd(){
 
 	UsingSkillEnd();
 
-	owner.skill_flag = 0;
-	if( owner.magic_point < 0)
-		owner.magic_point = 0;
+	//owner->skill_flag = 0;
+	if( owner->magic_point < 0)
+		owner->magic_point = 0;
 	
 	IntroFlag = 0;
 }
@@ -255,14 +255,14 @@ int SkillIntroEnd(){
 void RainbowShotInit( ShotType &shot_type ){
 	char bitflag = 0;
 	
-	owner.magic_point = owner.shooter.req_magic_point;//必殺技ゲージをタイマー代わりにするため
+	owner->magic_point = owner->shooter.req_magic_point;//必殺技ゲージをタイマー代わりにするため
 
 	EffectTime = 15000;//ミリ秒
 	SkillStartTime = GetNowCount();
 
 
 	//フラグ立て
-	bitflag = bitflag | (1 << owner.player_index);
+	bitflag = bitflag | (1 << owner->index);
 	//bitflag = bitflag | 0xff;//全プレイヤーバージョン(0b11111111)
 
 	overridePlayerShotType( RainbowOverRide, bitflag );
@@ -288,7 +288,7 @@ void RainbowOverRide( ShotType &shot_type ){
 
 }
 
-void RainbowShotUpdate(){
+bool RainbowShotUpdate(){
 	if( IntroTime != 0 ){
 		SkillStartTime += IntroTime;
 		IntroTime = 0;
@@ -296,10 +296,14 @@ void RainbowShotUpdate(){
 
 	//DrawFormatString( MouseX, MouseY, GetColor( 255,255,255 ), "%d", EffectTime );
 
-	owner.magic_point = owner.shooter.req_magic_point * (EffectTime - (GetNowCount() - SkillStartTime)) / EffectTime;
+	owner->magic_point = owner->shooter.req_magic_point * (EffectTime - (GetNowCount() - SkillStartTime)) / EffectTime;
 
-	if( (GetNowCount() - SkillStartTime) > EffectTime )
+	if ((GetNowCount() - SkillStartTime) > EffectTime) {
 		SkillEnd();
+		return false;
+	}
+
+	return true;
 }
 
 void RainbowShotDraw(){
@@ -308,7 +312,7 @@ void RainbowShotDraw(){
 
 void RainbowShotEnd(){
 	char bitflag = 0;
-	bitflag = bitflag | (1 << owner.player_index);
+	bitflag = bitflag | (1 << owner->index);
 	//bitflag = bitflag | 0xff;
 	resetPlayerShotType( bitflag );
 }
@@ -339,8 +343,8 @@ float HRExRate;
 
 void HyperRayInit( Player &player ){
 
-	player.can_move = 0;
-	player.can_shoot = 0;//ショット撃てないようにするフラグ
+	player.setFlag(enPlayerFlag::pfCanMove, false);
+	player.setFlag(enPlayerFlag::pfCanShoot, false);//ショット撃てないようにするフラグ
 	
 	HRcount = HRdelay = 15;
 	HRdraw = 0;
@@ -358,7 +362,7 @@ void HyperRayInit( Player &player ){
 
 }
 
-void HyperRayUpdate(){
+bool HyperRayUpdate(){
 
 	if( HRcount == 0 && HRdelay > 0 ){
 		HRdraw = HRdraw ^ 1;//排他的論理和によって1と0を切り替え
@@ -372,14 +376,18 @@ void HyperRayUpdate(){
 		HRtimer--;
 	}
 
-	if( HRtimer == 0 )
+	if (HRtimer == 0) {
 		SkillEnd();
+		return false;
+	}
+
+	return true;
 }
 
 void HyperRayDraw(){
 
 	if( HRdraw == 1 ){
-		DrawRotaGraphF( owner.pos.x, owner.pos.y - MAINSCREEN_HEIGHT / 2, 1.0, 0, HR1, 1 );
+		DrawRotaGraphF( owner->pos.x, owner->pos.y - MAINSCREEN_HEIGHT / 2, 1.0, 0, HR1, 1 );
 	}
 
 	if( HRdelay == 0 ){
@@ -390,22 +398,22 @@ void HyperRayDraw(){
 			ex_width = 1.f + HRExRate / 60.f * (float)(300 - HRtimer);
 		else
 			ex_width = HRExRate + 1.f;
-		DrawExtendGraphF( owner.pos.x - HRWidth / 2 * ex_width, owner.pos.y - HRHeight - 32, owner.pos.x + HRWidth / 2 * ex_width, owner.pos.y - 32, HR1, 1 );
-		DrawExtendGraphF( owner.pos.x - HRWidth / 2 * ex_width, owner.pos.y - HRHeight - 32, owner.pos.x + HRWidth / 2 * ex_width, owner.pos.y - 32, HR2, 1 );
-		DrawRotaGraphF( owner.pos.x, owner.pos.y - 32, 1.0, 0, HRLight, 1 );
+		DrawExtendGraphF( owner->pos.x - HRWidth / 2 * ex_width, owner->pos.y - HRHeight - 32, owner->pos.x + HRWidth / 2 * ex_width, owner->pos.y - 32, HR1, 1 );
+		DrawExtendGraphF( owner->pos.x - HRWidth / 2 * ex_width, owner->pos.y - HRHeight - 32, owner->pos.x + HRWidth / 2 * ex_width, owner->pos.y - 32, HR2, 1 );
+		DrawRotaGraphF( owner->pos.x, owner->pos.y - 32, 1.0, 0, HRLight, 1 );
 	}
 	
 	if( HRtimer < 240 && (HRtimer % 2) == 1 ){
 		//目がチカチカするようなら(HRtimer % 2)の部分を消せばよいよ
-		DrawExtendGraphF( owner.pos.x - HRWidth / 2.f * (1.f + HRExRate), owner.pos.y - HRHeight - 32, owner.pos.x + HRWidth / 2 * (1.f + HRExRate), owner.pos.y - 32, HR2, 1 );
+		DrawExtendGraphF( owner->pos.x - HRWidth / 2.f * (1.f + HRExRate), owner->pos.y - HRHeight - 32, owner->pos.x + HRWidth / 2 * (1.f + HRExRate), owner->pos.y - 32, HR2, 1 );
 	}
 
 	SetDrawBlendMode( DX_BLENDMODE_NOBLEND, 255 );
 }
 
 void HyperRayEnd(){
-	owner.can_move = true;
-	owner.can_shoot = true;//ショット撃てるようにする
+	owner->setFlag(enPlayerFlag::pfCanMove, true);
+	owner->setFlag(enPlayerFlag::pfCanShoot, true);//ショット撃てるようにする
 
 	DeleteGraph( HRLight );
 	DeleteGraph( HR1 );
@@ -426,14 +434,14 @@ void BCInit( ShotType &shot_type ){
 	EffectTime = 10000 + (3000 * shot_type.level);//ミリ秒
 	SkillStartTime = GetNowCount();
 
-	owner.magic_point = owner.shooter.req_magic_point;
-	owner.can_back = false;
+	owner->magic_point = owner->shooter.req_magic_point;
+	owner->setFlag(enPlayerFlag::pfCanBack, false);
 
 	//無敵フラグ(仮) 本当は全員に適用
-	owner.invincible = true;
+	owner ->setFlag(enPlayerFlag::pfInvincible, true);
 
 	//フラグ立て
-	//bitflag = bitflag | (1 << owner.PlayerNumber);
+	//bitflag = bitflag | (1 << owner->PlayerNumber);
 	bitflag = bitflag | 0xff;//全プレイヤーバージョン(0b11111111)
 
 	overridePlayerShotType( BCOverRide, bitflag );
@@ -446,18 +454,22 @@ void BCOverRide( ShotType &shot_type ){
 
 }
 
-void BCUpdate(){
+bool BCUpdate(){
 	if( IntroTime != 0 ){
 		SkillStartTime += IntroTime;
 		IntroTime = 0;
 	}
 
-	owner.magic_point = owner.shooter.req_magic_point * (EffectTime - (GetNowCount() - SkillStartTime)) / EffectTime;
+	owner->magic_point = owner->shooter.req_magic_point * (EffectTime - (GetNowCount() - SkillStartTime)) / EffectTime;
 
 	//KeyState[KEY_INPUT_S] = -1;//後退できないように
 
-	if( (GetNowCount() - SkillStartTime) > EffectTime )
+	if ((GetNowCount() - SkillStartTime) > EffectTime) {
 		SkillEnd();
+		return false;
+	}
+
+	return true;
 }
 
 void BCDraw(){
@@ -466,12 +478,12 @@ void BCDraw(){
 
 void BCEnd(){
 	char bitflag = 0;
-	//bitflag = bitflag | (1 << owner.PlayerNumber);
+	//bitflag = bitflag | (1 << owner->PlayerNumber);
 	bitflag = bitflag | 0xff;
 	resetPlayerShotType( bitflag );
 
-	owner.can_back = true;
-	owner.invincible = false;
+	owner->setFlag(enPlayerFlag::pfCanBack, true);
+	owner->setFlag(enPlayerFlag::pfInvincible, false);
 }
 
 //-----------------------
@@ -487,12 +499,12 @@ void DoubleShotInit( ShotType &shot_type ){
 	EffectTime = 10000 + (3000 * shot_type.level);//ミリ秒
 	SkillStartTime = GetNowCount();
 
-	owner.magic_point = owner.shooter.req_magic_point;
+	owner->magic_point = owner->shooter.req_magic_point;
 
 	beginPlayerDoubleShot();
 
 	//フラグ立て
-	//bitflag = bitflag | (1 << owner.PlayerNumber);
+	//bitflag = bitflag | (1 << owner->PlayerNumber);
 	bitflag = bitflag | 0xff;//全プレイヤーバージョン(0b11111111)
 
 	overridePlayerShotType( DoubleShotOverRide, bitflag );
@@ -503,16 +515,20 @@ void DoubleShotOverRide( ShotType &shot_type ){
 	shot_type.cool_time /= 1.5;//CoolTimeが3分の2に。
 }
 
-void DoubleShotUpdate(){
+bool DoubleShotUpdate(){
 	if( IntroTime != 0 ){
 		SkillStartTime += IntroTime;
 		IntroTime = 0;
 	}
 
-	owner.magic_point = owner.shooter.req_magic_point * (EffectTime - (GetNowCount() - SkillStartTime)) / EffectTime;
+	owner->magic_point = owner->shooter.req_magic_point * (EffectTime - (GetNowCount() - SkillStartTime)) / EffectTime;
 
-	if( (GetNowCount() - SkillStartTime) > EffectTime )
+	if ((GetNowCount() - SkillStartTime) > EffectTime) {
 		SkillEnd();
+		return false;
+	}
+
+	return true;
 }
 
 void DoubleShotDraw(){
@@ -521,7 +537,7 @@ void DoubleShotDraw(){
 
 void DoubleShotEnd(){
 	char bitflag = 0;
-	//bitflag = bitflag | (1 << owner.PlayerNumber);
+	//bitflag = bitflag | (1 << owner->PlayerNumber);
 	bitflag = bitflag | 0xff;
 	resetPlayerShotType( bitflag );
 	endPlayerDoubleShot();
@@ -590,14 +606,14 @@ bool Flash;
 
 int OnTheFilmInit( Player &player ){
 
-	player.can_move = 0;
+	player.setFlag(enPlayerFlag::pfCanMove, false);
 	
-	player.can_shoot = 0;//ショット撃てないようにするフラグ
+	player.setFlag(enPlayerFlag::pfCanShoot, false);//ショット撃てないようにするフラグ
 	//pre = player.pos;//プレイヤーを画面外にテレポートさせた後に戻ってこさせるため。
 	//player.pos.x = MAINSCREEN_WIDTH / 2;//プレイヤーを見えない場所へ
 	//player.pos.y = MAINSCREEN_HEIGHT * 2;
-	player.invisible = 1;
-	player.invincible = 1;
+	player.setFlag(enPlayerFlag::pfInvisible, true);
+	player.setFlag(enPlayerFlag::pfInvincible, true);
 
 	film_pos_x = MAINSCREEN_WIDTH / 2;
 	film_pos_y = MAINSCREEN_HEIGHT / 2;
@@ -607,10 +623,10 @@ int OnTheFilmInit( Player &player ){
 	film_y1 = film_pos_y - FilmHeight[player.level-1] / 2;
 	film_y2 = film_pos_y + FilmHeight[player.level-1] / 2;
 
-	film_x12 = film_x1 + FilmWidth[owner.level-1] / 4;
-	film_x22 = film_x2 - FilmWidth[owner.level-1] / 4;
-	film_y12 = film_y1 + FilmHeight[owner.level-1] / 4;
-	film_y22 = film_y2 - FilmHeight[owner.level-1] / 4;
+	film_x12 = film_x1 + FilmWidth[owner->level-1] / 4;
+	film_x22 = film_x2 - FilmWidth[owner->level-1] / 4;
+	film_y12 = film_y1 + FilmHeight[owner->level-1] / 4;
+	film_y22 = film_y2 - FilmHeight[owner->level-1] / 4;
 
 	start = GetNowCount();
 
@@ -629,7 +645,7 @@ int OnTheFilmInit( Player &player ){
 	return 0;
 }
 
-void OnTheFilmUpdate(){
+bool OnTheFilmUpdate(){
 
 	if( IntroTime != 0 ){
 		start += IntroTime;
@@ -653,19 +669,20 @@ void OnTheFilmUpdate(){
 			photo_timer--;
 		}else{
 			SkillEnd();
+			return false;
 		}	
 	}else{
 
 		//フィルムの範囲(x1,y1):(x2,y2)
-		film_x1 = film_pos_x - FilmWidth[owner.level-1] / 2;
-		film_x2 = film_pos_x + FilmWidth[owner.level-1] / 2;
-		film_y1 = film_pos_y - FilmHeight[owner.level-1] / 2;
-		film_y2 = film_pos_y + FilmHeight[owner.level-1] / 2;
+		film_x1 = film_pos_x - FilmWidth[owner->level-1] / 2;
+		film_x2 = film_pos_x + FilmWidth[owner->level-1] / 2;
+		film_y1 = film_pos_y - FilmHeight[owner->level-1] / 2;
+		film_y2 = film_pos_y + FilmHeight[owner->level-1] / 2;
 
-		film_x12 = film_x1 + FilmWidth[owner.level-1] / 4;
-		film_x22 = film_x2 - FilmWidth[owner.level-1] / 4;
-		film_y12 = film_y1 + FilmHeight[owner.level-1] / 4;
-		film_y22 = film_y2 - FilmHeight[owner.level-1] / 4;
+		film_x12 = film_x1 + FilmWidth[owner->level-1] / 4;
+		film_x22 = film_x2 - FilmWidth[owner->level-1] / 4;
+		film_y12 = film_y1 + FilmHeight[owner->level-1] / 4;
+		film_y22 = film_y2 - FilmHeight[owner->level-1] / 4;
 
 		//移動入力
 		if( Key::getKeyState(MOVE_LEFT) && film_x1 - FilmSpeed > 0 )
@@ -724,6 +741,8 @@ void OnTheFilmUpdate(){
 		}
 
 	}
+
+	return true;
 }
 
 
@@ -734,36 +753,36 @@ void OnTheFilmMakePhoto(){
 	}
 
 	SetDrawScreen( PhotoHandle );
-	switch( owner.level ){
+	switch( owner->level ){
 	case 1:
-		DrawBox( 0, 0, PhotoSize[owner.level-1][0], PhotoSize[owner.level-1][1], ColorWhite, 1 );
-		DrawRotaGraph( PhotoSize[owner.level-1][0] / 2, PhotoSize[owner.level-1][0] / 2, 1.1, 0, GraphHandle, 0 );
-		//DrawGraph( (PhotoSize[owner.level-1][0] - FilmWidth[owner.level-1]) / 2, (PhotoSize[owner.level-1][0] - FilmHeight[owner.level-1]) / 2, GraphHandle, 0 );
+		DrawBox( 0, 0, PhotoSize[owner->level-1][0], PhotoSize[owner->level-1][1], ColorWhite, 1 );
+		DrawRotaGraph( PhotoSize[owner->level-1][0] / 2, PhotoSize[owner->level-1][0] / 2, 1.1, 0, GraphHandle, 0 );
+		//DrawGraph( (PhotoSize[owner->level-1][0] - FilmWidth[owner->level-1]) / 2, (PhotoSize[owner->level-1][0] - FilmHeight[owner->level-1]) / 2, GraphHandle, 0 );
 		break;
 	case 2:
-		DrawBox( 0, 0, PhotoSize[owner.level-1][0], PhotoSize[owner.level-1][1], ColorWhite, 1 );
-		DrawRotaGraph( PhotoSize[owner.level-1][0] / 2, PhotoSize[owner.level-1][1] / 2, 1.0, 0, GraphHandle, 0 );
-		//DrawGraph( (PhotoSize[owner.level-1][0] - FilmWidth[owner.level-1]) / 2, (PhotoSize[owner.level-1][1] - FilmHeight[owner.level-1]) / 2, GraphHandle, 0 );
+		DrawBox( 0, 0, PhotoSize[owner->level-1][0], PhotoSize[owner->level-1][1], ColorWhite, 1 );
+		DrawRotaGraph( PhotoSize[owner->level-1][0] / 2, PhotoSize[owner->level-1][1] / 2, 1.0, 0, GraphHandle, 0 );
+		//DrawGraph( (PhotoSize[owner->level-1][0] - FilmWidth[owner->level-1]) / 2, (PhotoSize[owner->level-1][1] - FilmHeight[owner->level-1]) / 2, GraphHandle, 0 );
 		break;
 	case 3:
-		DrawBox( 0, 0, PhotoSize[owner.level-1][0], PhotoSize[owner.level-1][1], ColorWhite, 1 );
-		DrawRotaGraph( PhotoSize[owner.level-1][0] / 2, PhotoSize[owner.level-1][1] / 2, 1.0, 0, GraphHandle, 0 );
-		//DrawGraph( (PhotoSize[owner.level-1][0] - FilmWidth[owner.level-1]) / 4, (PhotoSize[owner.level-1][1] - FilmHeight[owner.level-1]) / 4, GraphHandle, 0 );
+		DrawBox( 0, 0, PhotoSize[owner->level-1][0], PhotoSize[owner->level-1][1], ColorWhite, 1 );
+		DrawRotaGraph( PhotoSize[owner->level-1][0] / 2, PhotoSize[owner->level-1][1] / 2, 1.0, 0, GraphHandle, 0 );
+		//DrawGraph( (PhotoSize[owner->level-1][0] - FilmWidth[owner->level-1]) / 4, (PhotoSize[owner->level-1][1] - FilmHeight[owner->level-1]) / 4, GraphHandle, 0 );
 		break;
 	case 4:
-		DrawBox( 0, 0, PhotoSize[owner.level-1][0], PhotoSize[owner.level-1][1], ColorWhite, 1 );
-		DrawRotaGraph( PhotoSize[owner.level-1][0] / 2, PhotoSize[owner.level-1][1] / 2, 1.0, 0, GraphHandle, 0 );
-		//DrawGraph( (PhotoSize[owner.level-1][0] - FilmWidth[owner.level-1]) / 8, (PhotoSize[owner.level-1][1] - FilmHeight[owner.level-1]) / 8, GraphHandle, 0 );
+		DrawBox( 0, 0, PhotoSize[owner->level-1][0], PhotoSize[owner->level-1][1], ColorWhite, 1 );
+		DrawRotaGraph( PhotoSize[owner->level-1][0] / 2, PhotoSize[owner->level-1][1] / 2, 1.0, 0, GraphHandle, 0 );
+		//DrawGraph( (PhotoSize[owner->level-1][0] - FilmWidth[owner->level-1]) / 8, (PhotoSize[owner->level-1][1] - FilmHeight[owner->level-1]) / 8, GraphHandle, 0 );
 		break;
 	case 5:
-		DrawBox( 0, 0, PhotoSize[owner.level-1][0], PhotoSize[owner.level-1][1], ColorWhite, 1 );
-		DrawRotaGraph( PhotoSize[owner.level-1][0] / 2, PhotoSize[owner.level-1][1] / 2, 1.0, 0, GraphHandle, 0 );
+		DrawBox( 0, 0, PhotoSize[owner->level-1][0], PhotoSize[owner->level-1][1], ColorWhite, 1 );
+		DrawRotaGraph( PhotoSize[owner->level-1][0] / 2, PhotoSize[owner->level-1][1] / 2, 1.0, 0, GraphHandle, 0 );
 		//DrawGraph( 0, 0, GraphHandle, 0 );
 		break;
 	default:
 		break;
 	}
-	SaveDrawScreenToPNG( 0, 0, PhotoSize[owner.level-1][0], PhotoSize[owner.level-1][1], "Film.png" );
+	SaveDrawScreenToPNG( 0, 0, PhotoSize[owner->level-1][0], PhotoSize[owner->level-1][1], "Film.png" );
 	SetDrawScreen( DX_SCREEN_BACK );
 }
 
@@ -774,172 +793,172 @@ void OnTheFilmDraw(){
 	if( Shatter == 0 ){
 		//いちいち割り算させるのあほらしいから後で簡略化しようね
 		//レベルごとに枠変えるから計算式頑張るぞー
-		switch( owner.level ){
+		switch( owner->level ){
 		case 1:
-			DrawLine( film_pos_x - FilmWidth[owner.level-1] / 8, film_pos_y, film_pos_x + FilmWidth[owner.level-1] / 8, film_pos_y, ColorGray, 2 );
-			DrawLine( film_pos_x, film_pos_y - FilmWidth[owner.level-1] / 8, film_pos_x, film_pos_y + FilmWidth[owner.level-1] / 8, ColorGray, 2 );
+			DrawLine( film_pos_x - FilmWidth[owner->level-1] / 8, film_pos_y, film_pos_x + FilmWidth[owner->level-1] / 8, film_pos_y, ColorGray, 2 );
+			DrawLine( film_pos_x, film_pos_y - FilmWidth[owner->level-1] / 8, film_pos_x, film_pos_y + FilmWidth[owner->level-1] / 8, ColorGray, 2 );
 
-			DrawLine( film_x1, film_y1, film_x1 + FilmWidth[owner.level-1] / 6, film_y1, ColorGray, 2 );
-			DrawLine( film_x1, film_y1, film_x1, film_y1 + FilmHeight[owner.level-1] / 6, ColorGray, 2 );
+			DrawLine( film_x1, film_y1, film_x1 + FilmWidth[owner->level-1] / 6, film_y1, ColorGray, 2 );
+			DrawLine( film_x1, film_y1, film_x1, film_y1 + FilmHeight[owner->level-1] / 6, ColorGray, 2 );
 
-			DrawLine( film_x1, film_y2, film_x1 + FilmWidth[owner.level-1] / 6, film_y2, ColorGray, 2 );
-			DrawLine( film_x1, film_y2, film_x1, film_y2 - FilmHeight[owner.level-1] / 6, ColorGray, 2 );
+			DrawLine( film_x1, film_y2, film_x1 + FilmWidth[owner->level-1] / 6, film_y2, ColorGray, 2 );
+			DrawLine( film_x1, film_y2, film_x1, film_y2 - FilmHeight[owner->level-1] / 6, ColorGray, 2 );
 
-			DrawLine( film_x2, film_y1, film_x2 - FilmWidth[owner.level-1] / 6, film_y1, ColorGray, 2 );
-			DrawLine( film_x2, film_y1, film_x2, film_y1 + FilmHeight[owner.level-1] / 6, ColorGray, 2 );
+			DrawLine( film_x2, film_y1, film_x2 - FilmWidth[owner->level-1] / 6, film_y1, ColorGray, 2 );
+			DrawLine( film_x2, film_y1, film_x2, film_y1 + FilmHeight[owner->level-1] / 6, ColorGray, 2 );
 
-			DrawLine( film_x2, film_y2, film_x2 - FilmWidth[owner.level-1] / 6, film_y2, ColorGray, 2 );
-			DrawLine( film_x2, film_y2, film_x2, film_y2 - FilmHeight[owner.level-1] / 6, ColorGray, 2 );
+			DrawLine( film_x2, film_y2, film_x2 - FilmWidth[owner->level-1] / 6, film_y2, ColorGray, 2 );
+			DrawLine( film_x2, film_y2, film_x2, film_y2 - FilmHeight[owner->level-1] / 6, ColorGray, 2 );
 
 			DrawFormatString( film_x2 - 90, film_y2 - 20, ColorGray, "00:%02d:%02d", second, m_second );
 		break;
 		case 2:
-			DrawLine( film_pos_x - FilmWidth[owner.level-1] / 16, film_pos_y, film_pos_x + FilmWidth[owner.level-1] / 16, film_pos_y, ColorGray, 2 );
-			DrawLine( film_pos_x, film_pos_y - FilmWidth[owner.level-1] / 16, film_pos_x, film_pos_y + FilmWidth[owner.level-1] / 16, ColorGray, 2 );
+			DrawLine( film_pos_x - FilmWidth[owner->level-1] / 16, film_pos_y, film_pos_x + FilmWidth[owner->level-1] / 16, film_pos_y, ColorGray, 2 );
+			DrawLine( film_pos_x, film_pos_y - FilmWidth[owner->level-1] / 16, film_pos_x, film_pos_y + FilmWidth[owner->level-1] / 16, ColorGray, 2 );
 
 
-			DrawLine( film_x1, film_y1, film_x1 + FilmWidth[owner.level-1] / 6, film_y1, ColorGray, 2 );
-			DrawLine( film_x1, film_y1, film_x1, film_y1 + FilmHeight[owner.level-1] / 6, ColorGray, 2 );
+			DrawLine( film_x1, film_y1, film_x1 + FilmWidth[owner->level-1] / 6, film_y1, ColorGray, 2 );
+			DrawLine( film_x1, film_y1, film_x1, film_y1 + FilmHeight[owner->level-1] / 6, ColorGray, 2 );
 
-			DrawLine( film_x12, film_y12, film_x12 + FilmWidth[owner.level-1] / 12, film_y12, ColorGray, 2 );
-			DrawLine( film_x12, film_y12, film_x12, film_y12 + FilmHeight[owner.level-1] / 12, ColorGray, 2 );
-
-
-			DrawLine( film_x1, film_y2, film_x1 + FilmWidth[owner.level-1] / 6, film_y2, ColorGray, 2 );
-			DrawLine( film_x1, film_y2, film_x1, film_y2 - FilmHeight[owner.level-1] / 6, ColorGray, 2 );
-
-			DrawLine( film_x12, film_y22, film_x12 + FilmWidth[owner.level-1] / 12, film_y22, ColorGray, 2 );
-			DrawLine( film_x12, film_y22, film_x12, film_y22 - FilmHeight[owner.level-1] / 12, ColorGray, 2 );
+			DrawLine( film_x12, film_y12, film_x12 + FilmWidth[owner->level-1] / 12, film_y12, ColorGray, 2 );
+			DrawLine( film_x12, film_y12, film_x12, film_y12 + FilmHeight[owner->level-1] / 12, ColorGray, 2 );
 
 
-			DrawLine( film_x2, film_y1, film_x2 - FilmWidth[owner.level-1] / 6, film_y1, ColorGray, 2 );
-			DrawLine( film_x2, film_y1, film_x2, film_y1 + FilmHeight[owner.level-1] / 6, ColorGray, 2 );
+			DrawLine( film_x1, film_y2, film_x1 + FilmWidth[owner->level-1] / 6, film_y2, ColorGray, 2 );
+			DrawLine( film_x1, film_y2, film_x1, film_y2 - FilmHeight[owner->level-1] / 6, ColorGray, 2 );
 
-			DrawLine( film_x22, film_y12, film_x22 - FilmWidth[owner.level-1] / 12, film_y12, ColorGray, 2 );
-			DrawLine( film_x22, film_y12, film_x22, film_y12 + FilmHeight[owner.level-1] / 12, ColorGray, 2 );
+			DrawLine( film_x12, film_y22, film_x12 + FilmWidth[owner->level-1] / 12, film_y22, ColorGray, 2 );
+			DrawLine( film_x12, film_y22, film_x12, film_y22 - FilmHeight[owner->level-1] / 12, ColorGray, 2 );
 
 
-			DrawLine( film_x2, film_y2, film_x2 - FilmWidth[owner.level-1] / 6, film_y2, ColorGray, 2 );
-			DrawLine( film_x2, film_y2, film_x2, film_y2 - FilmHeight[owner.level-1] / 6, ColorGray, 2 );
+			DrawLine( film_x2, film_y1, film_x2 - FilmWidth[owner->level-1] / 6, film_y1, ColorGray, 2 );
+			DrawLine( film_x2, film_y1, film_x2, film_y1 + FilmHeight[owner->level-1] / 6, ColorGray, 2 );
 
-			DrawLine( film_x22, film_y22, film_x22 - FilmWidth[owner.level-1] / 12, film_y22, ColorGray, 2 );
-			DrawLine( film_x22, film_y22, film_x22, film_y22 - FilmHeight[owner.level-1] / 12, ColorGray, 2 );
+			DrawLine( film_x22, film_y12, film_x22 - FilmWidth[owner->level-1] / 12, film_y12, ColorGray, 2 );
+			DrawLine( film_x22, film_y12, film_x22, film_y12 + FilmHeight[owner->level-1] / 12, ColorGray, 2 );
+
+
+			DrawLine( film_x2, film_y2, film_x2 - FilmWidth[owner->level-1] / 6, film_y2, ColorGray, 2 );
+			DrawLine( film_x2, film_y2, film_x2, film_y2 - FilmHeight[owner->level-1] / 6, ColorGray, 2 );
+
+			DrawLine( film_x22, film_y22, film_x22 - FilmWidth[owner->level-1] / 12, film_y22, ColorGray, 2 );
+			DrawLine( film_x22, film_y22, film_x22, film_y22 - FilmHeight[owner->level-1] / 12, ColorGray, 2 );
 
 			DrawFormatString( film_x2 - 90, film_y2 - 20, ColorGray, "00:%02d:%02d", second, m_second );
 			break;
 		case 3:
 			DrawBox( film_x1, film_y1, film_x2, film_y2, ColorGray, 0 );//外枠
 
-			DrawLine( film_pos_x - FilmWidth[owner.level-1] / 32, film_pos_y, film_pos_x + FilmWidth[owner.level-1] / 32, film_pos_y, ColorGray, 2 );
-			DrawLine( film_pos_x, film_pos_y - FilmWidth[owner.level-1] / 32, film_pos_x, film_pos_y + FilmWidth[owner.level-1] / 32, ColorGray, 2 );
+			DrawLine( film_pos_x - FilmWidth[owner->level-1] / 32, film_pos_y, film_pos_x + FilmWidth[owner->level-1] / 32, film_pos_y, ColorGray, 2 );
+			DrawLine( film_pos_x, film_pos_y - FilmWidth[owner->level-1] / 32, film_pos_x, film_pos_y + FilmWidth[owner->level-1] / 32, ColorGray, 2 );
 
-			DrawLine( film_x1+30, film_y1+30, film_x1+30 + FilmWidth[owner.level-1] / 6, film_y1+30, ColorGray, 2 );
-			DrawLine( film_x1+30, film_y1+30, film_x1+30, film_y1+30 + FilmHeight[owner.level-1] / 6, ColorGray, 2 );
+			DrawLine( film_x1+30, film_y1+30, film_x1+30 + FilmWidth[owner->level-1] / 6, film_y1+30, ColorGray, 2 );
+			DrawLine( film_x1+30, film_y1+30, film_x1+30, film_y1+30 + FilmHeight[owner->level-1] / 6, ColorGray, 2 );
 
-			//DrawLine( film_x12, film_y12, film_x12 + FilmWidth[owner.level-1] / 12, film_y12, ColorGray, 2 );
-			//DrawLine( film_x12, film_y12, film_x12, film_y12 + FilmHeight[owner.level-1] / 12, ColorGray, 2 );
-
-
-			DrawLine( film_x1+30, film_y2-30, film_x1+30 + FilmWidth[owner.level-1] / 6, film_y2-30, ColorGray, 2 );
-			DrawLine( film_x1+30, film_y2-30, film_x1+30, film_y2-30 - FilmHeight[owner.level-1] / 6, ColorGray, 2 );
-
-			//DrawLine( film_x12, film_y22, film_x12 + FilmWidth[owner.level-1] / 12, film_y22, ColorGray, 2 );
-			//DrawLine( film_x12, film_y22, film_x12, film_y22 - FilmHeight[owner.level-1] / 12, ColorGray, 2 );
+			//DrawLine( film_x12, film_y12, film_x12 + FilmWidth[owner->level-1] / 12, film_y12, ColorGray, 2 );
+			//DrawLine( film_x12, film_y12, film_x12, film_y12 + FilmHeight[owner->level-1] / 12, ColorGray, 2 );
 
 
-			DrawLine( film_x2-30, film_y1+30, film_x2-30 - FilmWidth[owner.level-1] / 6, film_y1+30, ColorGray, 2 );
-			DrawLine( film_x2-30, film_y1+30, film_x2-30, film_y1+30 + FilmHeight[owner.level-1] / 6, ColorGray, 2 );
+			DrawLine( film_x1+30, film_y2-30, film_x1+30 + FilmWidth[owner->level-1] / 6, film_y2-30, ColorGray, 2 );
+			DrawLine( film_x1+30, film_y2-30, film_x1+30, film_y2-30 - FilmHeight[owner->level-1] / 6, ColorGray, 2 );
 
-			//DrawLine( film_x22, film_y12, film_x22 - FilmWidth[owner.level-1] / 12, film_y12, ColorGray, 2 );
-			//DrawLine( film_x22, film_y12, film_x22, film_y12 + FilmHeight[owner.level-1] / 12, ColorGray, 2 );
+			//DrawLine( film_x12, film_y22, film_x12 + FilmWidth[owner->level-1] / 12, film_y22, ColorGray, 2 );
+			//DrawLine( film_x12, film_y22, film_x12, film_y22 - FilmHeight[owner->level-1] / 12, ColorGray, 2 );
 
 
-			DrawLine( film_x2-30, film_y2-30, film_x2-30 - FilmWidth[owner.level-1] / 6, film_y2-30, ColorGray, 2 );
-			DrawLine( film_x2-30, film_y2-30, film_x2-30, film_y2-30 - FilmHeight[owner.level-1] / 6, ColorGray, 2 );
+			DrawLine( film_x2-30, film_y1+30, film_x2-30 - FilmWidth[owner->level-1] / 6, film_y1+30, ColorGray, 2 );
+			DrawLine( film_x2-30, film_y1+30, film_x2-30, film_y1+30 + FilmHeight[owner->level-1] / 6, ColorGray, 2 );
 
-			//DrawLine( film_x22, film_y22, film_x22 - FilmWidth[owner.level-1] / 12, film_y22, ColorGray, 2 );
-			//DrawLine( film_x22, film_y22, film_x22, film_y22 - FilmHeight[owner.level-1] / 12, ColorGray, 2 );
+			//DrawLine( film_x22, film_y12, film_x22 - FilmWidth[owner->level-1] / 12, film_y12, ColorGray, 2 );
+			//DrawLine( film_x22, film_y12, film_x22, film_y12 + FilmHeight[owner->level-1] / 12, ColorGray, 2 );
+
+
+			DrawLine( film_x2-30, film_y2-30, film_x2-30 - FilmWidth[owner->level-1] / 6, film_y2-30, ColorGray, 2 );
+			DrawLine( film_x2-30, film_y2-30, film_x2-30, film_y2-30 - FilmHeight[owner->level-1] / 6, ColorGray, 2 );
+
+			//DrawLine( film_x22, film_y22, film_x22 - FilmWidth[owner->level-1] / 12, film_y22, ColorGray, 2 );
+			//DrawLine( film_x22, film_y22, film_x22, film_y22 - FilmHeight[owner->level-1] / 12, ColorGray, 2 );
 
 			DrawFormatString( film_x2 - 90, film_y2 - 20, ColorGray, "00:%02d:%02d", second, m_second );
 			break;
 		case 4:
 			DrawBox( film_x1, film_y1, film_x2, film_y2, ColorGray, 0 );//外枠
 
-			//DrawLine( film_pos_x - FilmWidth[owner.level-1] / 64, film_pos_y, film_pos_x + FilmWidth[owner.level-1] / 64, film_pos_y, ColorGray, 2 );
-			//DrawLine( film_pos_x, film_pos_y - FilmWidth[owner.level-1] / 64, film_pos_x, film_pos_y + FilmWidth[owner.level-1] / 64, ColorGray, 2 );
-			DrawCenterBox( film_pos_x, film_pos_y, FilmWidth[owner.level-1] / 4, FilmHeight[owner.level-1] / 4, ColorGray, 0 );
+			//DrawLine( film_pos_x - FilmWidth[owner->level-1] / 64, film_pos_y, film_pos_x + FilmWidth[owner->level-1] / 64, film_pos_y, ColorGray, 2 );
+			//DrawLine( film_pos_x, film_pos_y - FilmWidth[owner->level-1] / 64, film_pos_x, film_pos_y + FilmWidth[owner->level-1] / 64, ColorGray, 2 );
+			DrawCenterBox( film_pos_x, film_pos_y, FilmWidth[owner->level-1] / 4, FilmHeight[owner->level-1] / 4, ColorGray, 0 );
 
-			DrawCenterBox( film_pos_x - FilmWidth[owner.level-1] / 4, film_pos_y, FilmWidth[owner.level-1] / 16, FilmHeight[owner.level-1] / 16, ColorGray, 0 );
-			DrawCenterBox( film_pos_x + FilmWidth[owner.level-1] / 4, film_pos_y, FilmWidth[owner.level-1] / 16, FilmHeight[owner.level-1] / 16, ColorGray, 0 );
-			DrawCenterBox( film_pos_x, film_pos_y - FilmHeight[owner.level-1] / 4, FilmWidth[owner.level-1] / 16, FilmHeight[owner.level-1] / 16, ColorGray, 0 );
-			DrawCenterBox( film_pos_x, film_pos_y + FilmHeight[owner.level-1] / 4, FilmWidth[owner.level-1] / 16, FilmHeight[owner.level-1] / 16, ColorGray, 0 );
+			DrawCenterBox( film_pos_x - FilmWidth[owner->level-1] / 4, film_pos_y, FilmWidth[owner->level-1] / 16, FilmHeight[owner->level-1] / 16, ColorGray, 0 );
+			DrawCenterBox( film_pos_x + FilmWidth[owner->level-1] / 4, film_pos_y, FilmWidth[owner->level-1] / 16, FilmHeight[owner->level-1] / 16, ColorGray, 0 );
+			DrawCenterBox( film_pos_x, film_pos_y - FilmHeight[owner->level-1] / 4, FilmWidth[owner->level-1] / 16, FilmHeight[owner->level-1] / 16, ColorGray, 0 );
+			DrawCenterBox( film_pos_x, film_pos_y + FilmHeight[owner->level-1] / 4, FilmWidth[owner->level-1] / 16, FilmHeight[owner->level-1] / 16, ColorGray, 0 );
 
-			DrawLine( film_x1+30, film_y1+30, film_x1+30 + FilmWidth[owner.level-1] / 6, film_y1+30, ColorGray, 2 );
-			DrawLine( film_x1+30, film_y1+30, film_x1+30, film_y1+30 + FilmHeight[owner.level-1] / 6, ColorGray, 2 );
-
-
-			DrawLine( film_x1+30, film_y2-30, film_x1+30 + FilmWidth[owner.level-1] / 6, film_y2-30, ColorGray, 2 );
-			DrawLine( film_x1+30, film_y2-30, film_x1+30, film_y2-30 - FilmHeight[owner.level-1] / 6, ColorGray, 2 );
+			DrawLine( film_x1+30, film_y1+30, film_x1+30 + FilmWidth[owner->level-1] / 6, film_y1+30, ColorGray, 2 );
+			DrawLine( film_x1+30, film_y1+30, film_x1+30, film_y1+30 + FilmHeight[owner->level-1] / 6, ColorGray, 2 );
 
 
-			DrawLine( film_x2-30, film_y1+30, film_x2-30 - FilmWidth[owner.level-1] / 6, film_y1+30, ColorGray, 2 );
-			DrawLine( film_x2-30, film_y1+30, film_x2-30, film_y1+30 + FilmHeight[owner.level-1] / 6, ColorGray, 2 );
+			DrawLine( film_x1+30, film_y2-30, film_x1+30 + FilmWidth[owner->level-1] / 6, film_y2-30, ColorGray, 2 );
+			DrawLine( film_x1+30, film_y2-30, film_x1+30, film_y2-30 - FilmHeight[owner->level-1] / 6, ColorGray, 2 );
 
 
-			DrawLine( film_x2-30, film_y2-30, film_x2-30 - FilmWidth[owner.level-1] / 6, film_y2-30, ColorGray, 2 );
-			DrawLine( film_x2-30, film_y2-30, film_x2-30, film_y2-30 - FilmHeight[owner.level-1] / 6, ColorGray, 2 );
+			DrawLine( film_x2-30, film_y1+30, film_x2-30 - FilmWidth[owner->level-1] / 6, film_y1+30, ColorGray, 2 );
+			DrawLine( film_x2-30, film_y1+30, film_x2-30, film_y1+30 + FilmHeight[owner->level-1] / 6, ColorGray, 2 );
+
+
+			DrawLine( film_x2-30, film_y2-30, film_x2-30 - FilmWidth[owner->level-1] / 6, film_y2-30, ColorGray, 2 );
+			DrawLine( film_x2-30, film_y2-30, film_x2-30, film_y2-30 - FilmHeight[owner->level-1] / 6, ColorGray, 2 );
 
 			DrawFormatString( film_x2 - 90, film_y2 - 20, ColorGray, "00:%02d:%02d", second, m_second );
 			break;
 		case 5:
 			DrawBox( film_x1, film_y1, film_x2, film_y2, ColorGray, 0 );//外枠
 
-			//DrawLine( film_pos_x - FilmWidth[owner.level-1] / 3, film_pos_y, film_pos_x + FilmWidth[owner.level-1] / 3, film_pos_y, ColorGray, 2 );
-			//DrawLine( film_pos_x, film_pos_y - FilmHeight[owner.level-1] / 3, film_pos_x, film_pos_y + FilmHeight[owner.level-1] / 3, ColorGray, 2 );
+			//DrawLine( film_pos_x - FilmWidth[owner->level-1] / 3, film_pos_y, film_pos_x + FilmWidth[owner->level-1] / 3, film_pos_y, ColorGray, 2 );
+			//DrawLine( film_pos_x, film_pos_y - FilmHeight[owner->level-1] / 3, film_pos_x, film_pos_y + FilmHeight[owner->level-1] / 3, ColorGray, 2 );
 			DrawCircle( film_pos_x, film_pos_y, 8, ColorGray, 0, 2 );
 			
-			DrawCenterBox( film_pos_x, film_pos_y, FilmWidth[owner.level-1] / 8, FilmHeight[owner.level-1] / 8, ColorGray, 0 );
+			DrawCenterBox( film_pos_x, film_pos_y, FilmWidth[owner->level-1] / 8, FilmHeight[owner->level-1] / 8, ColorGray, 0 );
 
-			DrawCenterBox( film_pos_x - FilmWidth[owner.level-1] / 3, film_pos_y, FilmWidth[owner.level-1] / 16, FilmHeight[owner.level-1] / 16, ColorGray, 0 );
-			DrawCircle( film_pos_x - FilmWidth[owner.level-1] / 3, film_pos_y, 1, ColorGray );
-			DrawCenterBox( film_pos_x + FilmWidth[owner.level-1] / 3, film_pos_y, FilmWidth[owner.level-1] / 16, FilmHeight[owner.level-1] / 16, ColorGray, 0 );
-			DrawCircle( film_pos_x + FilmWidth[owner.level-1] / 3, film_pos_y, 1, ColorGray );
-			DrawCenterBox( film_pos_x, film_pos_y - FilmHeight[owner.level-1] / 3, FilmWidth[owner.level-1] / 16, FilmHeight[owner.level-1] / 16, ColorGray, 0 );
-			DrawCircle( film_pos_x, film_pos_y - FilmHeight[owner.level-1] / 3, 1, ColorGray );
-			DrawCenterBox( film_pos_x, film_pos_y + FilmHeight[owner.level-1] / 3, FilmWidth[owner.level-1] / 16, FilmHeight[owner.level-1] / 16, ColorGray, 0 );
-			DrawCircle( film_pos_x, film_pos_y + FilmHeight[owner.level-1] / 3, 1, ColorGray );
+			DrawCenterBox( film_pos_x - FilmWidth[owner->level-1] / 3, film_pos_y, FilmWidth[owner->level-1] / 16, FilmHeight[owner->level-1] / 16, ColorGray, 0 );
+			DrawCircle( film_pos_x - FilmWidth[owner->level-1] / 3, film_pos_y, 1, ColorGray );
+			DrawCenterBox( film_pos_x + FilmWidth[owner->level-1] / 3, film_pos_y, FilmWidth[owner->level-1] / 16, FilmHeight[owner->level-1] / 16, ColorGray, 0 );
+			DrawCircle( film_pos_x + FilmWidth[owner->level-1] / 3, film_pos_y, 1, ColorGray );
+			DrawCenterBox( film_pos_x, film_pos_y - FilmHeight[owner->level-1] / 3, FilmWidth[owner->level-1] / 16, FilmHeight[owner->level-1] / 16, ColorGray, 0 );
+			DrawCircle( film_pos_x, film_pos_y - FilmHeight[owner->level-1] / 3, 1, ColorGray );
+			DrawCenterBox( film_pos_x, film_pos_y + FilmHeight[owner->level-1] / 3, FilmWidth[owner->level-1] / 16, FilmHeight[owner->level-1] / 16, ColorGray, 0 );
+			DrawCircle( film_pos_x, film_pos_y + FilmHeight[owner->level-1] / 3, 1, ColorGray );
 
-			DrawCenterBox( film_pos_x - FilmWidth[owner.level-1] / 5, film_pos_y - FilmHeight[owner.level-1] / 5, FilmWidth[owner.level-1] / 32, FilmHeight[owner.level-1] / 32, ColorGray, 0 );
-			DrawCenterBox( film_pos_x - FilmWidth[owner.level-1] / 5, film_pos_y + FilmHeight[owner.level-1] / 5, FilmWidth[owner.level-1] / 32, FilmHeight[owner.level-1] / 32, ColorGray, 0 );
-			DrawCenterBox( film_pos_x + FilmWidth[owner.level-1] / 5, film_pos_y - FilmHeight[owner.level-1] / 5, FilmWidth[owner.level-1] / 32, FilmHeight[owner.level-1] / 32, ColorGray, 0 );
-			DrawCenterBox( film_pos_x + FilmWidth[owner.level-1] / 5, film_pos_y + FilmHeight[owner.level-1] / 5, FilmWidth[owner.level-1] / 32, FilmHeight[owner.level-1] / 32, ColorGray, 0 );
+			DrawCenterBox( film_pos_x - FilmWidth[owner->level-1] / 5, film_pos_y - FilmHeight[owner->level-1] / 5, FilmWidth[owner->level-1] / 32, FilmHeight[owner->level-1] / 32, ColorGray, 0 );
+			DrawCenterBox( film_pos_x - FilmWidth[owner->level-1] / 5, film_pos_y + FilmHeight[owner->level-1] / 5, FilmWidth[owner->level-1] / 32, FilmHeight[owner->level-1] / 32, ColorGray, 0 );
+			DrawCenterBox( film_pos_x + FilmWidth[owner->level-1] / 5, film_pos_y - FilmHeight[owner->level-1] / 5, FilmWidth[owner->level-1] / 32, FilmHeight[owner->level-1] / 32, ColorGray, 0 );
+			DrawCenterBox( film_pos_x + FilmWidth[owner->level-1] / 5, film_pos_y + FilmHeight[owner->level-1] / 5, FilmWidth[owner->level-1] / 32, FilmHeight[owner->level-1] / 32, ColorGray, 0 );
 
-			DrawLine( film_x1+30, film_y1+30, film_x1+30 + FilmWidth[owner.level-1] / 6, film_y1+30, ColorGray, 2 );
-			DrawLine( film_x1+30, film_y1+30, film_x1+30, film_y1+30 + FilmHeight[owner.level-1] / 6, ColorGray, 2 );
+			DrawLine( film_x1+30, film_y1+30, film_x1+30 + FilmWidth[owner->level-1] / 6, film_y1+30, ColorGray, 2 );
+			DrawLine( film_x1+30, film_y1+30, film_x1+30, film_y1+30 + FilmHeight[owner->level-1] / 6, ColorGray, 2 );
 
-			//DrawLine( film_x12, film_y12, film_x12 + FilmWidth[owner.level-1] / 12, film_y12, ColorGray, 2 );
-			//DrawLine( film_x12, film_y12, film_x12, film_y12 + FilmHeight[owner.level-1] / 12, ColorGray, 2 );
-
-
-			DrawLine( film_x1+30, film_y2-30, film_x1+30 + FilmWidth[owner.level-1] / 6, film_y2-30, ColorGray, 2 );
-			DrawLine( film_x1+30, film_y2-30, film_x1+30, film_y2-30 - FilmHeight[owner.level-1] / 6, ColorGray, 2 );
-
-			//DrawLine( film_x12, film_y22, film_x12 + FilmWidth[owner.level-1] / 12, film_y22, ColorGray, 2 );
-			//DrawLine( film_x12, film_y22, film_x12, film_y22 - FilmHeight[owner.level-1] / 12, ColorGray, 2 );
+			//DrawLine( film_x12, film_y12, film_x12 + FilmWidth[owner->level-1] / 12, film_y12, ColorGray, 2 );
+			//DrawLine( film_x12, film_y12, film_x12, film_y12 + FilmHeight[owner->level-1] / 12, ColorGray, 2 );
 
 
-			DrawLine( film_x2-30, film_y1+30, film_x2-30 - FilmWidth[owner.level-1] / 6, film_y1+30, ColorGray, 2 );
-			DrawLine( film_x2-30, film_y1+30, film_x2-30, film_y1+30 + FilmHeight[owner.level-1] / 6, ColorGray, 2 );
+			DrawLine( film_x1+30, film_y2-30, film_x1+30 + FilmWidth[owner->level-1] / 6, film_y2-30, ColorGray, 2 );
+			DrawLine( film_x1+30, film_y2-30, film_x1+30, film_y2-30 - FilmHeight[owner->level-1] / 6, ColorGray, 2 );
 
-			//DrawLine( film_x22, film_y12, film_x22 - FilmWidth[owner.level-1] / 12, film_y12, ColorGray, 2 );
-			//DrawLine( film_x22, film_y12, film_x22, film_y12 + FilmHeight[owner.level-1] / 12, ColorGray, 2 );
+			//DrawLine( film_x12, film_y22, film_x12 + FilmWidth[owner->level-1] / 12, film_y22, ColorGray, 2 );
+			//DrawLine( film_x12, film_y22, film_x12, film_y22 - FilmHeight[owner->level-1] / 12, ColorGray, 2 );
 
 
-			DrawLine( film_x2-30, film_y2-30, film_x2-30 - FilmWidth[owner.level-1] / 6, film_y2-30, ColorGray, 2 );
-			DrawLine( film_x2-30, film_y2-30, film_x2-30, film_y2-30 - FilmHeight[owner.level-1] / 6, ColorGray, 2 );
+			DrawLine( film_x2-30, film_y1+30, film_x2-30 - FilmWidth[owner->level-1] / 6, film_y1+30, ColorGray, 2 );
+			DrawLine( film_x2-30, film_y1+30, film_x2-30, film_y1+30 + FilmHeight[owner->level-1] / 6, ColorGray, 2 );
 
-			//DrawLine( film_x22, film_y22, film_x22 - FilmWidth[owner.level-1] / 12, film_y22, ColorGray, 2 );
-			//DrawLine( film_x22, film_y22, film_x22, film_y22 - FilmHeight[owner.level-1] / 12, ColorGray, 2 );
+			//DrawLine( film_x22, film_y12, film_x22 - FilmWidth[owner->level-1] / 12, film_y12, ColorGray, 2 );
+			//DrawLine( film_x22, film_y12, film_x22, film_y12 + FilmHeight[owner->level-1] / 12, ColorGray, 2 );
+
+
+			DrawLine( film_x2-30, film_y2-30, film_x2-30 - FilmWidth[owner->level-1] / 6, film_y2-30, ColorGray, 2 );
+			DrawLine( film_x2-30, film_y2-30, film_x2-30, film_y2-30 - FilmHeight[owner->level-1] / 6, ColorGray, 2 );
+
+			//DrawLine( film_x22, film_y22, film_x22 - FilmWidth[owner->level-1] / 12, film_y22, ColorGray, 2 );
+			//DrawLine( film_x22, film_y22, film_x22, film_y22 - FilmHeight[owner->level-1] / 12, ColorGray, 2 );
 
 			DrawFormatString( film_x2 - 90, film_y2 - 20, ColorGray, "00:%02d:%02d", second, m_second );
 			break;
@@ -964,11 +983,11 @@ void OnTheFilmDraw(){
 }
 
 void OnTheFilmEnd(){
-	owner.can_move = 1;//動けるように
-	owner.can_shoot = 1;//ショット撃てるようにするフラグ
-	//owner.pos = pre;//プレイヤーを画面外にテレポートさせた後に戻ってこさせるため。
-	owner.invincible = 0;
-	owner.invisible = 0;
+	owner->setFlag(enPlayerFlag::pfCanMove, true);//動けるように
+	owner->setFlag(enPlayerFlag::pfCanShoot, true);//ショット撃てるようにするフラグ
+	//owner->pos = pre;//プレイヤーを画面外にテレポートさせた後に戻ってこさせるため。
+	owner->setFlag(enPlayerFlag::pfInvincible, false);
+	owner->setFlag(enPlayerFlag::pfInvisible, false);
 	DeleteGraph( GraphHandle );
 	DeleteGraph( PhotoHandle );
 }
